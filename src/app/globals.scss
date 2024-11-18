@@ -1,0 +1,51 @@
+@import "@mantine/core/styles.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+	button,
+	input:-webkit-any([type=button]),
+	input:-webkit-any([type=reset]),
+	input:-webkit-any([type=submit]){
+		-webkit-appearance: button;
+		background-color: transparent;
+		background-image: none;
+	}
+}
+
+@layer utilities {
+	@supports not (height: 100dvh){
+		.h-dvh{
+			min-height: 100vh;
+		}
+
+		.min-h-dvh{
+			min-height: 100vh;
+		}
+	}
+
+	@supports not (inset: 0){
+		.inset-0{
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+		}
+	}
+}
+
+button,
+[role=button]{
+	@apply select-none;
+}
+
+:root{
+	font-size: 16px;
+}
+
+body{
+	@apply bg-neutral-50 text-neutral-900;
+	@apply dark:bg-neutral-900 dark:text-white;
+}

@@ -1,0 +1,6 @@
+certificates/
+.vscode/
+*.tsbuildinfo
+.editorconfig
+package-lock.json
+/test.*

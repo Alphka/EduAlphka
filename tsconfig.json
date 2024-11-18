@@ -1,0 +1,55 @@
+{
+	"compilerOptions": {
+		"module": "ESNext",
+		"target": "ES2021",
+		"moduleResolution": "Bundler",
+		"strict": true,
+		"checkJs": true,
+		"allowJs": true,
+		"forceConsistentCasingInFileNames": true,
+		"noUnusedParameters": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"isolatedModules": true,
+		"noUnusedLocals": true,
+		"skipLibCheck": true,
+		"incremental": true,
+		"jsx": "preserve",
+		"plugins": [
+			{ "name": "next" }
+		],
+		"lib": [
+			"DOM",
+			"DOM.Iterable",
+			"ESNext"
+		],
+		"typeRoots": [
+			"node_modules/@types",
+			"./src/typings"
+		],
+		"paths": {
+			"@components/*": ["./src/components/*"],
+			"@helpers/*": ["./src/helpers/*"],
+			"@typings/*": ["./src/typings/*"],
+			"@models/*": ["./src/models/*"],
+			"@hooks/*": ["./src/hooks/*"],
+			"@lib/*": ["./src/lib/*"],
+			"@app/*": ["./src/app/*"],
+			"@src/*": ["./src/*"]
+		},
+		"noEmit": true
+	},
+	"include": [
+		"next-env.d.ts",
+		"**/*.ts",
+		"**/*.tsx",
+		"next.config.ts",
+		".next/types/**/*.ts"
+	],
+	"exclude": [
+		"node_modules"
+	],
+	"typeAcquisition": {
+		"enable": true
+	}
+}
