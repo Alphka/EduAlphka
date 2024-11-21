@@ -1,11 +1,13 @@
 import type { PagePropsWithLocale } from "@typings/index"
 import type { Metadata, Viewport } from "next"
 import type { ReactNode } from "react"
+import { defaultTheme, type Themes } from "@app/contexts/ColorScheme"
 import { ColorSchemeScript } from "@mantine/core"
 import { APPLICATION_NAME } from "@app/constants"
 import { ToastContainer } from "react-toastify"
 import { getLanguage } from "./dictionaries"
 import { locales } from "@src/i18n"
+import { headers } from "next/headers"
 import { twJoin } from "tailwind-merge"
 import { Inter } from "next/font/google"
 import Providers from "../providers"
@@ -85,11 +87,18 @@ interface RootLayoutProps extends Omit<PagePropsWithLocale, "searchParams"> {
 
 export default async function RootLayout({ params, children }: RootLayoutProps){
 	const { locale } = await params
+	const headersStore = await headers()
 	const language = getLanguage(locale)
+
+	const colorScheme = (() => {
+		const value = headersStore.get("sec-ch-prefers-color-scheme")
+		return value === "dark" || value === "light" ? value : defaultTheme
+	})()
 
 	return (
 		<html
 			lang={language}
+			data-mantine-color-scheme={colorScheme}
 			suppressHydrationWarning
 		>
 			<head>
@@ -102,7 +111,10 @@ export default async function RootLayout({ params, children }: RootLayoutProps){
 					"antialiased min-h-dvh"
 				)}
 			>
-				<Providers fontFamily={inter.style.fontFamily}>
+				<Providers
+					fontFamily={inter.style.fontFamily}
+					defaultTheme={colorScheme}
+				>
 					{children}
 
 					<ToastContainer
