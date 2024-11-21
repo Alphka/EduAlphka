@@ -1,10 +1,10 @@
 import type { PagePropsWithLocale } from "@typings/index"
 import type { Metadata, Viewport } from "next"
 import type { ReactNode } from "react"
-import { defaultTheme, type Themes } from "@app/contexts/ColorScheme"
 import { ColorSchemeScript } from "@mantine/core"
 import { APPLICATION_NAME } from "@app/constants"
 import { ToastContainer } from "react-toastify"
+import { defaultTheme } from "@app/contexts/ColorScheme"
 import { getLanguage } from "./dictionaries"
 import { locales } from "@src/i18n"
 import { headers } from "next/headers"
@@ -14,6 +14,10 @@ import Providers from "../providers"
 
 import "react-toastify/dist/ReactToastify.css"
 import "./globals.scss"
+
+interface RootLayoutProps extends Omit<PagePropsWithLocale, "searchParams"> {
+	children: ReactNode
+}
 
 const inter = Inter({
 	weight: "variable",
@@ -29,7 +33,7 @@ export const viewport: Viewport = {
 	colorScheme: "dark light"
 }
 
-export async function generateMetadata({ params }: PagePropsWithLocale){
+export async function generateMetadata({ params }: RootLayoutProps){
 	const { locale } = await params
 	const localesSet = new Set(locales)
 
@@ -79,10 +83,6 @@ export async function generateMetadata({ params }: PagePropsWithLocale){
 
 export async function generateStaticParams(){
 	return locales.map(locale => ({ locale }))
-}
-
-interface RootLayoutProps extends Omit<PagePropsWithLocale, "searchParams"> {
-	children: ReactNode
 }
 
 export default async function RootLayout({ params, children }: RootLayoutProps){
