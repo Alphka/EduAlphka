@@ -68,10 +68,10 @@ export const metadata: Metadata = {
 }
 
 export async function generateStaticParams(){
-	return locales.map(locale => ({ lang: locale }))
+	return locales.map(locale => ({ locale }))
 }
 
-interface RootLayoutProps extends PagePropsWithLocale {
+interface RootLayoutProps extends Omit<PagePropsWithLocale, "searchParams"> {
 	children: ReactNode
 }
 

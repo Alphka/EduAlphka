@@ -19,6 +19,6 @@ export default async function Homepage({ params }: PagePropsWithLocale){
 	const dictionary = await getDictionary(locale)
 
 	return (
-		<p>{dictionary.helloWorld}</p>
+		<p>{dictionary.homepage.title}</p>
 	)
 }
