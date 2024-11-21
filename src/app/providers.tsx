@@ -2,11 +2,18 @@
 
 import type { ReactNode } from "react"
 import { createTheme, MantineProvider, TextInput } from "@mantine/core"
+import { useLocalStorage } from "@mantine/hooks"
+import ColorSchemeContext, { defaultTheme, type Themes } from "./contexts/ColorScheme"
 
 export default function Providers({ fontFamily, children }: {
 	children: ReactNode
 	fontFamily: string
 }){
+	const [colorScheme, setColorScheme] = useLocalStorage<Themes>({
+		key: "theme",
+		defaultValue: defaultTheme
+	})
+
 	const theme = createTheme({
 		cursorType: "pointer",
 		components: {
@@ -23,15 +30,22 @@ export default function Providers({ fontFamily, children }: {
 	})
 
 	return (
-		<MantineProvider
-			theme={theme}
-			withCssVariables
-			classNamesPrefix="css"
-			withStaticClasses={false}
-			defaultColorScheme="dark"
-			deduplicateCssVariables
+		<ColorSchemeContext.Provider
+			value={{
+				colorScheme,
+				onChange: setColorScheme
+			}}
 		>
-			{children}
-		</MantineProvider>
+			<MantineProvider
+				theme={theme}
+				withCssVariables
+				classNamesPrefix="css"
+				forceColorScheme={colorScheme}
+				withStaticClasses={false}
+				deduplicateCssVariables
+			>
+				{children}
+			</MantineProvider>
+		</ColorSchemeContext.Provider>
 	)
 }

@@ -1,14 +1,25 @@
 import type { Metadata, Viewport } from "next"
+import type { PagePropsWithLocale } from "@typings/index"
 import type { ReactNode } from "react"
 import { ColorSchemeScript } from "@mantine/core"
-import { APPLICATION_NAME } from "./constants"
+import { APPLICATION_NAME } from "@app/constants"
 import { ToastContainer } from "react-toastify"
+import { getLanguage } from "./dictionaries"
+import { locales } from "@src/i18n"
 import { twJoin } from "tailwind-merge"
 import { Inter } from "next/font/google"
-import Providers from "./providers"
+import Providers from "../providers"
 
 import "react-toastify/dist/ReactToastify.css"
 import "./globals.scss"
+
+const inter = Inter({
+	weight: "variable",
+	subsets: ["latin", "latin-ext"],
+	preload: true,
+	display: "swap",
+	variable: "--font-inter"
+})
 
 export const viewport: Viewport = {
 	width: "device-width",
@@ -23,7 +34,10 @@ export const metadata: Metadata = {
 	},
 	applicationName: APPLICATION_NAME,
 	alternates: {
-		canonical: "/"
+		canonical: "/",
+		languages: {
+			...Object.fromEntries(locales.map(locale => [locale, "/" + locale]))
+		}
 	},
 	robots: {
 		index: true,
@@ -53,22 +67,25 @@ export const metadata: Metadata = {
 	creator: "Kayo Souza"
 }
 
-const inter = Inter({
-	weight: "variable",
-	subsets: ["latin", "latin-ext"],
-	preload: true,
-	display: "swap",
-	variable: "--font-inter"
-})
+export async function generateStaticParams(){
+	return locales.map(locale => ({ lang: locale }))
+}
 
-export default function RootLayout({ children }: { children: ReactNode }){
+interface RootLayoutProps extends PagePropsWithLocale {
+	children: ReactNode
+}
+
+export default async function RootLayout({ params, children }: RootLayoutProps){
+	const { locale } = await params
+	const language = getLanguage(locale)
+
 	return (
 		<html
-			lang="pt-BR"
+			lang={language}
 			suppressHydrationWarning
 		>
 			<head>
-				<ColorSchemeScript />
+				<ColorSchemeScript localStorageKey="theme" />
 			</head>
 
 			<body
@@ -81,7 +98,7 @@ export default function RootLayout({ children }: { children: ReactNode }){
 					{children}
 
 					<ToastContainer
-						autoClose={3e3}
+						autoClose={5e3}
 						pauseOnHover={false}
 						pauseOnFocusLoss={false}
 					/>

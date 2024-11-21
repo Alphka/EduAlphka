@@ -1,0 +1,21 @@
+{
+	"recommendations": [
+		"EditorConfig.EditorConfig",
+		"mgmcdermott.vscode-language-babel",
+		"aaron-bond.better-comments",
+		"mikestead.dotenv",
+		"usernamehw.errorlens",
+		"ecmel.vscode-html-css",
+		"visualstudioexptteam.vscodeintellicode",
+		"visualstudioexptteam.intellicode-api-usage-examples",
+		"ms-vscode.vscode-typescript-next",
+		"eg2.vscode-npm-script",
+		"christian-kohler.npm-intellisense",
+		"mrmlnc.vscode-scss",
+		"bradlc.vscode-tailwindcss"
+	],
+	"unwantedRecommendations": [
+		"dbaeumer.vscode-eslint",
+		"esbenp.prettier-vscode"
+	]
+}

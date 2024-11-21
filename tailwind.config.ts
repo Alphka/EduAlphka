@@ -12,7 +12,7 @@ const config: Config = {
 			mantineColors: DEFAULT_THEME.colors
 		})
 	],
-	darkMode: "media"
+	darkMode: ["selector", '[data-mantine-color-scheme="dark"]']
 }
 
 export default config
