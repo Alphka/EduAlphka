@@ -1,7 +1,7 @@
-import { APPLICATION_NAME } from "@app/constants"
 import { GenericFormValidation } from "@app/constants/forms"
+import { APPLICATION_NAME } from "@app/constants"
 
-const ptBR = {
+const pt = {
 	homepage: {
 		title: "Página inicial"
 	},
@@ -59,4 +59,4 @@ const ptBR = {
 	}
 }
 
-export default ptBR
+export default pt

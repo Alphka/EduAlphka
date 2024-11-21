@@ -16,4 +16,8 @@ export default async function getRequestURL(){
 		const host = headerStore.get("x-forwarded-host") || headerStore.get("host")
 		if(host) return (`${headerStore.get("x-forwarded-proto") || "http"}://`) + host + url
 	}
+
+	url = headerStore.get("referer")
+
+	if(url) return url
 }

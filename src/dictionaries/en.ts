@@ -1,7 +1,7 @@
-import { APPLICATION_NAME } from "@app/constants"
 import { GenericFormValidation } from "@app/constants/forms"
+import { APPLICATION_NAME } from "@app/constants"
 
-const enUS = {
+const en = {
 	homepage: {
 		title: "Home"
 	},
@@ -59,4 +59,4 @@ const enUS = {
 	}
 }
 
-export default enUS
+export default en

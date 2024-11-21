@@ -1,5 +1,5 @@
-import type { Metadata, Viewport } from "next"
 import type { PagePropsWithLocale } from "@typings/index"
+import type { Metadata, Viewport } from "next"
 import type { ReactNode } from "react"
 import { ColorSchemeScript } from "@mantine/core"
 import { APPLICATION_NAME } from "@app/constants"
@@ -27,44 +27,52 @@ export const viewport: Viewport = {
 	colorScheme: "dark light"
 }
 
-export const metadata: Metadata = {
-	title: {
-		default: APPLICATION_NAME,
-		template: `%s | ${APPLICATION_NAME}`
-	},
-	applicationName: APPLICATION_NAME,
-	alternates: {
-		canonical: "/",
-		languages: {
-			...Object.fromEntries(locales.map(locale => [locale, "/" + locale]))
-		}
-	},
-	robots: {
-		index: true,
-		follow: true,
-		nocache: false,
-		noimageindex: false
-	},
-	openGraph: {
-		title: APPLICATION_NAME,
-		siteName: APPLICATION_NAME,
-		url: "/",
-		type: "website",
-		locale: "pt_BR"
-	},
-	keywords: [
-		"alphka",
-		"education",
-		"provas",
-		"testes",
-		"exames",
-		"plataforma",
-		"online",
-		"database",
-		"nosql",
-		"crud"
-	],
-	creator: "Kayo Souza"
+export async function generateMetadata({ params }: PagePropsWithLocale){
+	const { locale } = await params
+	const localesSet = new Set(locales)
+
+	localesSet.delete(locale)
+
+	return {
+		title: {
+			default: APPLICATION_NAME,
+			template: `%s | ${APPLICATION_NAME}`
+		},
+		applicationName: APPLICATION_NAME,
+		alternates: {
+			canonical: "/",
+			languages: {
+				...Object.fromEntries(locales.map(locale => [locale, "/" + locale]))
+			}
+		},
+		robots: {
+			index: true,
+			follow: true,
+			nocache: false,
+			noimageindex: false
+		},
+		openGraph: {
+			title: APPLICATION_NAME,
+			siteName: APPLICATION_NAME,
+			url: "/",
+			type: "website",
+			locale,
+			alternateLocale: Array.from(localesSet)
+		},
+		keywords: [
+			"alphka",
+			"education",
+			"provas",
+			"testes",
+			"exames",
+			"plataforma",
+			"online",
+			"database",
+			"nosql",
+			"crud"
+		],
+		creator: "Kayo Souza"
+	} as Metadata
 }
 
 export async function generateStaticParams(){

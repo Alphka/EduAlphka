@@ -3,14 +3,6 @@ import { defaultLocale, locales } from "./i18n"
 import { match } from "@formatjs/intl-localematcher"
 import Negotiator from "negotiator"
 
-function getLocale(request: NextRequest){
-	const languages = new Negotiator({
-		headers: Object.fromEntries(request.headers.entries())
-	}).languages()
-
-	return match(languages, locales, defaultLocale)
-}
-
 export default function middleware(request: NextRequest){
 	const { pathname } = request.nextUrl
 
@@ -49,7 +41,9 @@ export default function middleware(request: NextRequest){
 	}
 
 	if(!pathnameLocale){
-		const locale = getLocale(request)
+		const locale = match(new Negotiator({
+			headers: Object.fromEntries(request.headers.entries())
+		}).languages(), locales, defaultLocale)
 		const url = new URL("/" + locale + pathname.replace(/^(?!\/)/, "").replace(/\/$/, ""), request.url)
 		const status = request.method === "GET" ? 302 : undefined
 

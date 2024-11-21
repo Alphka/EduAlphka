@@ -2,8 +2,8 @@ import { defaultLocale } from "@src/i18n"
 import "server-only"
 
 const dictionaries = {
-	["pt-BR"]: () => import("@src/dictionaries/pt-BR").then(module => module.default),
-	["en-US"]: () => import("@src/dictionaries/en-US").then(module => module.default)
+	["pt"]: () => import("@src/dictionaries/pt").then(module => module.default),
+	["en"]: () => import("@src/dictionaries/en").then(module => module.default)
 }
 
 export type Dictionaries = typeof dictionaries
@@ -11,7 +11,7 @@ export type Dictionary<T extends keyof Dictionaries = keyof Dictionaries> = Awai
 
 export function getLanguage(locale?: string){
 	if(locale && locale in dictionaries) return locale as keyof typeof dictionaries
-	return defaultLocale || "pt-BR"
+	return defaultLocale
 }
 
 export async function getDictionary(locale: string){

@@ -1,4 +1,4 @@
 export type Locales = typeof locales[number]
 
-export const locales = ["pt-BR", "en-US"] as const
-export const defaultLocale = "pt-BR" satisfies Locales
+export const locales = ["pt", "en"] as const satisfies string[]
+export const defaultLocale = "pt" satisfies Locales

@@ -11,7 +11,9 @@ export default function Providers({ fontFamily, children }: {
 }){
 	const [colorScheme, setColorScheme] = useLocalStorage<Themes>({
 		key: "theme",
-		defaultValue: defaultTheme
+		defaultValue: defaultTheme,
+		serialize: value => value,
+		deserialize: value => value as Themes || defaultTheme
 	})
 
 	const theme = createTheme({
@@ -40,7 +42,7 @@ export default function Providers({ fontFamily, children }: {
 				theme={theme}
 				withCssVariables
 				classNamesPrefix="css"
-				forceColorScheme={colorScheme}
+				defaultColorScheme={colorScheme}
 				withStaticClasses={false}
 				deduplicateCssVariables
 			>

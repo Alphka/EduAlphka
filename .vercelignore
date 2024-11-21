@@ -2,5 +2,6 @@ certificates/
 .vscode/
 *.tsbuildinfo
 .editorconfig
+.env.example
 package-lock.json
 /test.*

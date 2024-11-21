@@ -5,6 +5,7 @@ import { ActionIcon, Anchor, Button, Checkbox, TextInput } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { login, type UserLoginData } from "../actions/login"
 import { GenericFormValidation } from "@app/constants/forms"
+import { useParams } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import handleServerAction from "@helpers/handleServerAction"
@@ -17,6 +18,7 @@ interface LoginForm {
 export default function LoginForm({ dictionary }: LoginForm){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 	const [loading, setLoading] = useState(false)
+	const params = useParams()
 
 	const { register, handleSubmit, formState: { errors } } = useForm<UserLoginData>()
 
@@ -117,7 +119,7 @@ export default function LoginForm({ dictionary }: LoginForm){
 					/>
 
 					<Anchor
-						href="/recover-password"
+						href={`/${params.locale}/recover-password`}
 						className="px-0.5 rounded-sm"
 						component={Link}
 					>
@@ -136,7 +138,7 @@ export default function LoginForm({ dictionary }: LoginForm){
 			</div>
 
 			<Anchor
-				href="/register"
+				href={`/${params.locale}/register`}
 				className="self-center text-current text-center px-2 rounded-sm"
 				aria-label={dictionary.form.register.accessibilityText}
 				component={Link}
