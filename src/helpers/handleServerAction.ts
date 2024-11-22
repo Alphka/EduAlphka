@@ -1,19 +1,23 @@
 import type { Dispatch, ReactNode, SetStateAction } from "react"
-import { useContext } from "react"
+import type { Dictionary } from "@app/[locale]/dictionaries"
+import type { Themes } from "@app/contexts/ColorScheme"
 import { toast } from "react-toastify"
-import ColorSchemeContext from "@app/contexts/ColorScheme"
 
-export default async function handleServerAction({
-	promise,
-	setLoading,
-	successMessage
-}: {
+interface ServerActionHandlerProps {
 	promise: Promise<{ errors: string[] }> | Promise<{ errors: string[] } | undefined>
 	setLoading: Dispatch<SetStateAction<boolean>>,
+	dictionary: Dictionary
+	colorScheme: Themes
 	successMessage?: ReactNode
-}){
-	const { colorScheme: theme } = useContext(ColorSchemeContext)
+}
 
+export default async function handleServerAction({
+	colorScheme: theme,
+	successMessage,
+	dictionary,
+	setLoading,
+	promise
+}: ServerActionHandlerProps){
 	try{
 		setLoading(true)
 
@@ -26,11 +30,11 @@ export default async function handleServerAction({
 				}
 			}else{
 				console.error("Server action failed:", result)
-				toast.error("Algo deu errado", { theme })
+				toast.error(dictionary.genericErrors.somethingWentWrong, { theme })
 			}
 		}else{
 			if(successMessage){
-				toast.success("Algo deu errado", { theme })
+				toast.success(dictionary.genericErrors.somethingWentWrong, { theme })
 			}
 		}
 	}catch(error){

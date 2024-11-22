@@ -1,11 +1,11 @@
 import type { PagePropsWithLocale } from "@typings/index"
 import type { Metadata } from "next"
 import { getDictionary } from "../dictionaries"
-import LoginForm from "./components/LoginForm"
+import RegisterForm from "./components/RegisterForm"
 
 export async function generateMetadata({ params }: PagePropsWithLocale){
 	const { locale } = await params
-	const { login: { title, description } } = await getDictionary(locale)
+	const { register: { title, description } } = await getDictionary(locale)
 
 	return {
 		title,
@@ -23,7 +23,7 @@ export default async function LoginPage({ params }: PagePropsWithLocale){
 
 	return (
 		<main className="flex flex-col items-center justify-center py-12 min-h-dvh">
-			<LoginForm dictionary={dictionary} />
+			<RegisterForm dictionary={dictionary} />
 		</main>
 	)
 }

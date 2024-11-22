@@ -13,12 +13,20 @@ export interface UserLoginData {
 	keep_logged_in?: boolean
 }
 
-export async function login(usernameOrEmail: string, password: string, keepLoggedIn = true){
+export async function login({
+	username: usernameOrEmail,
+	password,
+	keep_logged_in: keepLoggedIn = true
+}: UserLoginData){
 	const locale = await getLocale()
-	const { login: { form: dictionary } } = await getDictionary(locale)
+	const dictionary = await getDictionary(locale)
 
+	const isEmail = usernameOrEmail.includes("@")
 	const loginSchema = getLoginSchema(dictionary)
-	const validatedFields = loginSchema.safeParse({ username: usernameOrEmail, password })
+	const validatedFields = loginSchema.safeParse({
+		[isEmail ? "email" : "username"]: usernameOrEmail,
+		password
+	})
 
 	if(!validatedFields.success){
 		return {
@@ -26,11 +34,15 @@ export async function login(usernameOrEmail: string, password: string, keepLogge
 		}
 	}
 
-	try{
-		await authenticateUser(usernameOrEmail, password, keepLoggedIn)
+	usernameOrEmail = (validatedFields.data.username || validatedFields.data.email) as string
+	password = validatedFields.data.password
 
-		revalidatePath("/")
-		redirect("/")
+	try{
+		await authenticateUser(dictionary, {
+			usernameOrEmail,
+			password,
+			keepLoggedIn
+		})
 	}catch(error){
 		if(typeof error === "string"){
 			return { errors: [error] }
@@ -38,6 +50,10 @@ export async function login(usernameOrEmail: string, password: string, keepLogge
 
 		console.error(error)
 
-		return { errors: [dictionary.errors.failedToAuthenticate] }
+		return { errors: [dictionary.login.form.errors.failedToAuthenticate] }
 	}
+
+	revalidatePath("/")
+	revalidatePath(`/${locale}`)
+	redirect(`/${locale}`)
 }

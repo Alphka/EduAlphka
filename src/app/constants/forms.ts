@@ -12,7 +12,7 @@ export class GenericFormValidation {
 	static readonly passwordMaxLength = 255
 
 	static readonly validNamePattern = "^[A-Za-záàâãäéèêëíïóôõöúüçñÁÀÂÃÄÉÈËÍÏÓÔÕÖÚÜÇÑ '.\\\\\\-]+$"
+	static readonly validEmailPattern = "^([\\w!#$%&'*+\\/=?^`\\{\\|\\}~\\-]+(?:\\.[\\w!#$%&'*+\\/=?^`\\{\\|\\}~\\-]+)*@(?:[A-Za-z\\d](?:[A-Za-z\\d\\-]*[A-Za-z\\d])?\\.)+[A-Za-z\\d](?:[A-Za-z\\d\\-]*[A-Za-z\\d])?)$"
 	static readonly validUsernamePattern = "^(\\w(?:(?:\\w|(?:\\.(?!\\.))){0,28}(?:\\w))?)"
 	static readonly validPasswordPattern = "^[\\w~\`! @#$%^&*\\(\\)+=\\{\\}\\[\\]\\|\\;:\"<>,.\\/?\\-]+$"
-	static readonly validCharsGenericEmailPattern = "^([\\w!#$%&'*+\\/=?^`\\{\\|\\}~\\-]+(?:\\.[\\w!#$%&'*+\\/=?^`\\{\\|\\}~\\-]+)*@(?:[A-Za-z\\d](?:[A-Za-z\\d\\-]*[A-Za-z\\d])?\\.)+[A-Za-z\\d](?:[A-Za-z\\d\\-]*[A-Za-z\\d])?)$"
 }

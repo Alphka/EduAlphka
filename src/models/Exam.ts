@@ -1,4 +1,4 @@
-export const questionTypes = {
+export const QUESTION_TYPES = {
 	multiple_choice: {
 		name: "Opções - Múltipla escolha" as const,
 	},

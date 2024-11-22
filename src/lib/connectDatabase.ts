@@ -24,6 +24,7 @@ export default async function connectDatabase(){
 
 	if(!cached.promise){
 		const options: ConnectOptions = {
+			bufferCommands: false,
 			dbName: process.env.NODE_ENV
 		}
 

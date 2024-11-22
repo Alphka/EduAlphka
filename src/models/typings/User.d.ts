@@ -1,5 +1,5 @@
 import type { HydratedDocument, Model, ObjectId, QueryWithHelpers } from "mongoose"
-import type { accountTypes } from "@models/User"
+import type { ACCOUNT_TYPES } from "@models/User"
 import type { DateType } from "."
 
 export interface IUser {
@@ -7,28 +7,20 @@ export interface IUser {
 	email: string
 	username: string
 	password: string
-	accountType: typeof accountTypes[number]
+	accountType: typeof ACCOUNT_TYPES[number]
 	startedTests: {
 		exam: ObjectId
 		createdAt: DateType
 	}[]
 	createdAt: DateType
-	updatedAt: DateType
+	updatedAt?: DateType
 }
 
 export interface IUserMethods {
-	hashPassword(password: string): string
 	validatePassword(password: string): string
 }
 
-export interface IUserQueryHelpers {
-	byToken: (token: string) => QueryWithHelpers<
-		HydratedDocument<IUser>[],
-		HydratedDocument<IUser>,
-		IUserQueryHelpers
-	>
-}
-
-export interface UserModel extends Model<IUser, IUserQueryHelpers, IUserMethods> {
+export interface UserModel extends Model<IUser, {}, IUserMethods> {
+	hashPassword(password: string): string
 	generateToken(): Promise<string>
 }

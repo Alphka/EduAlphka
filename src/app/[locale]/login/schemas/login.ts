@@ -2,16 +2,27 @@ import type { Dictionary } from "@app/[locale]/dictionaries"
 import { GenericFormValidation } from "@app/constants/forms"
 import { z } from "zod"
 
-export default function getLoginSchema(dictionary: Dictionary["login"]["form"]){
+export default function getLoginSchema(dictionary: Dictionary){
 	return z.object({
-		username: z.string({ invalid_type_error: dictionary.username.validations.invalid })
-			.min(Math.min(GenericFormValidation.emailMinLength, GenericFormValidation.usernameMinLength), dictionary.username.validations.max)
-			.max(Math.max(GenericFormValidation.emailMaxLength, GenericFormValidation.usernameMaxLength), dictionary.username.validations.min)
-			.regex(new RegExp(GenericFormValidation.validUsernamePattern), dictionary.username.validations.invalidPattern),
-		password: z.string({ invalid_type_error: dictionary.password.validations.invalid })
-			.min(GenericFormValidation.passwordMinLength, dictionary.password.validations.min)
-			.max(GenericFormValidation.passwordMaxLength, dictionary.password.validations.max)
-			.regex(new RegExp(GenericFormValidation.validPasswordPattern), dictionary.password.validations.invalidPattern),
+		email: z.string({ invalid_type_error: dictionary.inputs.email.validations.invalid })
+			.trim()
+			.toLowerCase()
+			.min(GenericFormValidation.emailMinLength, dictionary.inputs.email.validations.max)
+			.max(GenericFormValidation.emailMaxLength, dictionary.inputs.email.validations.min)
+			.email(dictionary.inputs.email.validations.invalidPattern)
+			.regex(new RegExp(GenericFormValidation.validEmailPattern), dictionary.inputs.email.validations.invalidPattern)
+			.optional(),
+		username: z.string({ invalid_type_error: dictionary.inputs.username.validations.invalid })
+			.trim()
+			.min(GenericFormValidation.usernameMinLength, dictionary.inputs.username.validations.max)
+			.max(GenericFormValidation.usernameMaxLength, dictionary.inputs.username.validations.min)
+			.regex(new RegExp(GenericFormValidation.validUsernamePattern), dictionary.inputs.username.validations.invalidPattern)
+			.optional(),
+		password: z.string({ invalid_type_error: dictionary.inputs.password.validations.invalid })
+			.trim()
+			.min(GenericFormValidation.passwordMinLength, dictionary.inputs.password.validations.min)
+			.max(GenericFormValidation.passwordMaxLength, dictionary.inputs.password.validations.max)
+			.regex(new RegExp(GenericFormValidation.validPasswordPattern), dictionary.inputs.password.validations.invalidPattern),
 		keep_logged_in: z.enum(["on", "off"]).optional()
 	})
 }

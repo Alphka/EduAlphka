@@ -5,17 +5,20 @@ import { ActionIcon, Anchor, Button, Checkbox, TextInput } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { login, type UserLoginData } from "../actions/login"
 import { GenericFormValidation } from "@app/constants/forms"
+import { useContext } from "react"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import handleServerAction from "@helpers/handleServerAction"
+import ColorSchemeContext from "@app/contexts/ColorScheme"
 import Link from "next/link"
 
-interface LoginForm {
-	dictionary: Dictionary["login"]
+interface LoginFormProps {
+	dictionary: Dictionary
 }
 
-export default function LoginForm({ dictionary }: LoginForm){
+export default function LoginForm({ dictionary }: LoginFormProps){
+	const { colorScheme } = useContext(ColorSchemeContext)
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 	const [loading, setLoading] = useState(false)
 	const params = useParams()
@@ -29,17 +32,19 @@ export default function LoginForm({ dictionary }: LoginForm){
 			className="w-10/12 max-w-screen-sm flex flex-col gap-12"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
 				handleServerAction({
-					promise: login(username, password, keep_logged_in),
-					setLoading
+					promise: login({ username, password, keep_logged_in }),
+					setLoading,
+					dictionary,
+					colorScheme
 				})
 			})}
 		>
 			<header className="flex flex-col gap-2">
 				<h1 className="text-4xl font-extrabold leading-none">
-					{dictionary.form.title}
+					{dictionary.login.form.title}
 				</h1>
 				<h2 className="text-neutral-700 dark:text-gray-400 text-xl font-normal leading-tight tracking-tight">
-					{dictionary.form.subtitle}
+					{dictionary.login.form.subtitle}
 				</h2>
 			</header>
 
@@ -48,22 +53,18 @@ export default function LoginForm({ dictionary }: LoginForm){
 					<TextInput
 						size="md"
 						type="text"
-						label={dictionary.form.username.label}
-						placeholder={dictionary.form.username.placeholder}
+						label={dictionary.inputs.emailOrUsername.label}
+						placeholder={dictionary.inputs.emailOrUsername.placeholder}
 						autoComplete="username"
 						withAsterisk={false}
 						{...register("username", {
 							minLength: {
-								value: GenericFormValidation.usernameMinLength,
-								message: dictionary.form.username.validations.min
+								value: Math.min(GenericFormValidation.emailMinLength, GenericFormValidation.usernameMinLength),
+								message: dictionary.inputs.emailOrUsername.validations.min
 							},
 							maxLength: {
-								value: GenericFormValidation.usernameMaxLength,
-								message: dictionary.form.username.validations.max
-							},
-							pattern: {
-								value: new RegExp(GenericFormValidation.validUsernamePattern),
-								message: dictionary.form.username.validations.invalidPattern
+								value: Math.max(GenericFormValidation.emailMaxLength, GenericFormValidation.usernameMaxLength),
+								message: dictionary.inputs.emailOrUsername.validations.max
 							},
 							required: true
 						})}
@@ -73,8 +74,8 @@ export default function LoginForm({ dictionary }: LoginForm){
 					<TextInput
 						size="md"
 						type={isPasswordVisible ? "text" : "password"}
-						label={dictionary.form.password.label}
-						placeholder={isPasswordVisible ? dictionary.form.password.placeholder : "•".repeat(dictionary.form.password.placeholder.length)}
+						label={dictionary.inputs.password.label}
+						placeholder={isPasswordVisible ? dictionary.inputs.password.placeholder : "•".repeat(dictionary.inputs.password.placeholder.length)}
 						autoComplete="current-password"
 						pattern={GenericFormValidation.validPasswordPattern}
 						rightSection={(
@@ -83,7 +84,7 @@ export default function LoginForm({ dictionary }: LoginForm){
 								variant="subtle"
 								className="text-current"
 								onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-								aria-label={dictionary.form.password.eye[isPasswordVisible ? "hide" : "show"]}
+								aria-label={dictionary.inputs.password.eye[isPasswordVisible ? "hide" : "show"]}
 								onPointerDown={event => event.detail === 1 || event.preventDefault()}
 							>
 								<PasswordEyeIcon className="text-xl" />
@@ -93,15 +94,15 @@ export default function LoginForm({ dictionary }: LoginForm){
 						{...register("password", {
 							minLength: {
 								value: GenericFormValidation.passwordMinLength,
-								message: dictionary.form.password.validations.min
+								message: dictionary.inputs.password.validations.min
 							},
 							maxLength: {
 								value: GenericFormValidation.passwordMaxLength,
-								message: dictionary.form.password.validations.max
+								message: dictionary.inputs.password.validations.max
 							},
 							pattern: {
 								value: new RegExp(GenericFormValidation.validPasswordPattern),
-								message: dictionary.form.password.validations.invalidPattern
+								message: dictionary.inputs.password.validations.invalidPattern
 							},
 							required: true
 						})}
@@ -112,7 +113,7 @@ export default function LoginForm({ dictionary }: LoginForm){
 				<div className="flex items-center justify-between">
 					<Checkbox
 						size="sm"
-						label={dictionary.form.keepLoggedIn.label}
+						label={dictionary.inputs.keepLoggedIn.label}
 						{...register("keep_logged_in")}
 						error={errors.keep_logged_in?.message}
 						defaultChecked
@@ -123,7 +124,7 @@ export default function LoginForm({ dictionary }: LoginForm){
 						className="px-0.5 rounded-sm"
 						component={Link}
 					>
-						{dictionary.form.forgotYourPassword.text}
+						{dictionary.login.form.forgotYourPassword.text}
 					</Anchor>
 				</div>
 
@@ -131,20 +132,20 @@ export default function LoginForm({ dictionary }: LoginForm){
 					type="submit"
 					variant="filled"
 					loading={loading}
-					aria-label={dictionary.form.send.accessibilityText}
+					aria-label={dictionary.login.form.send.accessibilityText}
 				>
-					{dictionary.form.send.text}
+					{dictionary.login.form.send.text}
 				</Button>
 			</div>
 
 			<Anchor
 				href={`/${params.locale}/register`}
 				className="self-center text-current text-center px-2 rounded-sm"
-				aria-label={dictionary.form.register.accessibilityText}
+				aria-label={dictionary.login.form.register.accessibilityText}
 				component={Link}
 				prefetch
 			>
-				{dictionary.form.register.text}
+				{dictionary.login.form.register.text}
 			</Anchor>
 		</form>
 	)

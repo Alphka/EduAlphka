@@ -11,7 +11,7 @@ export interface IAnswer {
 	content?: string
 	isCorrect?: boolean
 	createdAt: DateType
-	updatedAt: DateType
+	updatedAt?: DateType
 }
 
 export type AnswerModel = Model<IAnswer>

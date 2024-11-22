@@ -47,7 +47,6 @@ export default function Providers({ defaultTheme, fontFamily, children }: Provid
 			<MantineProvider
 				theme={theme}
 				withCssVariables
-				classNamesPrefix="css"
 				forceColorScheme={colorScheme}
 				withStaticClasses={false}
 				deduplicateCssVariables
