@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server"
 import { defaultLocale, locales } from "./i18n"
+import { getMiddlewareToken } from "@helpers/getToken"
 import { match } from "@formatjs/intl-localematcher"
 import Negotiator from "negotiator"
 
@@ -41,18 +42,19 @@ export default function middleware(request: NextRequest){
 	}
 
 	if(!pathnameLocale){
-		const locale = match(new Negotiator({
-			headers: Object.fromEntries(request.headers.entries())
-		}).languages(), locales, defaultLocale)
-		const url = new URL("/" + locale + pathname.replace(/^(?!\/)/, "").replace(/\/$/, ""), request.url)
-		const status = request.method === "GET" ? 302 : undefined
+		const negotiator = new Negotiator({ headers: Object.fromEntries(request.headers.entries()) })
+		const locale = match(negotiator.languages(), locales, defaultLocale)
 
-		return NextResponse.redirect(url, status)
+		return NextResponse.redirect(
+			new URL("/" + locale + pathname.replace(/^(?!\/)/, "").replace(/\/$/, ""), request.url),
+			request.method === "GET" ? 302 : undefined
+		)
 	}
 
 	const requestHeaders = new Headers(request.headers)
 
-	requestHeaders.set("x-url", request.url)
+	requestHeaders.set("X-Url", request.url)
+	requestHeaders.set("Authorization", "Bearer " + getMiddlewareToken(request))
 
 	const response = NextResponse.next({
 		request: {

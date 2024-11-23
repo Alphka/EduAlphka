@@ -1,6 +1,7 @@
 import type { PagePropsWithLocale } from "@typings/index"
 import type { Metadata } from "next"
 import { getDictionary } from "./dictionaries"
+import verifyAuthorization from "@helpers/verifyAuthorization"
 
 export async function generateMetadata({ params }: PagePropsWithLocale){
 	const { locale } = await params
@@ -16,9 +17,14 @@ export async function generateMetadata({ params }: PagePropsWithLocale){
 
 export default async function Homepage({ params }: PagePropsWithLocale){
 	const { locale } = await params
+
+	await verifyAuthorization(locale)
+
 	const dictionary = await getDictionary(locale)
 
 	return (
-		<p>{dictionary.homepage.title}</p>
+		<main>
+			<p>{dictionary.homepage.title}</p>
+		</main>
 	)
 }
