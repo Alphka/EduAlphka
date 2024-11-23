@@ -1,5 +1,5 @@
-import { GenericFormValidation } from "@app/constants/forms"
-import { APPLICATION_NAME } from "@app/constants"
+import { GenericFormValidation } from "@constants/forms"
+import { APPLICATION_NAME } from "@constants"
 
 const en = {
 	homepage: {

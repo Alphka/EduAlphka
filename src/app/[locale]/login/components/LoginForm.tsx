@@ -1,16 +1,14 @@
 "use client"
 
-import type { Dictionary } from "@app/[locale]/dictionaries"
+import type { Dictionary } from "@dictionaries"
 import { ActionIcon, Anchor, Button, Checkbox, TextInput } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { login, type UserLoginData } from "../actions/login"
-import { GenericFormValidation } from "@app/constants/forms"
-import { useContext } from "react"
+import { GenericFormValidation } from "@constants/forms"
 import { useParams } from "next/navigation"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import handleServerAction from "@helpers/handleServerAction"
-import ColorSchemeContext from "@app/contexts/ColorScheme"
+import useServerActionHandler from "@hooks/useServerActionHandler"
 import Link from "next/link"
 
 interface LoginFormProps {
@@ -18,10 +16,9 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ dictionary }: LoginFormProps){
-	const { colorScheme } = useContext(ColorSchemeContext)
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-	const [loading, setLoading] = useState(false)
-	const params = useParams()
+	const { isPending, handleServerAction } = useServerActionHandler()
+	const { locale } = useParams()
 
 	const { register, handleSubmit, formState: { errors } } = useForm<UserLoginData>()
 
@@ -31,12 +28,11 @@ export default function LoginForm({ dictionary }: LoginFormProps){
 		<form
 			className="w-10/12 max-w-screen-sm flex flex-col gap-12"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
-				handleServerAction({
-					promise: login({ username, password, keep_logged_in }),
-					setLoading,
-					dictionary,
-					colorScheme
-				})
+				handleServerAction(login({
+					username,
+					password,
+					keep_logged_in
+				}))
 			})}
 		>
 			<header className="flex flex-col gap-2">
@@ -120,7 +116,7 @@ export default function LoginForm({ dictionary }: LoginFormProps){
 					/>
 
 					<Anchor
-						href={`/${params.locale}/recover-password`}
+						href={`/${locale}/recover-password`}
 						className="px-0.5 rounded-sm"
 						component={Link}
 					>
@@ -131,7 +127,7 @@ export default function LoginForm({ dictionary }: LoginFormProps){
 				<Button
 					type="submit"
 					variant="filled"
-					loading={loading}
+					loading={isPending}
 					aria-label={dictionary.login.form.send.accessibilityText}
 				>
 					{dictionary.login.form.send.text}
@@ -139,7 +135,7 @@ export default function LoginForm({ dictionary }: LoginFormProps){
 			</div>
 
 			<Anchor
-				href={`/${params.locale}/register`}
+				href={`/${locale}/register`}
 				className="self-center text-current text-center px-2 rounded-sm"
 				aria-label={dictionary.login.form.register.accessibilityText}
 				component={Link}

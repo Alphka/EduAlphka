@@ -1,5 +1,5 @@
-import type { Dictionary } from "@app/[locale]/dictionaries"
-import { GenericFormValidation } from "@app/constants/forms"
+import type { Dictionary } from "@dictionaries"
+import { GenericFormValidation } from "@constants/forms"
 import { ACCOUNT_TYPES } from "@models/User"
 import { z } from "zod"
 

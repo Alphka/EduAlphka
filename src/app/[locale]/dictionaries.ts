@@ -1,5 +1,4 @@
 import { defaultLocale } from "@src/i18n"
-import "server-only"
 
 const dictionaries = {
 	["pt"]: () => import("@src/dictionaries/pt").then(module => module.default),

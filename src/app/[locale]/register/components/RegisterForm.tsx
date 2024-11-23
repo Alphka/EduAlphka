@@ -1,27 +1,28 @@
 "use client"
 
-import type { Dictionary } from "@app/[locale]/dictionaries"
+import type { Dictionary } from "@dictionaries"
 import { ActionIcon, Button, Checkbox, Text, TextInput } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { signIn, type UserSignInData } from "../actions/signIn"
-import { GenericFormValidation } from "@app/constants/forms"
-import { useContext } from "react"
+import { GenericFormValidation } from "@constants/forms"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
-import handleServerAction from "@helpers/handleServerAction"
-import ColorSchemeContext from "@app/contexts/ColorScheme"
+import useServerActionHandler from "@hooks/useServerActionHandler"
 
 interface RegisterFormProps {
 	dictionary: Dictionary
 }
 
 export default function RegisterForm({ dictionary }: RegisterFormProps){
-	const { colorScheme } = useContext(ColorSchemeContext)
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 	const [isProfessor, setIsMasterSelected] = useState(true)
-	const [loading, setLoading] = useState(false)
+	const { isPending, handleServerAction } = useServerActionHandler()
 
-	const { register, handleSubmit, formState: { errors } } = useForm<Omit<UserSignInData, "account_type">>()
+	const {
+		register,
+		handleSubmit,
+		formState: { errors }
+	} = useForm<Omit<UserSignInData, "account_type">>()
 
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
@@ -29,19 +30,14 @@ export default function RegisterForm({ dictionary }: RegisterFormProps){
 		<form
 			className="w-10/12 max-w-screen-sm flex flex-col gap-12"
 			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
-				handleServerAction({
-					promise: signIn({
-						name,
-						email,
-						username,
-						password,
-						account_type: isProfessor ? "professor" : "candidate",
-						keep_logged_in
-					}),
-					dictionary,
-					setLoading,
-					colorScheme
-				})
+				handleServerAction(signIn({
+					name,
+					email,
+					username,
+					password,
+					account_type: isProfessor ? "professor" : "candidate",
+					keep_logged_in
+				}))
 			})}
 		>
 			<header className="flex flex-col gap-2">
@@ -123,7 +119,7 @@ export default function RegisterForm({ dictionary }: RegisterFormProps){
 							},
 							pattern: {
 								value: new RegExp(GenericFormValidation.validEmailPattern),
-								message: dictionary.inputs.email.validations.invalidPattern
+								message: dictionary.inputs.email.validations.invalid
 							},
 							required: true
 						})}
@@ -169,8 +165,8 @@ export default function RegisterForm({ dictionary }: RegisterFormProps){
 					/>
 				</div>
 
-				<div>
-					<Text size="md" className="mb-1">
+				<div className="flex flex-col gap-1">
+					<Text size="md">
 						{dictionary.inputs.accountType.label}
 					</Text>
 
@@ -203,7 +199,7 @@ export default function RegisterForm({ dictionary }: RegisterFormProps){
 				<Button
 					type="submit"
 					variant="filled"
-					loading={loading}
+					loading={isPending}
 					aria-label={dictionary.register.form.send.accessibilityText}
 				>
 					{dictionary.register.form.send.text}

@@ -1,7 +1,7 @@
 "use server"
 
 import { revalidatePath } from "next/cache"
-import { getDictionary } from "@app/[locale]/dictionaries"
+import { getDictionary } from "@dictionaries"
 import { redirect } from "next/navigation"
 import authenticateUser from "@lib/authenticateUser"
 import getLoginSchema from "../schemas/login"

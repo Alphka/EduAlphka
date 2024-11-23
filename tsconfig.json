@@ -28,12 +28,16 @@
 			"./src/typings"
 		],
 		"paths": {
+			"@dictionaries": ["./src/app/[locale]/dictionaries.ts"],
+			"@constants/*": ["./src/app/constants/*"],
+			"@constants": ["./src/app/constants/index.ts"],
+			"@contexts/*": ["./src/app/contexts/*"],
+			"@hooks/*": ["./src/app/hooks/*"],
 			"@components/*": ["./src/components/*"],
 			"@helpers/*": ["./src/helpers/*"],
 			"@typings/*": ["./src/typings/*"],
 			"@models": ["./src/models/index.ts"],
 			"@models/*": ["./src/models/*"],
-			"@hooks/*": ["./src/hooks/*"],
 			"@lib/*": ["./src/lib/*"],
 			"@app/*": ["./src/app/*"],
 			"@src/*": ["./src/*"]

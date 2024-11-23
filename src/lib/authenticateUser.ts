@@ -1,9 +1,9 @@
 import type { HydratedDocument } from "mongoose"
-import type { Dictionary } from "@app/[locale]/dictionaries"
+import type { Dictionary } from "@dictionaries"
 import type { IUser } from "@models/typings/User"
 import { cookies, headers } from "next/headers"
 import { Session, User } from "@models"
-import { TOKEN_KEY } from "@app/constants"
+import { TOKEN_KEY } from "@constants"
 import connectDatabase from "./connectDatabase"
 import "server-only"
 
