@@ -44,6 +44,12 @@
 		},
 		"noEmit": true
 	},
+	"ts-node": {
+		"compilerOptions": {
+			"module": "CommonJS",
+			"noEmit": false
+		}
+	},
 	"include": [
 		"next-env.d.ts",
 		"**/*.ts",

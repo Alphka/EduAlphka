@@ -1,5 +1,4 @@
 import { connect, type ConnectOptions } from "mongoose"
-import "server-only"
 
 declare global {
 	var mongoose: {
@@ -8,7 +7,7 @@ declare global {
 	}
 }
 
-const { MONGODB_URI } = process.env
+const { DATABASE_NAME, MONGODB_URI, NODE_ENV } = process.env
 
 if(!MONGODB_URI) throw "Please define the MONGODB_URI environment variable inside .env.local"
 
@@ -25,7 +24,7 @@ export default async function connectDatabase(){
 	if(!cached.promise){
 		const options: ConnectOptions = {
 			bufferCommands: false,
-			dbName: process.env.NODE_ENV
+			dbName: DATABASE_NAME || NODE_ENV
 		}
 
 		cached.promise = connect(MONGODB_URI!, options)

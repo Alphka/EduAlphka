@@ -28,6 +28,9 @@ const pt = {
 			}
 		}
 	},
+	logout: {
+		title: "Sair da conta"
+	},
 	register: {
 		title: "Regitre-se",
 		description: "Registre-se na plataforma " + APPLICATION_NAME,

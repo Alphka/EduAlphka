@@ -6,6 +6,7 @@ declare global {
 			PORT?: string
 			HASH_SALT?: string
 			MONGODB_URI?: string
+			DATABASE_NAME?: string
 		}
 	}
 }

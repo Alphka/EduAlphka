@@ -5,7 +5,6 @@ import { cookies, headers } from "next/headers"
 import { Session, User } from "@models"
 import { TOKEN_KEY } from "@constants"
 import connectDatabase from "./connectDatabase"
-import "server-only"
 
 export default async function authenticateUser(dictionary: Dictionary, {
 	keepLoggedIn = true,
@@ -43,7 +42,7 @@ export default async function authenticateUser(dictionary: Dictionary, {
 
 	tokenExpirationDate.setMonth(tokenExpirationDate.getMonth() + 1)
 
-	new Session({
+	await Session.create({
 		token,
 		userId: user.id,
 		userAgent: headersStore.get("user-agent") || "",

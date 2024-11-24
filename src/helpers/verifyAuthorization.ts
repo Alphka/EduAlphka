@@ -1,14 +1,32 @@
+import type { AccountType } from "@typings/api"
 import type { Locales } from "@src/i18n"
+import { Session, User } from "@models"
 import { redirect } from "next/navigation"
-import getLocale from "./getLocale"
+import getRouteWithLocale from "./getRouteWithLocale"
+import connectDatabase from "@lib/connectDatabase"
 import getToken from "./getToken"
+import routes from "@app/routes"
 
-async function verifyAuthorization(locale?: Locales): Promise<void>
-async function verifyAuthorization(_locale?: Locales){
-	const locale = _locale ?? await getLocale()
-	const token = await getToken()
-
-	if(!token) redirect(locale ? `/${locale}/login` : "/login")
+interface AuthorizationOptions {
+	accountType?: AccountType
+	locale?: Locales
 }
 
-export default verifyAuthorization
+export default async function verifyAuthorization(options: AuthorizationOptions = {}){
+	const token = await getToken()
+
+	if(!token) redirect(await getRouteWithLocale(routes.login.pathname, options.locale))
+
+	await connectDatabase()
+
+	const session = await Session.findOne({ token }).select("userId")
+	const user = session && await User.findOne({ _id: session.userId })
+
+	if(!user) redirect(await getRouteWithLocale(routes.login.pathname, options.locale))
+
+	if(options.accountType){
+		if(user.accountType !== options.accountType) redirect(await getRouteWithLocale(routes.accessDenied.pathname, options.locale))
+	}
+
+	return user
+}

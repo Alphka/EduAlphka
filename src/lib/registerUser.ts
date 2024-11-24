@@ -2,7 +2,6 @@ import type { AccountType } from "@typings/api"
 import type { Dictionary } from "@dictionaries"
 import { User } from "@models"
 import connectDatabase from "./connectDatabase"
-import "server-only"
 
 export default async function registerUser(dictionary: Dictionary, {
 	name,

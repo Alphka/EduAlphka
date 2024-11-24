@@ -3,9 +3,11 @@
 import { revalidatePath } from "next/cache"
 import { getDictionary } from "@dictionaries"
 import { redirect } from "next/navigation"
+import getRouteWithLocale from "@helpers/getRouteWithLocale"
 import authenticateUser from "@lib/authenticateUser"
 import getLoginSchema from "../schemas/login"
 import getLocale from "@helpers/getLocale"
+import routes from "@app/routes"
 
 export interface UserLoginData {
 	username: string
@@ -54,6 +56,6 @@ export async function login({
 	}
 
 	revalidatePath("/")
-	revalidatePath(`/${locale}`)
-	redirect(`/${locale}`)
+	revalidatePath(getRouteWithLocale(routes.homepage.pathname, locale))
+	redirect(getRouteWithLocale(routes.homepage.pathname, locale))
 }

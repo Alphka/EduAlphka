@@ -70,7 +70,7 @@ userSchema.static("generateToken", async function generateToken(){
 			if(error) return reject(error)
 			resolve(buffer.toString("hex"))
 		}))
-	}while((await Session.find().byToken(token).exec()).length)
+	}while(await Session.findOne({ token }))
 
 	return token
 })

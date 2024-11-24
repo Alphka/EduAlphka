@@ -1,7 +1,7 @@
-import type { ISession, ISessionQueryHelpers, SessionModel } from "./typings/Session"
-import { model, models, Schema, type HydratedDocument, type QueryWithHelpers } from "mongoose"
+import type { ISession, SessionModel } from "./typings/Session"
+import { model, models, Schema } from "mongoose"
 
-export const sessionSchema = new Schema<ISession, SessionModel, {}, ISessionQueryHelpers>({
+export const sessionSchema = new Schema<ISession, SessionModel>({
 	token: {
 		type: String,
 		unique: true,
@@ -26,16 +26,7 @@ export const sessionSchema = new Schema<ISession, SessionModel, {}, ISessionQuer
 		required: true
 	}
 }, {
-	_id: false,
-	versionKey: false,
-	query: {
-		byToken(
-			this: QueryWithHelpers<any, HydratedDocument<ISession>, ISessionQueryHelpers>,
-			token: string
-		){
-			return this.find({ token })
-		}
-	}
+	versionKey: false
 })
 
 const Session = models?.Session as SessionModel || model<ISession, SessionModel>("Session", sessionSchema)

@@ -172,16 +172,16 @@ export default function RegisterForm({ dictionary }: RegisterFormProps){
 
 					<Button.Group>
 						<Button
-							className="w-full"
 							variant={isProfessor ? "filled" : "default"}
 							onClick={() => setIsMasterSelected(true)}
+							fullWidth
 						>
 							{dictionary.inputs.accountType.professor.text}
 						</Button>
 						<Button
-							className="w-full"
 							variant={isProfessor ? "default" : "filled"}
 							onClick={() => setIsMasterSelected(false)}
+							fullWidth
 						>
 							{dictionary.inputs.accountType.candidate.text}
 						</Button>

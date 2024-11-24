@@ -10,12 +10,14 @@ import { locales } from "@src/i18n"
 import { headers } from "next/headers"
 import { twJoin } from "tailwind-merge"
 import { Inter } from "next/font/google"
+import getRouteWithLocale from "@helpers/getRouteWithLocale"
 import Providers from "../providers"
+import routes from "@app/routes"
 
 import "react-toastify/dist/ReactToastify.css"
 import "./globals.scss"
 
-interface RootLayoutProps extends Omit<PagePropsWithLocale, "searchParams"> {
+export interface RootLayoutProps extends Omit<PagePropsWithLocale, "searchParams"> {
 	children: ReactNode
 }
 
@@ -48,7 +50,7 @@ export async function generateMetadata({ params }: RootLayoutProps){
 		alternates: {
 			canonical: "/",
 			languages: {
-				...Object.fromEntries(locales.map(locale => [locale, "/" + locale]))
+				...Object.fromEntries(locales.map(locale => [locale, getRouteWithLocale(routes.homepage.pathname, locale)]))
 			}
 		},
 		robots: {

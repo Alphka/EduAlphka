@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server"
 import { defaultLocale, locales } from "./i18n"
 import { getMiddlewareToken } from "@helpers/getToken"
 import { match } from "@formatjs/intl-localematcher"
+import getRouteWithLocale from "@helpers/getRouteWithLocale"
 import Negotiator from "negotiator"
 
 export default function middleware(request: NextRequest){
@@ -17,7 +18,7 @@ export default function middleware(request: NextRequest){
 		})
 
 		if(pathnameLanguage){
-			return NextResponse.redirect(new URL("/" + pathnameLanguage + pathnameWithoutLocale, request.nextUrl))
+			return NextResponse.redirect(new URL(getRouteWithLocale(pathnameWithoutLocale, pathnameLanguage), request.nextUrl))
 		}
 	}
 
@@ -37,7 +38,7 @@ export default function middleware(request: NextRequest){
 		})
 
 		if(typeof pathnameLocaleInsesitive === "string"){
-			return NextResponse.redirect(new URL("/" + pathnameLocaleInsesitive + pathnameWithoutLocale, request.nextUrl))
+			return NextResponse.redirect(new URL(getRouteWithLocale(pathnameWithoutLocale, pathnameLocaleInsesitive), request.nextUrl))
 		}
 	}
 
@@ -46,7 +47,7 @@ export default function middleware(request: NextRequest){
 		const locale = match(negotiator.languages(), locales, defaultLocale)
 
 		return NextResponse.redirect(
-			new URL("/" + locale + pathname.replace(/^(?!\/)/, "").replace(/\/$/, ""), request.url),
+			new URL(getRouteWithLocale(pathname.replace(/^(?!\/)/, "").replace(/\/$/, ""), locale), request.url),
 			request.method === "GET" ? 302 : undefined
 		)
 	}

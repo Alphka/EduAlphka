@@ -1,4 +1,4 @@
-import type { HydratedDocument, Model, ObjectId, QueryWithHelpers } from "mongoose"
+import type { Model, ObjectId } from "mongoose"
 import type { DateType } from "."
 
 export interface ISession {
@@ -9,12 +9,4 @@ export interface ISession {
 	expiresAt: DateType
 }
 
-export interface ISessionQueryHelpers {
-	byToken: (token: string) => QueryWithHelpers<
-		HydratedDocument<ISession>[],
-		HydratedDocument<ISession>,
-		ISessionQueryHelpers
-	>
-}
-
-export type SessionModel = Model<ISession, ISessionQueryHelpers>
+export type SessionModel = Model<ISession>

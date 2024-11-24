@@ -28,6 +28,9 @@ const en = {
 			}
 		}
 	},
+	logout: {
+		title: "Logout"
+	},
 	register: {
 		title: "Sign-in",
 		description: `Sign-in on the ${APPLICATION_NAME} platform`,
