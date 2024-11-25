@@ -7,7 +7,7 @@ export interface IAnswer {
 	type: QuestionType
 	submit: ObjectId
 	question: ObjectId
-	option?: UUID
+	option?: ObjectId
 	content?: string
 	isCorrect?: boolean
 	createdAt: DateType

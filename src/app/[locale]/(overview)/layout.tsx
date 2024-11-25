@@ -4,7 +4,6 @@ import { getDictionary } from "@dictionaries"
 import { twJoin } from "tailwind-merge"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import getRouteWithLocale from "@helpers/getRouteWithLocale"
-import getColorFromName from "@helpers/getColorFromName"
 import getNameInitials from "@helpers/getNameInitials"
 import getRequestURL from "@helpers/getRequestURL"
 import routes from "@app/routes"
@@ -56,14 +55,28 @@ export default async function Layout({ params, children }: LayoutProps){
 				})}
 			</ul>
 
-			<div>
+			<div className="flex flex-col h-full overflow-hidden">
 				<div className="flex-shrink-0 bg-gray-light dark:bg-dark-600 flex items-center justify-between px-4 py-2 gap-4 border-b border-b-dark-100 dark:border-b-slate-700">
 					<div />
 
 					<div className="flex items-center gap-2">
 						<Avatar
-							color={getColorFromName(user.name)}
 							radius="xl"
+							name={user.name}
+							color="initials"
+							allowedInitialsColors={[
+								"red",
+								"pink",
+								"grape",
+								"violet",
+								"indigo",
+								"blue",
+								"cyan",
+								"green",
+								"yellow",
+								"orange",
+								"teal"
+							]}
 						>
 							{getNameInitials(user.name)}
 						</Avatar>

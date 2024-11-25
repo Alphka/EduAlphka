@@ -14,10 +14,10 @@ export const answerSchema = new Schema<IAnswer>({
 		required: true
 	},
 	question: {
-		type: Schema.ObjectId,
+		type: String,
 		required: true
 	},
-	option: String,
+	option: Schema.ObjectId,
 	content: String,
 	isCorrect: Boolean,
 	createdAt: {
