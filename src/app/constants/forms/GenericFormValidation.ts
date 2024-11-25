@@ -1,4 +1,4 @@
-export class GenericFormValidation {
+export default class GenericFormValidation {
 	static readonly nameMinLength = 3
 	static readonly nameMaxLength = 255
 

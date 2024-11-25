@@ -1,9 +1,19 @@
-import { GenericFormValidation } from "@constants/forms"
+import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { APPLICATION_NAME } from "@constants"
 
 const en = {
 	homepage: {
-		title: "Home"
+		title: "Home",
+		examButton: {
+			text: "Create exam"
+		}
+	},
+	exam: {
+		form: {
+			examData: {
+				title: "Exam data"
+			}
+		}
 	},
 	login: {
 		title: "Login",
@@ -120,6 +130,36 @@ const en = {
 			},
 			validations: {
 				invalid: "Invalid account type"
+			}
+		},
+		examTitle: {
+			label: "Title",
+			placeholder: "Exam title",
+			validations: {
+				invalid: "Invalid exam title",
+				min: `The exam title must be at least ${ExamFormValidation.titleMinLength} characters long`,
+				max: `The exam title must have a maximum of ${ExamFormValidation.titleMaxLength} characters`,
+				invalidPattern: "The exam title contains invalid characters"
+			}
+		},
+		examDescription: {
+			label: "Description",
+			placeholder: "Exam description",
+			validations: {
+				invalid: "Invalid exam description",
+				min: `The exam description must be at least ${ExamFormValidation.descriptionMinLength} characters long`,
+				max: `The exam description must have a maximum of ${ExamFormValidation.descriptionMaxLength} characters`,
+				invalidPattern: "The exam description contains invalid characters"
+			}
+		},
+		examDuration: {
+			label: "Duration",
+			placeholder: "Exam duration",
+			validations: {
+				invalid: "Invalid exam duration",
+				min: `The exam duration must be at least ${ExamFormValidation.minDurationInMinutes} characters long`,
+				max: `The exam duration must have a maximum of ${ExamFormValidation.maxDurationInMinutes} characters`,
+				invalidPattern: "The exam duration must contain only numbers"
 			}
 		}
 	},

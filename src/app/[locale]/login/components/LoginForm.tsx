@@ -20,7 +20,11 @@ export default function LoginForm({ dictionary }: LoginFormProps){
 	const { isPending, handleServerAction } = useServerActionHandler()
 	const { locale } = useParams()
 
-	const { register, handleSubmit, formState: { errors } } = useForm<UserLoginData>()
+	const {
+		register,
+		handleSubmit,
+		formState: { errors }
+	} = useForm<UserLoginData>()
 
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 

@@ -22,8 +22,14 @@ export default async function Layout({ params, children }: LayoutProps){
 	const { pathname } = new URL(url!)
 
 	return (
-		<div className="grid grid-cols-[200px_1fr]">
-			<ul className="bg-gray-light dark:bg-dark-800 flex flex-col px-4 py-3 gap-4 h-dvh border-r border-r-dark-100 dark:border-r-slate-700">
+		<div className="flex">
+			<ul
+				className={twJoin(
+					"basis-56 bg-neutral-100 dark:bg-neutral-800 flex flex-col px-4 py-3 gap-4 h-dvh",
+					"border-r border-r-neutral-800 dark:border-r-neutral-600",
+					"max-sm:hidden"
+				)}
+			>
 				{Object.entries(routes).map(([key, route]) => {
 					if(!("Icon" in route)) return null
 
@@ -55,8 +61,13 @@ export default async function Layout({ params, children }: LayoutProps){
 				})}
 			</ul>
 
-			<div className="flex flex-col h-full overflow-hidden">
-				<div className="flex-shrink-0 bg-gray-light dark:bg-dark-600 flex items-center justify-between px-4 py-2 gap-4 border-b border-b-dark-100 dark:border-b-slate-700">
+			<div className="flex-grow h-full flex flex-col overflow-hidden">
+				<div
+					className={twJoin(
+						"flex-shrink-0 bg-neutral-100 dark:bg-neutral-800 flex items-center justify-between px-4 py-2 gap-4",
+						"border-b border-b-neutral-800 dark:border-b-neutral-600"
+					)}
+				>
 					<div />
 
 					<div className="flex items-center gap-2">

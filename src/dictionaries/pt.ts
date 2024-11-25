@@ -1,9 +1,19 @@
-import { GenericFormValidation } from "@constants/forms"
+import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { APPLICATION_NAME } from "@constants"
 
 const pt = {
 	homepage: {
-		title: "Página inicial"
+		title: "Página inicial",
+		examButton: {
+			text: "Criar teste"
+		}
+	},
+	exam: {
+		form: {
+			examData: {
+				title: "Dados do teste"
+			}
+		}
 	},
 	login: {
 		title: "Login",
@@ -120,6 +130,36 @@ const pt = {
 			},
 			validations: {
 				invalid: "Tipo de conta inválido"
+			}
+		},
+		examTitle: {
+			label: "Título",
+			placeholder: "Título do teste",
+			validations: {
+				invalid: "Título do teste inválido",
+				min: `O título do teste deve ter no mínimo ${ExamFormValidation.titleMinLength} caracteres`,
+				max: `O título do teste deve ter no máximo ${ExamFormValidation.titleMaxLength} caracteres`,
+				invalidPattern: "O título do teste contains invalid characters"
+			}
+		},
+		examDescription: {
+			label: "Description",
+			placeholder: "Descrição do teste",
+			validations: {
+				invalid: "Descrição do teste inválida",
+				min: `A descrição do teste deve ter no mínimo ${ExamFormValidation.descriptionMinLength} minutos`,
+				max: `A descrição do teste deve ter no máximo ${ExamFormValidation.descriptionMaxLength} minutos`,
+				invalidPattern: "A descrição do teste contém caracteres inválidos"
+			}
+		},
+		examDuration: {
+			label: "Duração do teste",
+			placeholder: "Duração do teste",
+			validations: {
+				invalid: "Duração do teste inválida",
+				min: `A duração do teste deve ter no mínimo ${ExamFormValidation.minDurationInMinutes} minutos`,
+				max: `A duração do teste deve ter no máximo ${ExamFormValidation.maxDurationInMinutes} minutos`,
+				invalidPattern: "A duração do teste deve conter apenas números"
 			}
 		}
 	},

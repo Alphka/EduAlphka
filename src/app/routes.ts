@@ -17,7 +17,15 @@ const routes = {
 	},
 	accessDenied: {
 		pathname: "/access-denied"
+	},
+	exam: {
+		pathname: "/exam",
+		children: {
+			create: {
+				pathname: "/exam/create"
+			}
+		}
 	}
-}
+} as const
 
 export default routes

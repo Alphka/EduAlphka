@@ -110,6 +110,7 @@ export default async function RootLayout({ params, children }: RootLayoutProps){
 			<body
 				className={twJoin(
 					inter.variable,
+					inter.className,
 					"antialiased min-h-dvh"
 				)}
 			>
