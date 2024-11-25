@@ -9,9 +9,12 @@ const en = {
 		}
 	},
 	exam: {
-		form: {
-			examData: {
-				title: "Exam data"
+		createForm: {
+			title: "Create exam",
+			form: {
+				examData: {
+					title: "Exam data"
+				}
 			}
 		}
 	},

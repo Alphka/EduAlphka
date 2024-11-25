@@ -1,11 +1,11 @@
 import type { PagePropsWithLocale } from "@typings/index"
 import type { Metadata } from "next"
+import { MdAddCircleOutline } from "react-icons/md"
 import { getDictionary } from "../dictionaries"
 import { Button } from "@mantine/core"
-import { MdAddCircleOutline } from "react-icons/md"
-import Link from "next/link"
-import routes from "@app/routes"
 import getRouteWithLocale from "@helpers/getRouteWithLocale"
+import routes from "@app/routes"
+import Link from "next/link"
 
 export async function generateMetadata({ params }: PagePropsWithLocale){
 	const { locale } = await params

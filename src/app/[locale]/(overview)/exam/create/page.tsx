@@ -5,14 +5,12 @@ import CreateExamForm from "./components/CreateExamForm"
 
 export async function generateMetadata({ params }: PagePropsWithLocale){
 	const { locale } = await params
-	const { login: { title, description } } = await getDictionary(locale)
+	const { exam: { createForm: { title } } } = await getDictionary(locale)
 
 	return {
 		title,
-		description,
 		openGraph: {
-			title,
-			description
+			title
 		}
 	} as Metadata
 }

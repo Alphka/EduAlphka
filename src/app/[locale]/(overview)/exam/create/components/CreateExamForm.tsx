@@ -1,8 +1,8 @@
 "use client"
 
 import type { Dictionary } from "@dictionaries"
-import { ExamFormValidation } from "@constants/forms"
-import { TextInput } from "@mantine/core"
+import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
+import { NumberInput, Textarea, TextInput } from "@mantine/core"
 import { useForm } from "react-hook-form"
 import Legend from "@app/components/forms/Legend"
 
@@ -28,7 +28,7 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 		>
 			<fieldset>
 				<Legend>
-					{dictionary.exam.form.examData.title}
+					{dictionary.exam.createForm.form.examData.title}
 				</Legend>
 
 				<div className="flex flex-col gap-6">
@@ -37,8 +37,8 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 						type="text"
 						label={dictionary.inputs.examTitle.label}
 						placeholder={dictionary.inputs.examTitle.placeholder}
+						aria-label={dictionary.inputs.examTitle.placeholder}
 						autoComplete="off"
-						withAsterisk={false}
 						{...register("title", {
 							minLength: {
 								value: ExamFormValidation.titleMinLength,
@@ -48,18 +48,23 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 								value: ExamFormValidation.titleMaxLength,
 								message: dictionary.inputs.examTitle.validations.max
 							},
+							pattern: {
+								value: new RegExp(GenericFormValidation.validSpecialNamePattern),
+								message: dictionary.inputs.password.validations.invalidPattern
+							},
 							required: true
 						})}
 						error={errors.title?.message}
 					/>
 
-					<TextInput
+					<Textarea
 						size="md"
-						type="text"
+						minRows={2}
+						maxRows={12}
 						label={dictionary.inputs.examDescription.label}
 						placeholder={dictionary.inputs.examDescription.placeholder}
+						aria-label={dictionary.inputs.examDescription.placeholder}
 						autoComplete="off"
-						withAsterisk={false}
 						{...register("description", {
 							minLength: {
 								value: ExamFormValidation.descriptionMinLength,
@@ -68,19 +73,27 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 							maxLength: {
 								value: ExamFormValidation.descriptionMaxLength,
 								message: dictionary.inputs.examDescription.validations.max
-							}
+							},
+							pattern: {
+								value: new RegExp(GenericFormValidation.validDescriptionPattern),
+								message: dictionary.inputs.password.validations.invalidPattern
+							},
 						})}
 						error={errors.description?.message}
+						autosize
 					/>
 
-					<TextInput
+					<NumberInput
 						size="md"
-						type="text"
-						inputMode="numeric"
 						label={dictionary.inputs.examDuration.label}
 						placeholder={dictionary.inputs.examDuration.placeholder}
+						aria-label={dictionary.inputs.examDuration.placeholder}
 						autoComplete="off"
-						withAsterisk={false}
+						step={1}
+						decimalScale={0}
+						allowNegative={false}
+						stepHoldDelay={300}
+        				stepHoldInterval={stepCount => Math.max(1000 / stepCount ** 2, 25)}
 						{...register("duration", {
 							min: {
 								value: ExamFormValidation.minDurationInMinutes,
@@ -90,8 +103,16 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 								value: ExamFormValidation.maxDurationInMinutes,
 								message: dictionary.inputs.examDuration.validations.max
 							},
+							pattern: {
+								value: /^\d+$/,
+								message: dictionary.inputs.password.validations.invalidPattern
+							},
 							required: true
 						})}
+						onBlur={undefined}
+						onChange={undefined}
+						min={ExamFormValidation.minDurationInMinutes}
+						max={ExamFormValidation.maxDurationInMinutes}
 						error={errors.duration?.message}
 					/>
 				</div>

@@ -9,9 +9,12 @@ const pt = {
 		}
 	},
 	exam: {
-		form: {
-			examData: {
-				title: "Dados do teste"
+		createForm: {
+			title: "Criar teste",
+			form: {
+				examData: {
+					title: "Dados do teste"
+				}
 			}
 		}
 	},

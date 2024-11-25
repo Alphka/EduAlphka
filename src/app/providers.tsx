@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { createTheme, MantineProvider, TextInput } from "@mantine/core"
+import { createTheme, MantineProvider, NumberInput, Textarea, TextInput } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import ColorSchemeContext, { type Themes } from "./contexts/ColorScheme"
 
@@ -26,6 +26,16 @@ export default function Providers({ defaultTheme, fontFamily, children }: Provid
 		cursorType: "pointer",
 		components: {
 			TextInput: TextInput.extend({
+				classNames: {
+					label: "mb-1"
+				}
+			}),
+			Textarea: Textarea.extend({
+				classNames: {
+					label: "mb-1"
+				}
+			}),
+			NumberInput: NumberInput.extend({
 				classNames: {
 					label: "mb-1"
 				}
