@@ -53,6 +53,9 @@ export async function generateMetadata({ params }: RootLayoutProps){
 				...Object.fromEntries(locales.map(locale => [locale, getRouteWithLocale(routes.homepage.pathname, locale)]))
 			}
 		},
+		other: {
+			"darkreader-lock": ""
+		},
 		robots: {
 			index: true,
 			follow: true,

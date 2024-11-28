@@ -3,7 +3,7 @@ import { APPLICATION_NAME } from "@constants"
 
 const en = {
 	homepage: {
-		title: "Home",
+		title: "Dashboard",
 		examButton: {
 			text: "Create exam"
 		}

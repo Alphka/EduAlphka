@@ -3,7 +3,7 @@ import { APPLICATION_NAME } from "@constants"
 
 const pt = {
 	homepage: {
-		title: "Página inicial",
+		title: "Dashboard",
 		examButton: {
 			text: "Criar teste"
 		}
@@ -36,7 +36,7 @@ const pt = {
 				accessibilityText: "Criar uma conta"
 			},
 			errors: {
-				invalidCredentials: "Invalid credentials",
+				invalidCredentials: "Credenciais inválidas",
 				failedToAuthenticate: "Falha ao autenticar o usuário"
 			}
 		}

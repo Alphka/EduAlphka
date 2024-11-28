@@ -73,6 +73,6 @@ export default function middleware(request: NextRequest){
 
 export const config = {
 	matcher: [
-		"/((?!api|_logs|_src|_next/(?:static|image)|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt).*)"
+		"/((?!api|_logs|_src|_next/(?:static|image)|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout).*)"
 	]
 }
