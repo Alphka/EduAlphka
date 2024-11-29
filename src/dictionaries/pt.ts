@@ -45,7 +45,7 @@ const pt = {
 		title: "Sair da conta"
 	},
 	register: {
-		title: "Regitre-se",
+		title: "Registre-se",
 		description: "Registre-se na plataforma " + APPLICATION_NAME,
 		form: {
 			title: "Crie uma conta",

@@ -41,7 +41,7 @@ export default function RegisterForm({ dictionary }: RegisterFormProps){
 			})}
 		>
 			<header className="flex flex-col gap-2">
-				<h1 className="text-4xl font-extrabold leading-none">
+				<h1 className="text-4xl font-extrabold">
 					{dictionary.register.form.title}
 				</h1>
 				<h2 className="text-neutral-700 dark:text-gray-400 text-xl font-normal leading-tight tracking-tight">
