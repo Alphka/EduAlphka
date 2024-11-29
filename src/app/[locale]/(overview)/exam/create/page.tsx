@@ -21,8 +21,6 @@ export default async function CreateExam({ params }: PagePropsWithLocale){
 	const dictionary = await getDictionary(locale)
 
 	return (
-		<main>
-			<CreateExamForm dictionary={dictionary} />
-		</main>
+		<CreateExamForm dictionary={dictionary} />
 	)
 }

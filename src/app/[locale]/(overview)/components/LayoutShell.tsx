@@ -41,7 +41,7 @@ export default function LayoutShell({
 					mobile: !opened
 				}
 			}}
-			padding="md"
+			padding="lg"
 		>
 			<AppShell.Header>
 				<Burger

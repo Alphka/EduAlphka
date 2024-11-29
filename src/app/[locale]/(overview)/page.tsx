@@ -24,19 +24,17 @@ export default async function Homepage({ params }: PagePropsWithLocale){
 	const dictionary = await getDictionary(locale)
 
 	return (
-		<main>
-			<div className="flex justify-between">
-				<p>{dictionary.homepage.title}</p>
+		<div className="flex justify-between">
+			<p>{dictionary.homepage.title}</p>
 
-				<Button
-					href={getRouteWithLocale(routes.exam.children.create.pathname, locale)}
-					variant="filled"
-					component={Link}
-					leftSection={<MdAddCircleOutline className="text-lg" />}
-				>
-					{dictionary.homepage.examButton.text}
-				</Button>
-			</div>
-		</main>
+			<Button
+				href={getRouteWithLocale(routes.exam.children.create.pathname, locale)}
+				variant="filled"
+				component={Link}
+				leftSection={<MdAddCircleOutline className="text-lg" />}
+			>
+				{dictionary.homepage.examButton.text}
+			</Button>
+		</div>
 	)
 }
