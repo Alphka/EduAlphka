@@ -1,4 +1,4 @@
-export default async function NotFoundPage(){
+export default function NotFoundPage(){
 	return (
 		<main className="flex flex-col items-center justify-center min-h-dvh">
 			<h1>

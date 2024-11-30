@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 	}
 }
 
-export default async function LoginPage(){
+export default function LoginPage(){
 	return (
 		<main className="flex flex-col items-center justify-center py-12 min-h-dvh">
 			<LoginForm />

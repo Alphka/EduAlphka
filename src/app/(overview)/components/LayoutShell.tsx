@@ -1,22 +1,21 @@
 "use client"
 
 import type { ReactNode } from "react"
+import type { IUser } from "@models/typings/User"
 import { AppShell, Burger, Avatar, NavLink } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { usePathname } from "next/navigation"
-import { useContext } from "react"
 import { twJoin } from "tailwind-merge"
-import CredentialsContext from "@contexts/CredentialsContext"
 import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
 import Link from "next/link"
 
 interface LayoutShellProps {
+	user: Pick<IUser, "name">
 	children: ReactNode
 }
 
-export default function LayoutShell({ children }: LayoutShellProps){
-	const { user } = useContext(CredentialsContext)
+export default function LayoutShell({ user, children }: LayoutShellProps){
 	const [opened, { toggle }] = useDisclosure()
 	const pathname = usePathname()
 

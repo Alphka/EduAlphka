@@ -20,7 +20,7 @@ export default function middleware(request: NextRequest){
 		}
 	})
 
-	response.headers.set("Accept-CH", "Sec-CH-Prefers-Color-Scheme, Viewport-Width")
+	response.headers.set("Accept-CH", "Viewport-Width")
 	response.headers.set("Referrer-Policy", "origin-when-cross-origin")
 	response.headers.set("X-Frame-Options", "DENY")
 	response.headers.set("X-XSS-Protection", "1; mode=block")

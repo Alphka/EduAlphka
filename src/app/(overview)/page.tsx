@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 	}
 }
 
-export default async function Homepage(){
+export default function Homepage(){
 	return (
 		<div className="flex justify-between">
 			<p>{title}</p>

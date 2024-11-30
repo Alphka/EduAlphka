@@ -5,7 +5,6 @@ import { APPLICATION_NAME } from "@constants"
 import { ToastContainer } from "react-toastify"
 import { twJoin } from "tailwind-merge"
 import { Inter } from "next/font/google"
-import verifyAuthorization from "@helpers/verifyAuthorization"
 import Providers from "./providers"
 
 import "react-toastify/dist/ReactToastify.css"
@@ -26,7 +25,7 @@ const inter = Inter({
 export const viewport: Viewport = {
 	width: "device-width",
 	initialScale: 1,
-	colorScheme: "dark light"
+	colorScheme: "only dark" as unknown as Viewport["colorScheme"]
 }
 
 export async function generateMetadata(){
@@ -70,9 +69,7 @@ export async function generateMetadata(){
 	} as Metadata
 }
 
-export default async function RootLayout({ children }: RootLayoutProps){
-	const user = await verifyAuthorization()
-
+export default function RootLayout({ children }: RootLayoutProps){
 	return (
 		<html suppressHydrationWarning>
 			<head>
@@ -86,10 +83,7 @@ export default async function RootLayout({ children }: RootLayoutProps){
 					"antialiased min-h-dvh"
 				)}
 			>
-				<Providers
-					user={user.toJSON({ flattenObjectIds: true, versionKey: false }) as any}
-					fontFamily={inter.style.fontFamily}
-				>
+				<Providers fontFamily={inter.style.fontFamily}>
 					{children}
 
 					<ToastContainer
