@@ -28,7 +28,6 @@
 			"./src/typings"
 		],
 		"paths": {
-			"@dictionaries": ["./src/app/[locale]/dictionaries.ts"],
 			"@constants/*": ["./src/app/constants/*"],
 			"@constants": ["./src/app/constants/index.ts"],
 			"@contexts/*": ["./src/app/contexts/*"],

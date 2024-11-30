@@ -1,9 +1,8 @@
 import type { AccountType } from "@typings/api"
-import type { Dictionary } from "@dictionaries"
 import { User } from "@models"
 import connectDatabase from "./connectDatabase"
 
-export default async function registerUser(dictionary: Dictionary, {
+export default async function registerUser({
 	name,
 	email,
 	username,
@@ -18,7 +17,7 @@ export default async function registerUser(dictionary: Dictionary, {
 }){
 	await connectDatabase()
 
-	let user = await User.findOne({
+	const user = await User.findOne({
 		$or: [
 			{ email },
 			{ username }
@@ -26,12 +25,12 @@ export default async function registerUser(dictionary: Dictionary, {
 	})
 
 	if(user){
-		if(user.username === username) throw dictionary.register.form.errors.emailAlreadyInUse
-		if(user.email === email) throw dictionary.register.form.errors.emailAlreadyInUse
-		throw dictionary.register.form.errors.credentialsAlreadyInUse
+		if(user.username === username) throw "Esse nome de usuário já está em uso"
+		if(user.email === email) throw "Esse e-mail já está em uso"
+		throw "Essas credenciais já estão em uso"
 	}
 
-	user = await User.create({
+	return await User.create({
 		name,
 		email,
 		username,
@@ -39,6 +38,4 @@ export default async function registerUser(dictionary: Dictionary, {
 		accountType,
 		startedTests: []
 	})
-
-	return user
 }

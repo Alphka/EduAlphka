@@ -2,27 +2,16 @@
 
 import type { ReactNode } from "react"
 import { createTheme, MantineProvider, NumberInput, Textarea, TextInput } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
 import { TimeInput } from "@mantine/dates"
-import ColorSchemeContext, { type Themes } from "./contexts/ColorScheme"
+import CredentialsContext, { type UserCredentials } from "./contexts/CredentialsContext"
 
 interface ProviderProps {
-	children: ReactNode
+	user: UserCredentials
 	fontFamily: string
-	defaultTheme: Themes
+	children: ReactNode
 }
 
-export default function Providers({ defaultTheme, fontFamily, children }: ProviderProps){
-	const [colorScheme, setColorScheme] = useLocalStorage<Themes>({
-		key: "theme",
-		defaultValue: defaultTheme,
-		serialize: value => value,
-		deserialize: value => {
-			if(value === "light" || value === "dark") return value
-			return defaultTheme
-		}
-	})
-
+export default function Providers({ user, fontFamily, children }: ProviderProps){
 	const theme = createTheme({
 		cursorType: "pointer",
 		components: {
@@ -55,21 +44,15 @@ export default function Providers({ defaultTheme, fontFamily, children }: Provid
 	})
 
 	return (
-		<ColorSchemeContext.Provider
-			value={{
-				colorScheme,
-				onChange: setColorScheme
-			}}
-		>
+		<CredentialsContext.Provider value={{ user }}>
 			<MantineProvider
 				theme={theme}
 				withCssVariables
-				forceColorScheme={colorScheme}
-				withStaticClasses={false}
+				forceColorScheme="dark"
 				deduplicateCssVariables
 			>
 				{children}
 			</MantineProvider>
-		</ColorSchemeContext.Provider>
+		</CredentialsContext.Provider>
 	)
 }

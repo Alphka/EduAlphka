@@ -1,22 +1,17 @@
 import type { HydratedDocument } from "mongoose"
-import type { Dictionary } from "@dictionaries"
 import type { IUser } from "@models/typings/User"
 import { cookies, headers } from "next/headers"
 import { Session, User } from "@models"
 import { TOKEN_KEY } from "@constants"
 import connectDatabase from "./connectDatabase"
 
-export default async function authenticateUser(dictionary: Dictionary, {
+export default async function authenticateUser({
 	keepLoggedIn = true,
 	...data
-}: {
+}: { keepLoggedIn: boolean } & ({
 	usernameOrEmail: string
 	password: string
-	keepLoggedIn: boolean
-} | {
-	user: HydratedDocument<IUser>
-	keepLoggedIn: boolean
-}){
+} | { user: HydratedDocument<IUser> })){
 	await connectDatabase()
 
 	let user: HydratedDocument<IUser>
@@ -30,7 +25,7 @@ export default async function authenticateUser(dictionary: Dictionary, {
 			[usernameOrEmail.includes("@") ? "email" : "username"]: usernameOrEmail
 		})
 
-		if(!_user || !_user.validatePassword(password)) throw dictionary.login.form.errors.invalidCredentials
+		if(!_user || !_user.validatePassword(password)) throw "Credenciais inválidas"
 
 		user = _user
 	}

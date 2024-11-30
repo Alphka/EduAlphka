@@ -1,3 +1,4 @@
+import { Divider } from "@mantine/core"
 import type { HTMLAttributes } from "react"
 import { twMerge } from "tailwind-merge"
 
@@ -22,7 +23,8 @@ export default function Legend({ className, children, ...props }: HTMLAttributes
 			{...props}
 		>
 			{children}
-			<hr className="border-neutral-300 border-x-0 border-t border-b-0" />
+			<Divider bd="gray" />
+			{/* <hr className="border-neutral-300 border-x-0 border-t border-b-0" /> */}
 		</legend>
 	)
 }

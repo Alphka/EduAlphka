@@ -1,11 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { useContext, useState } from "react"
-import { getDictionary } from "@dictionaries"
-import { useParams } from "next/navigation"
+import { useState } from "react"
 import { toast } from "react-toastify"
-import ColorSchemeContext from "@contexts/ColorScheme"
 
 type ServerActionPromise = Promise<{ errors: string[] } | undefined>
 
@@ -14,9 +11,6 @@ interface ServerActionHandlerProps {
 }
 
 export default function useServerActionHandler({ successMessage }: ServerActionHandlerProps = {}){
-	const { colorScheme: theme } = useContext(ColorSchemeContext)
-	const { locale } = useParams()
-
 	const [isPending, setIsPending] = useState(false)
 
 	return {
@@ -28,17 +22,15 @@ export default function useServerActionHandler({ successMessage }: ServerActionH
 			if(result){
 				if("errors" in result && result.errors.length){
 					for(const error of result.errors){
-						toast.error(error, { theme })
+						toast.error(error)
 					}
 				}else{
 					console.error("Server action failed:", result)
-
-					const dictionary = await getDictionary(locale as string)
-					toast.error(dictionary.genericErrors.somethingWentWrong, { theme })
+					toast.error("Algo deu errado")
 				}
 			}else{
 				if(successMessage){
-					toast.success(successMessage, { theme })
+					toast.success(successMessage)
 				}
 			}
 
