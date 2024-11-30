@@ -3,6 +3,7 @@
 import type { ReactNode } from "react"
 import { createTheme, MantineProvider, NumberInput, Textarea, TextInput } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
+import { TimeInput } from "@mantine/dates"
 import ColorSchemeContext, { type Themes } from "./contexts/ColorScheme"
 
 interface ProviderProps {
@@ -38,6 +39,12 @@ export default function Providers({ defaultTheme, fontFamily, children }: Provid
 			NumberInput: NumberInput.extend({
 				classNames: {
 					label: "mb-1"
+				}
+			}),
+			TimeInput: TimeInput.extend({
+				classNames: {
+					label: "mb-1",
+					input: "[&::-webkit-calendar-picker-indicator]:hidden"
 				}
 			})
 		},

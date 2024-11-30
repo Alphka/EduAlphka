@@ -155,6 +155,16 @@ const en = {
 				invalidPattern: "The exam description contains invalid characters"
 			}
 		},
+		examSubject: {
+			label: "Subject",
+			placeholder: "Exam subject",
+			validations: {
+				invalid: "Invalid subject name",
+				min: `The subject name must be at least ${GenericFormValidation.nameMinLength} characters long`,
+				max: `The subject name must have a maximum of ${GenericFormValidation.nameMaxLength} characters`,
+				invalidPattern: "The subject name must contain only numbers"
+			}
+		},
 		examDuration: {
 			label: "Duration",
 			placeholder: "Exam duration",

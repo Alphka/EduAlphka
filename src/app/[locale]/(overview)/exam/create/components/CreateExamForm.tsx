@@ -2,8 +2,11 @@
 
 import type { Dictionary } from "@dictionaries"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
-import { NumberInput, Textarea, TextInput } from "@mantine/core"
+import { ActionIcon, Textarea, TextInput } from "@mantine/core"
+import { MdAccessTime } from "react-icons/md"
+import { TimeInput } from "@mantine/dates"
 import { useForm } from "react-hook-form"
+import { useRef } from "react"
 import Legend from "@app/components/forms/Legend"
 
 interface CreateExamFormProps {
@@ -11,13 +14,16 @@ interface CreateExamFormProps {
 }
 
 export default function CreateExamForm({ dictionary }: CreateExamFormProps){
+	const durationInputRef = useRef<HTMLInputElement>(null)
+
 	const {
 		register,
 		handleSubmit,
 		formState: { errors }
 	} = useForm<{
 		title: string
-		description?: string
+		description: string
+		subject?: string
 		duration: number
 	}>()
 
@@ -55,6 +61,7 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 							required: true
 						})}
 						error={errors.title?.message}
+						withAsterisk
 					/>
 
 					<Textarea
@@ -76,47 +83,80 @@ export default function CreateExamForm({ dictionary }: CreateExamFormProps){
 							},
 							pattern: {
 								value: new RegExp(GenericFormValidation.validDescriptionPattern),
-								message: dictionary.inputs.password.validations.invalidPattern
+								message: dictionary.inputs.examDescription.validations.invalidPattern
 							},
 						})}
 						error={errors.description?.message}
+						withAsterisk
 						autosize
 					/>
 
-					<NumberInput
-						size="md"
-						label={dictionary.inputs.examDuration.label}
-						placeholder={dictionary.inputs.examDuration.placeholder}
-						aria-label={dictionary.inputs.examDuration.placeholder}
-						autoComplete="off"
-						step={1}
-						decimalScale={0}
-						allowNegative={false}
-						stepHoldDelay={300}
-        				stepHoldInterval={stepCount => Math.max(1000 / stepCount ** 2, 25)}
-						{...register("duration", {
-							min: {
-								value: ExamFormValidation.minDurationInMinutes,
-								message: dictionary.inputs.examDuration.validations.min
-							},
-							max: {
-								value: ExamFormValidation.maxDurationInMinutes,
-								message: dictionary.inputs.examDuration.validations.max
-							},
-							pattern: {
-								value: /^\d+$/,
-								message: dictionary.inputs.password.validations.invalidPattern
-							},
-							required: true
-						})}
-						onBlur={undefined}
-						onChange={undefined}
-						min={ExamFormValidation.minDurationInMinutes}
-						max={ExamFormValidation.maxDurationInMinutes}
-						error={errors.duration?.message}
-					/>
+					<div className="flex gap-6">
+						<TextInput
+							size="md"
+							type="text"
+							className="flex-grow"
+							label={dictionary.inputs.examSubject.label}
+							placeholder={dictionary.inputs.examSubject.placeholder}
+							aria-label={dictionary.inputs.examSubject.placeholder}
+							autoComplete="off"
+							{...register("subject", {
+								minLength: {
+									value: GenericFormValidation.nameMinLength,
+									message: dictionary.inputs.examSubject.validations.min
+								},
+								maxLength: {
+									value: GenericFormValidation.nameMaxLength,
+									message: dictionary.inputs.examSubject.validations.max
+								},
+								pattern: {
+									value: new RegExp(GenericFormValidation.validSpecialNamePattern),
+									message: dictionary.inputs.examSubject.validations.invalidPattern
+								}
+							})}
+							error={errors.title?.message}
+						/>
+
+						<TimeInput
+							size="md"
+							className="basis-1/5"
+							label={dictionary.inputs.examDuration.label}
+							placeholder={dictionary.inputs.examDuration.placeholder}
+							aria-label={dictionary.inputs.examDuration.placeholder}
+							step={1}
+							rightSection={(
+								<ActionIcon
+									color="gray"
+									variant="subtle"
+									onClick={() => durationInputRef.current?.showPicker()}
+								>
+									<MdAccessTime className="text-base" />
+								</ActionIcon>
+							)}
+							minTime={formatDurationTime(ExamFormValidation.minDurationInMinutes)}
+							maxTime={formatDurationTime(ExamFormValidation.maxDurationInMinutes)}
+							{...register("duration", { required: true })}
+							min={ExamFormValidation.minDurationInMinutes}
+							max={ExamFormValidation.maxDurationInMinutes}
+							error={errors.duration?.message}
+							ref={durationInputRef}
+							withAsterisk
+						/>
+					</div>
 				</div>
 			</fieldset>
 		</form>
 	)
+}
+
+function formatDurationTime(minutes: number){
+    const hours = Math.floor(minutes / 60)
+    const remainingMinutes = Math.floor(minutes % 60)
+    const seconds = Math.round((minutes % 1) * 60)
+
+    const formattedHours = hours.toString().padStart(2, "0")
+    const formattedMinutes = remainingMinutes.toString().padStart(2, "0")
+    const formattedSeconds = seconds.toString().padStart(2, "0")
+
+    return `${formattedHours}:${formattedMinutes}:${formattedSeconds}`
 }

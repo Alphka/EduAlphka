@@ -25,8 +25,9 @@
 	},
 	"dependencies": {
 		"@formatjs/intl-localematcher": "~0.5.8",
-		"@mantine/core": "7.14.2",
-		"@mantine/hooks": "7.14.2",
+		"@mantine/core": "~7.14.3",
+		"@mantine/dates": "~7.14.3",
+		"@mantine/hooks": "~7.14.3",
 		"autoprefixer": "~10.4.20",
 		"lodash": "~4.17.21",
 		"mongoose": "~8.8.3",

@@ -155,6 +155,16 @@ const pt = {
 				invalidPattern: "A descrição do teste contém caracteres inválidos"
 			}
 		},
+		examSubject: {
+			label: "Disciplina",
+			placeholder: "Disciplina do teste",
+			validations: {
+				invalid: "Nome da discplina inválido",
+				min: `O nome da disciplina deve ter no mínimo ${GenericFormValidation.nameMinLength} caracteres`,
+				max: `O nome da disciplina deve ter no máximo ${GenericFormValidation.nameMaxLength} caracteres`,
+				invalidPattern: "O nome da disciplina contém caracteres inválidos"
+			}
+		},
 		examDuration: {
 			label: "Duração do teste",
 			placeholder: "Duração do teste",
