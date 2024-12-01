@@ -189,6 +189,7 @@ export default function CreateExamForm(){
 								<ActionIcon
 									color={errors.exam?.duration ? "currentColor" : "gray"}
 									variant="subtle"
+									aria-label="Escolha o horário"
 									onClick={() => durationInputRef.current?.showPicker?.()}
 								>
 									<MdAccessTime className="text-[1.25rem]" />
