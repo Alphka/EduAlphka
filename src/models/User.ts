@@ -54,10 +54,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		default: Date.now,
 		required: true
 	},
-	updatedAt: {
-		type: Date,
-		default: Date.now
-	}
+	updatedAt: Date
 })
 
 userSchema.static("generateToken", async function generateToken(){

@@ -1,11 +1,11 @@
 import type { AnswerModel, IAnswer } from "./typings/Answer"
 import { model, models, Schema } from "mongoose"
-import { QUESTION_TYPES } from "./Exam"
+import { QuestionTypes } from "./Exam"
 
 export const answerSchema = new Schema<IAnswer>({
 	type: {
 		type: String,
-		enum: QUESTION_TYPES.types,
+		enum: Object.keys(QuestionTypes),
 		required: true
 	},
 	submit: {
@@ -25,10 +25,7 @@ export const answerSchema = new Schema<IAnswer>({
 		default: Date.now,
 		required: true
 	},
-	updatedAt: {
-		type: Date,
-		default: Date.now
-	}
+	updatedAt: Date
 })
 
 const Answer: AnswerModel = models?.Answer || model<IAnswer, AnswerModel>("Answer", answerSchema)

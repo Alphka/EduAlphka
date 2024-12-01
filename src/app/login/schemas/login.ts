@@ -21,11 +21,16 @@ export const passwordString = z.string({ invalid_type_error: "Senha inválida" }
 	.max(GenericFormValidation.passwordMaxLength, `A senha deve ter no máximo ${GenericFormValidation.passwordMaxLength} caracteres`)
 	.regex(new RegExp(GenericFormValidation.validPasswordPattern), "A senha contém caracteres inválidos")
 
+export const keepLoggedInSchema = z.boolean({
+	required_error: "O campo 'Manter conectado' é obrigatório",
+	invalid_type_error: "Tipo inválido para o campo 'Manter conectado'"
+})
+
 const loginSchema = z.object({
 	email: emailString.optional(),
 	username: usernameString.optional(),
 	password: passwordString,
-	keep_logged_in: z.boolean()
+	keep_logged_in: keepLoggedInSchema
 }).superRefine(({ email, username }, refinementContext) => {
 	if(
 		(!email && !username) ||

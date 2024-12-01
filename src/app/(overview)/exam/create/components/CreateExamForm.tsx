@@ -1,11 +1,11 @@
 "use client"
 
-import type { QuestionType } from "@models/typings/Exam"
 import type { UUID } from "crypto"
-import { ActionIcon, Button, Divider, Fieldset, Select, Textarea, TextInput, Title, type ComboboxItem } from "@mantine/core"
+import { ActionIcon, Button, Divider, Fieldset, Select, Textarea, TextInput, Title } from "@mantine/core"
 import { useRef, useState, type ChangeEvent, type FocusEvent } from "react"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdAccessTime, MdOutlineDeleteForever } from "react-icons/md"
+import { QuestionTypes } from "@models/Exam"
 import { v4 as uuid } from "uuid"
 import { TimeInput } from "@mantine/dates"
 import { useForm } from "react-hook-form"
@@ -253,16 +253,10 @@ export default function CreateExamForm(){
 								label="Selecione o tipo da questão"
 								placeholder="Selecione uma opção"
 								aria-label="Tipo da questão"
-								data={[
-									{
-										label: "Dissertativa",
-										value: "dissertative"
-									},
-									{
-										label: "Múltipla escolha",
-										value: "multiple_choice"
-									}
-								] as (ComboboxItem & { value: QuestionType })[]}
+								data={Object.entries(QuestionTypes).map(([value, label]) => ({
+									label,
+									value
+								}))}
 								{...register(`question_type.${index}`, {
 									required: {
 										value: true,

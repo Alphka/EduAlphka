@@ -79,6 +79,8 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 							? route.pathname === pathname
 							: route.pathname === pathname || pathname.startsWith(route.pathname)
 
+						const hasChildren = "children" in route && !!Object.keys(route.children).length
+
 						return (
 							<li
 								className={twJoin(
@@ -91,17 +93,18 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 									label={route.title}
 									active={isActive}
 									component={Link}
-									className="rounded"
+									className={twJoin(hasChildren ? "rounded-l rounded-t" : "rounded")}
 									leftSection={<route.Icon className="text-base" />}
 									prefetch={false}
 								>
-									{"children" in route && Object.entries(route.children).map(([childKey, childRoute]) => (
+									{hasChildren && Object.entries(route.children).map(([childKey, childRoute]) => (
 										<NavLink
 											href={childRoute.pathname}
 											label={childRoute.title}
 											component={Link}
-											prefetch={false}
+											className="rounded-b"
 											active={pathname === childRoute.pathname || childRoute.pathname.startsWith(pathname + "/")}
+											prefetch={false}
 											key={childKey}
 										/>
 									))}

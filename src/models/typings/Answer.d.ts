@@ -1,10 +1,9 @@
 import type { Model, ObjectId } from "mongoose"
-import type { QuestionType } from "./Exam"
+import type { QuestionTypes } from "@models/Exam"
 import type { DateType } from "."
-import type { UUID } from "crypto"
 
 export interface IAnswer {
-	type: QuestionType
+	type: typeof QuestionTypes[keyof typeof QuestionTypes]
 	submit: ObjectId
 	question: ObjectId
 	option?: ObjectId

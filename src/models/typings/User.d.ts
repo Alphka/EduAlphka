@@ -10,7 +10,7 @@ export interface IUser {
 	accountType: typeof ACCOUNT_TYPES[number]
 	startedTests: {
 		exam: ObjectId
-		createdAt: DateType
+		startedAt: DateType
 	}[]
 	createdAt: DateType
 	updatedAt?: DateType

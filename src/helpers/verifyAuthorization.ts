@@ -16,8 +16,8 @@ export default async function verifyAuthorization(options: AuthorizationOptions 
 
 	await connectDatabase()
 
-	const session = await Session.findOne({ token }).select("userId")
-	const user = session && await User.findOne({ _id: session.userId })
+	const session = await Session.findOne({ token }).select("user")
+	const user = session && await User.findOne({ _id: session.user })
 
 	if(!user) redirect(routes.login.pathname)
 

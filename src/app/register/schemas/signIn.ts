@@ -1,4 +1,4 @@
-import { emailString, passwordString, usernameString } from "@app/login/schemas/login"
+import { emailString, keepLoggedInSchema, passwordString, usernameString } from "@app/login/schemas/login"
 import { GenericFormValidation } from "@constants/forms"
 import { ACCOUNT_TYPES } from "@models/User"
 import { z } from "zod"
@@ -12,8 +12,11 @@ const signInSchema = z.object({
 	email: emailString,
 	username: usernameString,
 	password: passwordString,
-	account_type: z.enum(ACCOUNT_TYPES, { invalid_type_error: "Tipo de conta inválido" }),
-	keep_logged_in: z.boolean()
+	account_type: z.enum(ACCOUNT_TYPES, {
+		invalid_type_error: "Tipo de conta inválido",
+		required_error: "O tipo de conta é obrigatório"
+	}),
+	keep_logged_in: keepLoggedInSchema
 })
 
 export default signInSchema

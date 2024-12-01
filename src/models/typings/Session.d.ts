@@ -3,7 +3,7 @@ import type { DateType } from "."
 
 export interface ISession {
 	token: string
-	userId: ObjectId
+	user: ObjectId
 	userAgent: string
 	createdAt: DateType
 	expiresAt: DateType

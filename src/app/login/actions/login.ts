@@ -9,19 +9,20 @@ import routes from "@app/routes"
 export interface UserLoginData {
 	username: string
 	password: string
-	keep_logged_in?: boolean
+	keep_logged_in: boolean
 }
 
 export async function login({
 	username: usernameOrEmail,
 	password,
-	keep_logged_in: keepLoggedIn = true
+	keep_logged_in: keepLoggedIn
 }: UserLoginData){
 	const isEmail = usernameOrEmail.includes("@")
 
 	const validatedFields = loginSchema.safeParse({
 		[isEmail ? "email" : "username"]: usernameOrEmail,
-		password
+		password,
+		keep_logged_in: keepLoggedIn
 	})
 
 	if(!validatedFields.success){
