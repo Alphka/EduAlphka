@@ -23,7 +23,7 @@ export default function RegisterForm(){
 
 	return (
 		<form
-			className="w-10/12 max-w-screen-sm flex flex-col gap-12"
+			className="w-10/12 max-w-screen-sm flex flex-col gap-xl"
 			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
 				handleServerAction(signIn({
 					name,
@@ -35,17 +35,17 @@ export default function RegisterForm(){
 				}))
 			})}
 		>
-			<header className="flex flex-col gap-2">
-				<h1 className="text-4xl font-extrabold">
+			<header>
+				<h1 className="text-6xl font-extrabold">
 					Crie uma conta
 				</h1>
-				<h2 className="text-neutral-700 dark:text-gray-400 text-xl font-normal leading-tight tracking-tight">
+				<h2 className="text-neutral-700 dark:text-gray-400 text-xl leading-tight tracking-tight">
 					Junte-se à nossa plataforma de testes online e comece sua jornada de aprendizado!
 				</h2>
 			</header>
 
-			<div className="flex flex-col gap-6">
-				<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-xl">
+				<div className="flex flex-col gap-md">
 					<TextInput
 						size="md"
 						type="text"
@@ -65,7 +65,10 @@ export default function RegisterForm(){
 								value: new RegExp(GenericFormValidation.validNamePattern),
 								message: "O nome contém caracteres inválidos"
 							},
-							required: true
+							required: {
+								value: true,
+								message: "O nome é obrigatório"
+							}
 						})}
 						error={errors.name?.message}
 						withAsterisk
@@ -90,7 +93,10 @@ export default function RegisterForm(){
 								value: new RegExp(GenericFormValidation.validUsernamePattern),
 								message: "O nome de usuário contém caracteres inválidos"
 							},
-							required: true
+							required: {
+								value: true,
+								message: "O nome de usuário é obrigatório"
+							}
 						})}
 						error={errors.username?.message}
 						withAsterisk
@@ -99,10 +105,9 @@ export default function RegisterForm(){
 					<TextInput
 						size="md"
 						type="text"
-						label="E-mail"
-						placeholder="Digite o seu endereço de e-mail"
+						label="Email"
+						placeholder="Digite o seu endereço de email"
 						autoComplete="email"
-						withAsterisk={false}
 						{...register("email", {
 							minLength: {
 								value: GenericFormValidation.emailMinLength,
@@ -116,9 +121,13 @@ export default function RegisterForm(){
 								value: new RegExp(GenericFormValidation.validEmailPattern),
 								message: "O email contém caracteres inválidos"
 							},
-							required: true
+							required: {
+								value: true,
+								message: "O email é obrigatório"
+							}
 						})}
 						error={errors.email?.message}
+						withAsterisk
 					/>
 
 					<TextInput
@@ -137,10 +146,9 @@ export default function RegisterForm(){
 								aria-label={isPasswordVisible ? "Esconder senha" : "Mostrar senha"}
 								onPointerDown={event => event.detail === 1 || event.preventDefault()}
 							>
-								<PasswordEyeIcon className="text-xl" />
+								<PasswordEyeIcon className="text-md" />
 							</ActionIcon>
 						)}
-						withAsterisk={false}
 						{...register("password", {
 							minLength: {
 								value: GenericFormValidation.passwordMinLength,
@@ -154,9 +162,13 @@ export default function RegisterForm(){
 								value: new RegExp(GenericFormValidation.validPasswordPattern),
 								message: "A senha contém caracteres inválidos"
 							},
-							required: true
+							required: {
+								value: true,
+								message: "A senha é obrigatória"
+							}
 						})}
 						error={errors.password?.message}
+						withAsterisk
 					/>
 				</div>
 

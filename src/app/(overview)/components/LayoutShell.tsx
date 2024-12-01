@@ -31,10 +31,10 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 					mobile: !opened
 				}
 			}}
-			padding="lg"
+			padding="xl"
 		>
 			<AppShell.Header>
-				<div className="flex items-center justify-between px-4 py-2 gap-4">
+				<div className="h-full flex items-center justify-between px-sm gap-md">
 					<div>
 						<Burger
 							opened={opened}
@@ -44,7 +44,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						/>
 					</div>
 
-					<div className="flex items-center gap-2">
+					<div className="flex items-center gap-md">
 						<Avatar
 							name={user.name}
 							size="md"

@@ -57,6 +57,7 @@
 	"javascript.preferences.importModuleSpecifierEnding": "minimal",
 	"javascript.preferences.quoteStyle": "double",
 
+	"typescript.tsdk": "node_modules\\typescript\\lib",
 	"typescript.enablePromptUseWorkspaceTsdk": false,
 	"typescript.format.indentSwitchCase": true,
 	"typescript.format.insertSpaceAfterConstructor": false,

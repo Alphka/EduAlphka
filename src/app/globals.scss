@@ -44,8 +44,3 @@ button,
 :root{
 	font-size: 16px;
 }
-
-body{
-	@apply bg-neutral-50 text-neutral-900;
-	@apply dark:bg-zinc-900 dark:text-white;
-}

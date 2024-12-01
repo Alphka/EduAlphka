@@ -11,9 +11,9 @@ export default class GenericFormValidation {
 	static readonly passwordMinLength = 6
 	static readonly passwordMaxLength = 255
 
-	static readonly validNameChars = "A-Za-záàâãäéèêëíïóôõöúüçñÁÀÂÃÄÉÈËÍÏÓÔÕÖÚÜÇÑᵈªᵃºᵒ '.\\\\\\-"
+	static readonly validNameChars = "A-Za-zÀ-ÖØ-Þß-öø-ÿÑÇĶñçķᵈªᵃºᵒ '.\\\\\\-"
 	static readonly validSpecialNameChars = `${this.validNameChars}0-9@&\\/` as const
-	static readonly validDescriptionChars = `${this.validSpecialNameChars}\\*⁰¹²³⁴⁵⁶⁷⁸⁹ᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴵᴼᴾᴿᵀᵁᵂ⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿⁱᵒᵖʳˢᵗᵘᵛʷˣʸᶻ!:;,“”©™®•\\(\\)\\t\\n@&` as const
+	static readonly validDescriptionChars = `${this.validSpecialNameChars}\\*\\+×÷⁰¹²³⁴⁵⁶⁷⁸⁹ᴬᴮᴰᴱᴳᴴᴵᴶᴷᴸᴹᴺᴵᴼᴾᴿᵀᵁᵂ⁻ᵃᵇᶜᵈᵉᶠᵍʰⁱʲᵏˡᵐⁿⁱᵒᵖʳˢᵗᵘᵛʷˣʸᶻ!"#$%'\\(\\)*+,.;<=>?\\]^_\`\\|\\{\\}~:“”©™®•\\t\\n` as const
 	static readonly validSpecialNamePattern = `^[${this.validSpecialNameChars}]+$` as const
 	static readonly validDescriptionPattern = `^[${this.validDescriptionChars}]+$` as const
 

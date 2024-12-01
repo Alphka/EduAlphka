@@ -23,7 +23,7 @@ export default function LoginForm(){
 
 	return (
 		<form
-			className="w-10/12 max-w-screen-sm flex flex-col gap-12"
+			className="w-10/12 max-w-screen-sm flex flex-col gap-xl"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
 				handleServerAction(login({
 					username,
@@ -32,22 +32,22 @@ export default function LoginForm(){
 				}))
 			})}
 		>
-			<header className="flex flex-col gap-2">
-				<h1 className="text-4xl font-extrabold">
+			<header>
+				<h1 className="text-6xl font-extrabold">
 					Acesse sua conta
 				</h1>
-				<h2 className="text-neutral-700 dark:text-gray-400 text-xl font-normal leading-tight tracking-tight">
-					Entre com seu endereço de e-mail ou nome usuário
+				<h2 className="text-neutral-700 dark:text-gray-400 text-xl leading-tight tracking-tight">
+					Entre com seu endereço de email ou nome usuário
 				</h2>
 			</header>
 
-			<div className="flex flex-col gap-6">
-				<div className="flex flex-col gap-4">
+			<div className="flex flex-col gap-xl">
+				<div className="flex flex-col gap-md">
 					<TextInput
 						size="md"
 						type="text"
-						label="E-mail ou nome de usuário"
-						placeholder="Digite o seu endereço de e-mail ou nome de usuário"
+						label="Email ou nome de usuário"
+						placeholder="Digite o seu endereço de email ou nome de usuário"
 						autoComplete="username"
 						{...register("username", {
 							minLength: {
@@ -58,7 +58,10 @@ export default function LoginForm(){
 								value: Math.max(GenericFormValidation.emailMaxLength, GenericFormValidation.usernameMaxLength),
 								message: `O email ou nome de usuário deve ter no máximo ${Math.max(GenericFormValidation.emailMaxLength, GenericFormValidation.usernameMaxLength)} caracteres`
 							},
-							required: true
+							required: {
+								value: true,
+								message: "O email ou nome de usuário é obrigatório"
+							}
 						})}
 						error={errors.username?.message}
 						withAsterisk
@@ -83,7 +86,6 @@ export default function LoginForm(){
 								<PasswordEyeIcon className="text-xl" />
 							</ActionIcon>
 						)}
-						withAsterisk={false}
 						{...register("password", {
 							minLength: {
 								value: GenericFormValidation.passwordMinLength,
@@ -97,13 +99,17 @@ export default function LoginForm(){
 								value: new RegExp(GenericFormValidation.validPasswordPattern),
 								message: "A senha contém caracteres inválidos"
 							},
-							required: true
+							required: {
+								value: true,
+								message: "A senha é obrigatória"
+							}
 						})}
 						error={errors.password?.message}
+						withAsterisk
 					/>
 				</div>
 
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between gap-md">
 					<Checkbox
 						size="sm"
 						label="Manter logado"

@@ -73,14 +73,14 @@ export default function RootLayout({ children }: RootLayoutProps){
 	return (
 		<html suppressHydrationWarning>
 			<head>
-				<ColorSchemeScript localStorageKey="theme" />
+				<ColorSchemeScript forceColorScheme="dark" />
 			</head>
 
 			<body
 				className={twJoin(
 					inter.variable,
 					inter.className,
-					"antialiased min-h-dvh"
+					"bg-dark antialiased min-h-dvh"
 				)}
 			>
 				<Providers fontFamily={inter.style.fontFamily}>
