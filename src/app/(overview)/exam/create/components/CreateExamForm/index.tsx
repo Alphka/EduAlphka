@@ -1,47 +1,93 @@
 "use client"
 
-import type { UUID } from "crypto"
-import { ActionIcon, Button, Divider, Fieldset, Select, Textarea, TextInput, Title } from "@mantine/core"
-import { useRef, useState, type ChangeEvent, type FocusEvent } from "react"
+import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
+import { useRef, type ChangeEvent, type FocusEvent } from "react"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
-import { MdAccessTime, MdOutlineDeleteForever } from "react-icons/md"
-import { QuestionTypes } from "@models/Exam"
-import { v4 as uuid } from "uuid"
+import { useFieldArray, useForm } from "react-hook-form"
+import { MdAccessTime } from "react-icons/md"
 import { TimeInput } from "@mantine/dates"
-import { useForm } from "react-hook-form"
 import formatTimeDuration from "@helpers/formatTimeDuration"
+import QuestionContainer from "./components/QuestionContainer"
 
-interface Question {
-	id: UUID
+export interface ExamFormData {
+	exam: {
+		title: string
+		description: string
+		subject?: string
+		duration: string
+	}
+	question: {
+		title: string
+		question_type: string
+		text?: string
+		option?: {
+			text: string
+		}[]
+		/** Option's index */
+		correct_answer?: number
+	}[]
 }
 
-const newQuestion = () => ({
-	id: uuid()
-} as Question)
-
 export default function CreateExamForm(){
-	const [questions, setQuestions] = useState<Question[]>(() => [newQuestion()])
 	const durationInputRef = useRef<HTMLInputElement>(null)
 
 	const {
+		control,
 		setValue,
 		register,
-		unregister,
+		setError,
+		clearErrors,
 		handleSubmit,
 		formState: { errors }
-	} = useForm<{
-		exam_title: string
-		exam_description: string
-		exam_subject?: string
-		exam_duration: string
-		question_title: string[]
-		question_type: string[]
-	}>({
-		mode: "onBlur"
+	} = useForm<ExamFormData>({
+		reValidateMode: "onChange",
+		defaultValues: {
+			question: [{
+				title: "",
+				question_type: "",
+				text: "",
+				option: [{ text: "" }]
+			}]
+		},
+		mode: "onSubmit"
+	})
+
+	const {
+		fields: questionFields,
+		append: appendQuestion,
+		remove: removeQuestion
+	} = useFieldArray({
+		control,
+		name: "question"
 	})
 
 	return (
-		<form onSubmit={handleSubmit(() => {})}>
+		<form
+			onSubmit={handleSubmit(({
+				question: questions
+			}) => {
+				let hasError = false
+
+				for(let questionIndex = 0, { length } = questions; questionIndex < length; questionIndex++){
+					const question = questions[questionIndex]
+					const path = `question.${questionIndex}.correct_answer` as const
+
+					if(typeof question.correct_answer !== "number"){
+
+						setError(path, {
+							type: "required",
+							message: "Nenhuma opção foi selecionada como a resposta correta",
+						})
+
+						hasError = true
+					}else{
+						clearErrors(path)
+					}
+				}
+
+				if(hasError) return
+			})}
+		>
 			<Fieldset
 				legend="Informações do teste"
 				radius="md"
@@ -55,7 +101,7 @@ export default function CreateExamForm(){
 						placeholder="Descrição do teste"
 						aria-label="Descrição do teste"
 						autoComplete="off"
-						{...register("exam_title", {
+						{...register("exam.title", {
 							minLength: {
 								value: ExamFormValidation.titleMinLength,
 								message: `O título do teste deve ter no mínimo ${ExamFormValidation.titleMinLength} caracteres`
@@ -73,7 +119,7 @@ export default function CreateExamForm(){
 								message: "O título do teste é obrigatório"
 							}
 						})}
-						error={errors.exam_title?.message}
+						error={errors.exam?.title?.message}
 						withAsterisk
 					/>
 
@@ -85,7 +131,7 @@ export default function CreateExamForm(){
 						placeholder="Descrição do teste"
 						aria-label="Descrição do teste"
 						autoComplete="off"
-						{...register("exam_description", {
+						{...register("exam.description", {
 							minLength: {
 								value: ExamFormValidation.descriptionMinLength,
 								message: `A descrição do teste deve ter no mínimo ${ExamFormValidation.descriptionMinLength} minutos`
@@ -103,7 +149,7 @@ export default function CreateExamForm(){
 								message: "A descrição do teste é obrigatória"
 							}
 						})}
-						error={errors.exam_description?.message}
+						error={errors.exam?.description?.message}
 						withAsterisk
 						autosize
 					/>
@@ -117,7 +163,7 @@ export default function CreateExamForm(){
 							placeholder="Disciplina do teste"
 							aria-label="Disciplina do teste"
 							autoComplete="off"
-							{...register("exam_subject", {
+							{...register("exam.subject", {
 								minLength: {
 									value: GenericFormValidation.nameMinLength,
 									message: `O nome da disciplina deve ter no mínimo ${GenericFormValidation.nameMinLength} caracteres`
@@ -131,7 +177,7 @@ export default function CreateExamForm(){
 									message: "O nome da disciplina contém caracteres inválidos"
 								}
 							})}
-							error={errors.exam_subject?.message}
+							error={errors.exam?.subject?.message}
 						/>
 
 						<TimeInput
@@ -141,21 +187,21 @@ export default function CreateExamForm(){
 							aria-label="Duração do teste"
 							rightSection={(
 								<ActionIcon
-									color={errors.exam_duration ? "currentColor" : "gray"}
+									color={errors.exam?.duration ? "currentColor" : "gray"}
 									variant="subtle"
 									onClick={() => durationInputRef.current?.showPicker?.()}
 								>
-									<MdAccessTime className="text-xl" />
+									<MdAccessTime className="text-[1.25rem]" />
 								</ActionIcon>
 							)}
 							minTime={formatTimeDuration(ExamFormValidation.minDurationInMinutes)}
 							maxTime={formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}
-							{...register("exam_duration", {
+							{...register("exam.duration", {
 								onBlur(event: FocusEvent<HTMLInputElement>){
 									const { target: input } = event
 									const value = input.value === "00:00" ? "" : input.value
 
-									setValue("exam_duration", value, {
+									setValue("exam.duration", value, {
 										shouldDirty: true,
 										shouldValidate: true
 									})
@@ -164,7 +210,7 @@ export default function CreateExamForm(){
 									const { target: input } = event
 									const value = input.value === "00:00" ? "" : input.value
 
-									setValue("exam_duration", value, {
+									setValue("exam.duration", value, {
 										shouldValidate: true
 									})
 								},
@@ -173,7 +219,7 @@ export default function CreateExamForm(){
 									message: "A duração do teste é obrigatória"
 								}
 							})}
-							error={errors.exam_duration?.message}
+							error={errors.exam?.duration?.message}
 							ref={durationInputRef}
 							withAsterisk
 						/>
@@ -189,85 +235,18 @@ export default function CreateExamForm(){
 				mb="lg"
 			>
 				<ul className="flex flex-col gap-xl">
-					{questions.map(({ id }, index) => (
-						<li
-							className="flex flex-col gap-md"
-							key={id}
-						>
-							<div className="relative">
-								<Title order={3} fw={500} size="lg">
-									Questão {index + 1}
-								</Title>
-
-								<ActionIcon
-									variant="subtle"
-									className="absolute top-0 bottom-0 right-0"
-									aria-label={`Remover ${index + 1}ª questão`}
-									title="Remover questão"
-									onClick={() => {
-										unregister(`question_title.${index}`)
-										unregister(`question_type.${index}`)
-
-										setQuestions(questions => [
-											...questions.slice(0, index),
-											...questions.slice(index + 1)
-										])
-									}}
-									disabled={index === 0}
-								>
-									<MdOutlineDeleteForever />
-								</ActionIcon>
-							</div>
-
-							<TextInput
-								size="md"
-								type="text"
-								label="Título da questão"
-								placeholder="Título da questão"
-								aria-label="Título da questão"
-								autoComplete="off"
-								{...register(`question_title.${index}`, {
-									minLength: {
-										value: ExamFormValidation.questionTitleMinLength,
-										message: `O título da questão deve ter no mínimo ${ExamFormValidation.questionTitleMinLength} caracteres`
-									},
-									maxLength: {
-										value: ExamFormValidation.questionTitleMaxLength,
-										message: `O título da questão deve ter no máximo ${ExamFormValidation.questionTitleMaxLength} caracteres`
-									},
-									pattern: {
-										value: new RegExp(GenericFormValidation.validDescriptionPattern),
-										message: "O título da questão contém caracteres inválidos"
-									},
-									required: {
-										value: true,
-										message: "O título da questão é obrigatório"
-									}
-								})}
-								error={errors.question_title?.[index]?.message}
-								withAsterisk
-							/>
-
-							<Select
-								size="md"
-								label="Selecione o tipo da questão"
-								placeholder="Selecione uma opção"
-								aria-label="Tipo da questão"
-								data={Object.entries(QuestionTypes).map(([value, label]) => ({
-									label,
-									value
-								}))}
-								{...register(`question_type.${index}`, {
-									required: {
-										value: true,
-										message: "O tipo da questão é obrigatório"
-									}
-								})}
-								onChange={value => {
-									setValue(`question_type.${index}`, value || "")
+					{questionFields.map(({ id }, index) => (
+						<li className="flex flex-col gap-md" key={id}>
+							<QuestionContainer
+								{...{
+									removeQuestion,
+									clearErrors,
+									register,
+									setValue,
+									control,
+									errors,
+									index
 								}}
-								error={errors.question_type?.[index]?.message}
-								withAsterisk
 							/>
 						</li>
 					))}
@@ -279,7 +258,12 @@ export default function CreateExamForm(){
 					<Button
 						variant="default"
 						onClick={() => {
-							setQuestions(questions => questions.concat(newQuestion()))
+							appendQuestion({
+								title: "",
+								question_type: "",
+								text: "",
+								option: [{ text: "" }]
+							})
 						}}
 					>
 						Adicionar questão
@@ -290,7 +274,6 @@ export default function CreateExamForm(){
 			<Button
 				type="submit"
 				variant="filled"
-				mt="xl"
 			>
 				Cadastrar teste
 			</Button>

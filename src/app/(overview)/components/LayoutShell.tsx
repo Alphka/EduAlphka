@@ -50,6 +50,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 							size="md"
 							radius="xl"
 							color="initials"
+							className="leading-none"
 							allowedInitialsColors={[
 								"red",
 								"pink",

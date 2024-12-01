@@ -83,7 +83,7 @@ export default function LoginForm(){
 								aria-label={isPasswordVisible ? "Esconder senha" : "Mostrar senha"}
 								onPointerDown={event => event.detail === 1 || event.preventDefault()}
 							>
-								<PasswordEyeIcon className="text-xl" />
+								<PasswordEyeIcon className="text-[1.25rem]" />
 							</ActionIcon>
 						)}
 						{...register("password", {

@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { createTheme, MantineProvider, NumberInput, Textarea, TextInput } from "@mantine/core"
+import { createTheme, MantineProvider, NumberInput, Textarea, TextInput, Select } from "@mantine/core"
 import { TimeInput } from "@mantine/dates"
 
 interface ProviderProps {
@@ -32,6 +32,11 @@ export default function Providers({ fontFamily, children }: ProviderProps){
 				classNames: {
 					label: "mb-1",
 					input: "[&::-webkit-calendar-picker-indicator]:hidden"
+				}
+			}),
+			Select: Select.extend({
+				classNames: {
+					label: "mb-1"
 				}
 			})
 		},
