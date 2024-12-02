@@ -35,7 +35,6 @@ export default function CreateExamForm(){
 		control,
 		setValue,
 		register,
-		setError,
 		clearErrors,
 		handleSubmit,
 		formState: { errors }
@@ -63,35 +62,12 @@ export default function CreateExamForm(){
 
 	return (
 		<form
-			onSubmit={handleSubmit(({
-				question: questions
-			}) => {
-				let hasError = false
-
-				for(let questionIndex = 0, { length } = questions; questionIndex < length; questionIndex++){
-					const question = questions[questionIndex]
-					const path = `question.${questionIndex}.correct_answer` as const
-
-					if(typeof question.correct_answer !== "number"){
-
-						setError(path, {
-							type: "required",
-							message: "Nenhuma opção foi selecionada como a resposta correta",
-						})
-
-						hasError = true
-					}else{
-						clearErrors(path)
-					}
-				}
-
-				if(hasError) return
-			})}
+			className="flex flex-col gap-8"
+			onSubmit={handleSubmit(() => {})}
 		>
 			<Fieldset
 				legend="Informações do teste"
 				radius="md"
-				mb="lg"
 			>
 				<div className="flex flex-col gap-md">
 					<TextInput
@@ -228,12 +204,11 @@ export default function CreateExamForm(){
 				</div>
 			</Fieldset>
 
-			<Divider my="xl" />
+			<Divider />
 
 			<Fieldset
 				legend="Questões"
 				radius="md"
-				mb="lg"
 			>
 				<ul className="flex flex-col gap-xl">
 					{questionFields.map(({ id }, index) => (
@@ -274,7 +249,9 @@ export default function CreateExamForm(){
 
 			<Button
 				type="submit"
+				size="sm"
 				variant="filled"
+				className="self-start"
 			>
 				Cadastrar teste
 			</Button>

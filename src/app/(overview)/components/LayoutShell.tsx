@@ -76,11 +76,13 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 					{Object.entries(routes).map(([key, route]) => {
 						if(!("Icon" in route)) return null
 
-						const isActive = (pathname === "/" || route.pathname === "/")
-							? route.pathname === pathname
-							: route.pathname === pathname || pathname.startsWith(route.pathname)
+						const isActive = (route: string) => {
+							if(pathname === "/" || route === "/") return route === pathname
+							return route === pathname || pathname.startsWith(route) // || route.startsWith(pathname + "/")
+						}
 
 						const hasChildren = "children" in route && !!Object.keys(route.children).length
+						const isOpened = hasChildren && Object.entries(route.children).some(([, childRoute]) => isActive(childRoute.pathname))
 
 						return (
 							<li
@@ -92,9 +94,13 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 								<NavLink
 									href={route.pathname}
 									label={route.title}
-									active={isActive}
+									active={isActive(route.pathname)}
+									opened={isOpened}
 									component={Link}
-									className={twJoin(hasChildren ? "rounded-l rounded-t" : "rounded")}
+									className={twJoin(
+										"rounded",
+										hasChildren && "data-[expanded=true]:rounded-none data-[expanded=true]:rounded-l data-[expanded=true]:rounded-t"
+									)}
 									leftSection={<route.Icon className="text-base" />}
 									prefetch={false}
 								>
@@ -104,7 +110,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 											label={childRoute.title}
 											component={Link}
 											className="rounded-b"
-											active={pathname === childRoute.pathname || childRoute.pathname.startsWith(pathname + "/")}
+											active={isActive(childRoute.pathname)}
 											prefetch={false}
 											key={childKey}
 										/>

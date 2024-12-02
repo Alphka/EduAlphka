@@ -1,9 +1,10 @@
 import type { QuestionContainerProps } from "./QuestionContainer"
-import type { UseFieldArrayRemove } from "react-hook-form"
+import { useWatch, type UseFieldArrayRemove } from "react-hook-form"
 import { ActionIcon, Radio, TextInput } from "@mantine/core"
 import { MdDeleteOutline } from "react-icons/md"
+import { useRef } from "react"
 
-interface OptionContainerProps extends Pick<QuestionContainerProps, "clearErrors" | "register" | "setValue" | "errors"> {
+interface OptionContainerProps extends Pick<QuestionContainerProps, "clearErrors" | "control" | "register" | "setValue" | "errors"> {
 	questionIndex: number
 	removeOption: UseFieldArrayRemove
 	optionIndex: number
@@ -18,24 +19,40 @@ export default function OptionContainer({
 	canDelete,
 	setValue,
 	register,
+	control,
 	errors
 }: OptionContainerProps){
+	const optionRef = useRef<HTMLInputElement>(null)
+	const watch = useWatch({ control, defaultValue: undefined })
+
 	const contentError = errors.question?.[questionIndex]?.option?.[optionIndex]?.text?.message
 	const optionError = errors.question?.[questionIndex]?.correct_answer?.message
+	const optionPath = `question.${questionIndex}.correct_answer` as const
 
 	return <>
+		<input
+			type="hidden"
+			{...register(optionPath, {
+				required: {
+					value: true,
+					message: "Nenhuma opção foi selecionada como a resposta correta"
+				}
+			})}
+		/>
+
 		<Radio
+			name={optionPath}
 			size="lg"
 			variant="outline"
 			onChange={() => {
-				const path = `question.${questionIndex}.correct_answer` as const
-				setValue(path, optionIndex)
-				clearErrors(path)
+				setValue(optionPath, optionIndex)
+				clearErrors(optionPath)
 			}}
-			name={`option.${questionIndex}`}
+			defaultChecked={watch.question?.[questionIndex]?.correct_answer === optionIndex}
 			aria-label="Definir como a resposta correta"
 			title={optionError || "Definir como a resposta correta"}
 			error={!!optionError}
+			ref={optionRef}
 		/>
 
 		<TextInput

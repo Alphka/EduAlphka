@@ -129,22 +129,25 @@ export default function QuestionContainer({
 
 			{questionType && (questionType === "multiple_choice" ? <>
 				<ul className="flex flex-col gap-md">
-					{options.map(({ id }, optionIndex, { length }) => (
-						<li className="flex items-center justify-between gap-sm" key={id}>
-							<OptionContainer
-								questionIndex={index}
-								canDelete={length === 1}
-								{...{
-									removeOption,
-									optionIndex,
-									clearErrors,
-									register,
-									setValue,
-									errors
-								}}
-							/>
-						</li>
-					))}
+					{options.map(({ id }, optionIndex, { length }) => {
+						return (
+							<li className="flex items-center justify-between gap-sm" key={id}>
+								<OptionContainer
+									questionIndex={index}
+									canDelete={length === 1}
+									{...{
+										removeOption,
+										optionIndex,
+										clearErrors,
+										register,
+										setValue,
+										control,
+										errors
+									}}
+								/>
+							</li>
+						)
+					})}
 				</ul>
 
 				<div className="flex justify-center">
