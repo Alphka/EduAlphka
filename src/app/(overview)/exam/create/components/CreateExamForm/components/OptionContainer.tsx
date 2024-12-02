@@ -30,16 +30,6 @@ export default function OptionContainer({
 	const optionPath = `question.${questionIndex}.correct_answer` as const
 
 	return <>
-		<input
-			type="hidden"
-			{...register(optionPath, {
-				required: {
-					value: true,
-					message: "Nenhuma opção foi selecionada como a resposta correta"
-				}
-			})}
-		/>
-
 		<Radio
 			name={optionPath}
 			size="lg"

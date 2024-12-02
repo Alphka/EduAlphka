@@ -130,8 +130,30 @@ export default function QuestionContainer({
 			{questionType && (questionType === "multiple_choice" ? <>
 				<ul className="flex flex-col gap-md">
 					{options.map(({ id }, optionIndex, { length }) => {
+						const path = `question.${index}.correct_answer` as const
+
 						return (
 							<li className="flex items-center justify-between gap-sm" key={id}>
+								{optionIndex === 0 && (
+									<input
+										type="text"
+										className="sr-only"
+										aria-hidden
+										tabIndex={-1}
+										onFocus={() => {
+											const options = document.getElementsByName(path)
+											options[0]?.focus()
+										}}
+										{...register(path, {
+											required: {
+												value: true,
+												message: "Nenhuma opção foi selecionada como a resposta correta"
+											}
+										})}
+										name={undefined}
+									/>
+								)}
+
 								<OptionContainer
 									questionIndex={index}
 									canDelete={length === 1}
