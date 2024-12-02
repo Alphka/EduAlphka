@@ -1,4 +1,13 @@
-import type { IExam, ExamModel } from "./typings/Exam"
+import type {
+	IExam,
+	ExamModel,
+	IExamQuestion,
+	QuestionModel,
+	OptionModel,
+	TQuestionOption,
+	ExamMultipleChoiceQuestion,
+	ExamDissertativeQuestion
+} from "./typings/Exam"
 import { model, models, Schema } from "mongoose"
 
 export enum QuestionTypes {
@@ -6,14 +15,18 @@ export enum QuestionTypes {
 	dissertative = "Dissertativa"
 }
 
-const OptionSchema = new Schema({
+const OptionSchema = new Schema<TQuestionOption, OptionModel>({
 	text: {
 		type: String,
 		required: true
 	}
 })
 
-const QuestionSchema = new Schema({
+const QuestionSchema = new Schema<
+	& IExamQuestion
+	& Omit<ExamMultipleChoiceQuestion, "type">
+	& Omit<ExamDissertativeQuestion, "type">
+, QuestionModel>({
 	type: {
 		type: String,
 		enum: Object.keys(QuestionTypes),
@@ -25,10 +38,10 @@ const QuestionSchema = new Schema({
 	},
 	isRequired: {
 		type: Boolean,
-		required: true
+		// required: true
 	},
 	options: [OptionSchema],
-	correctAnswer: String
+	correctAnswer: Schema.ObjectId
 })
 
 export const examSchema = new Schema<IExam, ExamModel>({

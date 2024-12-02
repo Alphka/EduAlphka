@@ -55,7 +55,6 @@ export async function signIn({
 		return { errors: ["Falha ao registrar o usuário"] }
 	}
 
-	revalidatePath("/")
 	revalidatePath(routes.homepage.pathname)
 	redirect(routes.homepage.pathname)
 }

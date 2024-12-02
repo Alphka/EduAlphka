@@ -1,7 +1,6 @@
 import type { AccountType } from "@typings/api"
-import { Session, User } from "@models"
 import { redirect } from "next/navigation"
-import connectDatabase from "@lib/connectDatabase"
+import getUserByToken from "./getUserByToken"
 import getToken from "./getToken"
 import routes from "@app/routes"
 
@@ -14,10 +13,7 @@ export default async function verifyAuthorization(options: AuthorizationOptions 
 
 	if(!token) redirect(routes.login.pathname)
 
-	await connectDatabase()
-
-	const session = await Session.findOne({ token }).select("user")
-	const user = session && await User.findOne({ _id: session.user })
+	const user = await getUserByToken(token)
 
 	if(!user) redirect(routes.login.pathname)
 

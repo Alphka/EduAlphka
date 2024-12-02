@@ -16,7 +16,7 @@ interface LayoutShellProps {
 }
 
 export default function LayoutShell({ user, children }: LayoutShellProps){
-	const [opened, { toggle }] = useDisclosure()
+	const [burgerOpened, { toggle: toggleBurger }] = useDisclosure()
 	const pathname = usePathname()
 
 	return (
@@ -28,7 +28,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 				width: 300,
 				breakpoint: "sm",
 				collapsed: {
-					mobile: !opened
+					mobile: !burgerOpened
 				}
 			}}
 			padding="xl"
@@ -37,8 +37,8 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 				<div className="h-full flex items-center justify-between px-sm gap-md">
 					<div>
 						<Burger
-							opened={opened}
-							onClick={toggle}
+							opened={burgerOpened}
+							onClick={toggleBurger}
 							hiddenFrom="sm"
 							size="sm"
 						/>

@@ -9,7 +9,7 @@ import {
 	type UseFormRegister,
 	type UseFormSetValue
 } from "react-hook-form"
-import { ActionIcon, Button, Select, Textarea, TextInput, Title } from "@mantine/core"
+import { ActionIcon, Button, Select, Textarea, Title } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdOutlineDeleteForever } from "react-icons/md"
 import { QuestionTypes } from "@models/Exam"
@@ -18,6 +18,7 @@ import OptionContainer from "./OptionContainer"
 export interface QuestionContainerProps {
 	removeQuestion: UseFieldArrayRemove
 	clearErrors: UseFormClearErrors<ExamFormData>
+	canDelete: boolean
 	register: UseFormRegister<ExamFormData>
 	setValue: UseFormSetValue<ExamFormData>
 	control: Control<ExamFormData, any>
@@ -28,6 +29,7 @@ export interface QuestionContainerProps {
 export default function QuestionContainer({
 	removeQuestion,
 	clearErrors,
+	canDelete,
 	register,
 	setValue,
 	control,
@@ -35,7 +37,7 @@ export default function QuestionContainer({
 	index
 }: QuestionContainerProps){
 	const {
-		fields: options,
+		fields: optionFields,
 		append: appendOption,
 		remove: removeOption
 	} = useFieldArray({
@@ -69,39 +71,42 @@ export default function QuestionContainer({
 				onClick={() => {
 					removeQuestion(index)
 				}}
-				disabled={index === 0}
+				disabled={!canDelete}
 			>
 				<MdOutlineDeleteForever className="text-[1.25rem]" />
 			</ActionIcon>
 		</div>
 
-		<TextInput
+		<Textarea
 			size="md"
-			type="text"
-			label="Título da questão"
-			placeholder="Título da questão"
-			aria-label="Título da questão"
+			minRows={2}
+			maxRows={12}
+			label="Pergunta"
+			placeholder="Conteúdo da questão"
+			aria-label="Conteúdo da questão"
 			autoComplete="off"
-			{...register(`question.${index}.title`, {
+			{...register(`question.${index}.text`, {
 				minLength: {
-					value: ExamFormValidation.questionTitleMinLength,
-					message: `O título da questão deve ter no mínimo ${ExamFormValidation.questionTitleMinLength} caracteres`
+					value: ExamFormValidation.questionTextMinLength,
+					message: `O conteúdo da questão deve ter no mínimo ${ExamFormValidation.questionTextMinLength} caracteres`
 				},
 				maxLength: {
-					value: ExamFormValidation.questionTitleMaxLength,
-					message: `O título da questão deve ter no máximo ${ExamFormValidation.questionTitleMaxLength} caracteres`
+					value: ExamFormValidation.questionTextMaxLength,
+					message: `O conteúdo da questão deve ter no máximo ${ExamFormValidation.questionTextMaxLength} caracteres`
 				},
 				pattern: {
 					value: new RegExp(GenericFormValidation.validDescriptionPattern),
-					message: "O título da questão contém caracteres inválidos"
+					message: "O conteúdo da questão contém caracteres inválidos"
 				},
 				required: {
 					value: true,
-					message: "O título da questão é obrigatório"
+					message: "O conteúdo da questão é obrigatório"
 				}
 			})}
-			error={errors.question?.[index]?.title?.message}
+			error={errors.question?.[index]?.text?.message}
 			withAsterisk
+			spellCheck
+			autosize
 		/>
 
 		<div className="flex flex-col gap-md">
@@ -124,12 +129,14 @@ export default function QuestionContainer({
 					setValue(`question.${index}.question_type`, value || "")
 				}}
 				error={errors.question?.[index]?.question_type?.message}
+				allowDeselect={false}
+				clearable={false}
 				withAsterisk
 			/>
 
-			{questionType && (questionType === "multiple_choice" ? <>
+			{questionType && questionType === "multiple_choice" && <>
 				<ul className="flex flex-col gap-md">
-					{options.map(({ id }, optionIndex, { length }) => {
+					{optionFields.map(({ id }, optionIndex, { length }) => {
 						const path = `question.${index}.correct_answer` as const
 
 						return (
@@ -174,30 +181,18 @@ export default function QuestionContainer({
 
 				<div className="flex justify-center">
 					<Button
+						size="sm"
 						variant="subtle"
 						aria-label={`Adicionar opção de múltipla escolha à ${index}ª questão`}
 						onClick={() => {
 							appendOption({ text: "" })
 						}}
+						disabled={optionFields.length === 50}
 					>
 						Adicionar opção
 					</Button>
 				</div>
-			</> : (
-				<Textarea
-					size="md"
-					minRows={4}
-					maxRows={12}
-					placeholder="Conteúdo da questão"
-					{...register(`question.${index}.text`, {
-						required: {
-							value: true,
-							message: "O conteúdo da opção é obrigatório"
-						}
-					})}
-					autosize
-				/>
-			))}
+			</>}
 		</div>
 	</>
 }

@@ -1,0 +1,86 @@
+"use server"
+
+import type { HydratedDocument } from "mongoose"
+import type { TQuestionOption } from "@models/typings/Exam"
+import getDurationMinutes from "@helpers/getDurationMinutes"
+import connectDatabase from "@lib/connectDatabase"
+import getSessionUser from "@helpers/getSessionUser"
+import Exam from "@models/Exam"
+
+export interface ExamData {
+	title: string
+	description: string
+	subject?: string
+	/** HH:MM */
+	duration: string
+}
+
+export interface QuestionData {
+	type: string
+	text: string
+	option?: {
+		text: string
+	}[]
+	/** Option's index */
+	correct_answer?: number
+}
+
+export default async function createExam({
+	title,
+	description,
+	subject,
+	duration
+}: ExamData, questions: QuestionData[]){
+	await connectDatabase()
+
+	const owner = await getSessionUser()
+
+	if(!owner || owner.accountType !== "professor") return { errors: ["Acesso negado"] }
+
+	const exam = new Exam({
+		owner,
+		title,
+		description,
+		subject,
+		duration: getDurationMinutes(duration),
+		questions: questions.map(({ type, text, option: options/*, isRequired */ }) => {
+			switch(type){
+				case "dissertative":
+					return {
+						type,
+						text,
+						// isRequired
+					}
+				case "multiple_choice":
+					if(!options) return { errors: ["As questões de múltipla escolha devem possuir opções definidas"] }
+
+					return {
+						type,
+						text,
+						options,
+						// isRequired
+					}
+				default:
+					return { errors: ["Tipo de questão inválido: " + type] }
+			}
+		}),
+		candidates: []
+	})
+
+	for(let index = 0, { length } = questions; index < length; index++){
+		const examQuestion = exam.questions[index]
+		const question = questions[index]
+
+		if(examQuestion.type !== "multiple_choice") continue
+
+		examQuestion.correctAnswer = (examQuestion.options as HydratedDocument<TQuestionOption>[])[question.correct_answer!]._id
+	}
+
+	await exam.save()
+
+	// revalidatePath(routes.exam)
+	// revalidatePath(routes.exam.pathname)
+	// redirect(routes.exam.pathname)
+
+	// expiresAt?: DateType
+}

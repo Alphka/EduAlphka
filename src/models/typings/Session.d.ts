@@ -1,9 +1,9 @@
-import type { Model, ObjectId } from "mongoose"
+import type { Model, Types } from "mongoose"
 import type { DateType } from "."
 
 export interface ISession {
 	token: string
-	user: ObjectId
+	user: Types.ObjectId
 	userAgent: string
 	createdAt: DateType
 	expiresAt: DateType

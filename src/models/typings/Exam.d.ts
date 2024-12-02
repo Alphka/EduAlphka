@@ -1,36 +1,40 @@
-import type { Model, ObjectId } from "mongoose"
+import type { Model, Types } from "mongoose"
 import type { QuestionTypes } from "@models/Exam"
 import type { DateType } from "."
 
-interface ExamQuestion {
-	type: typeof QuestionTypes[keyof typeof QuestionTypes]
+interface IExamQuestion {
+	type: keyof typeof QuestionTypes
 	text: string
 	isRequired: boolean
 }
 
-interface ExamMultipleChoiceQuestion extends ExamQuestion {
-	type: QuestionTypes.multiple_choice
+export interface ExamMultipleChoiceQuestion extends IExamQuestion {
+	type: "multiple_choice"
 	options: {
 		text: string
 	}[]
-	correctAnswer: ObjectId
+	correctAnswer: Types.ObjectId
 }
 
-interface ExamDissertativeQuestion extends ExamQuestion {
-	type: QuestionTypes.dissertative
+export interface ExamDissertativeQuestion extends IExamQuestion {
+	type: "dissertative"
 }
+
+export type TQuestionOption = ExamMultipleChoiceQuestion | ExamDissertativeQuestion
 
 export interface IExam {
-	owner: ObjectId
+	owner: Types.ObjectId
 	title: string
 	description: string
 	subject?: string
 	duration: number
-	questions: (ExamMultipleChoiceQuestion | ExamDissertativeQuestion)[]
-	candidates: ObjectId[]
+	questions: TQuestionOption[]
+	candidates: Types.ObjectId[]
 	createdAt: DateType
 	updatedAt?: DateType
 	expiresAt?: DateType
 }
 
+export type QuestionModel = Model<IExamQuestion>
+export type OptionModel = Model<TQuestionOption>
 export type ExamModel = Model<IExam>

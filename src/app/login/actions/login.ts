@@ -50,7 +50,6 @@ export async function login({
 		return { errors: ["Falha ao autenticar o usuário"] }
 	}
 
-	revalidatePath("/")
 	revalidatePath(routes.homepage.pathname)
 	redirect(routes.homepage.pathname)
 }

@@ -1,5 +1,5 @@
-import type { HydratedDocument, Model, ObjectId, QueryWithHelpers } from "mongoose"
 import type { ACCOUNT_TYPES } from "@models/User"
+import type { Model, Types } from "mongoose"
 import type { DateType } from "."
 
 export interface IUser {
@@ -9,7 +9,7 @@ export interface IUser {
 	password: string
 	accountType: typeof ACCOUNT_TYPES[number]
 	startedTests: {
-		exam: ObjectId
+		exam: Types.ObjectId
 		startedAt: DateType
 	}[]
 	createdAt: DateType

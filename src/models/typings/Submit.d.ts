@@ -1,9 +1,9 @@
-import type { Model, ObjectId } from "mongoose"
+import type { Model, Types } from "mongoose"
 import type { DateType } from "."
 
 export interface ISubmit {
-	user: ObjectId
-	exam: ObjectId
+	user: Types.ObjectId
+	exam: Types.ObjectId
 	createdAt: DateType
 }
 

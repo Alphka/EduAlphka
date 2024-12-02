@@ -1,31 +1,21 @@
 "use client"
 
 import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
-import { useRef, type ChangeEvent, type FocusEvent } from "react"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
+import { useRef, type ChangeEvent, type FocusEvent } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { MdAccessTime } from "react-icons/md"
 import { TimeInput } from "@mantine/dates"
+import { twJoin } from "tailwind-merge"
+import createExam, { type ExamData, type QuestionData } from "../../../actions/createExam"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import QuestionContainer from "./components/QuestionContainer"
 
 export interface ExamFormData {
-	exam: {
-		title: string
-		description: string
-		subject?: string
-		duration: string
-	}
-	question: {
-		title: string
-		question_type: string
-		text?: string
-		option?: {
-			text: string
-		}[]
-		/** Option's index */
-		correct_answer?: number
-	}[]
+	exam: ExamData
+	question: (Omit<QuestionData, "type"> & {
+		question_type: QuestionData["type"]
+	})[]
 }
 
 export default function CreateExamForm(){
@@ -42,7 +32,6 @@ export default function CreateExamForm(){
 		reValidateMode: "onChange",
 		defaultValues: {
 			question: [{
-				title: "",
 				question_type: "",
 				text: "",
 				option: [{ text: "" }]
@@ -63,7 +52,25 @@ export default function CreateExamForm(){
 	return (
 		<form
 			className="flex flex-col gap-8"
-			onSubmit={handleSubmit(() => {})}
+			onSubmit={handleSubmit(({
+				exam: {
+					title,
+					description,
+					subject,
+					duration
+				},
+				question: questions
+			}) => {
+				createExam({
+					title,
+					description,
+					subject,
+					duration
+				}, questions.map(({ question_type, ...questionData }) => ({
+					type: question_type,
+					...questionData
+				})))
+			})}
 		>
 			<Fieldset
 				legend="Informações do teste"
@@ -211,9 +218,16 @@ export default function CreateExamForm(){
 				radius="md"
 			>
 				<ul className="flex flex-col gap-xl">
-					{questionFields.map(({ id }, index) => (
-						<li className="flex flex-col gap-md" key={id}>
+					{questionFields.map(({ id }, index, { length }) => (
+						<li
+							className={twJoin(
+								"flex flex-col gap-md",
+								"after:w-full after:bg-[var(--mantine-color-default-border)] after:absolute after:h-1"
+							)}
+							key={id}
+						>
 							<QuestionContainer
+								canDelete={length !== 1}
 								{...{
 									removeQuestion,
 									clearErrors,
@@ -235,9 +249,8 @@ export default function CreateExamForm(){
 						variant="default"
 						onClick={() => {
 							appendQuestion({
-								title: "",
-								question_type: "",
 								text: "",
+								question_type: "",
 								option: [{ text: "" }]
 							})
 						}}
