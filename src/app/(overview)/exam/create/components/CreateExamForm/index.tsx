@@ -221,8 +221,8 @@ export default function CreateExamForm(){
 					{questionFields.map(({ id }, index, { length }) => (
 						<li
 							className={twJoin(
-								"flex flex-col gap-md",
-								"after:w-full after:bg-[var(--mantine-color-default-border)] after:absolute after:h-1"
+								"relative flex flex-col gap-md",
+								index !== length - 1 && "after:w-full after:bg-[var(--mantine-color-default-border)] after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4 after:translate-y-1/2"
 							)}
 							key={id}
 						>

@@ -25,9 +25,7 @@ export const sessionSchema = new Schema<ISession, SessionModel>({
 		type: Date,
 		required: true
 	}
-}, {
-	versionKey: false
-})
+}, { versionKey: false })
 
 const Session = models?.Session as SessionModel || model<ISession, SessionModel>("Session", sessionSchema)
 

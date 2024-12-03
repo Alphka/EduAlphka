@@ -14,7 +14,7 @@ export const answerSchema = new Schema<IAnswer>({
 		required: true
 	},
 	question: {
-		type: String,
+		type: Schema.ObjectId,
 		required: true
 	},
 	option: Schema.ObjectId,

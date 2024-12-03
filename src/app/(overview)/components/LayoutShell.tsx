@@ -9,6 +9,7 @@ import { twJoin } from "tailwind-merge"
 import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
 import Link from "next/link"
+import getStringColor from "@helpers/getStringColor"
 
 interface LayoutShellProps {
 	user: Pick<IUser, "name">
@@ -82,7 +83,8 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						}
 
 						const hasChildren = "children" in route && !!Object.keys(route.children).length
-						const isOpened = hasChildren && Object.entries(route.children).some(([, childRoute]) => isActive(childRoute.pathname))
+						const opened = hasChildren && Object.entries(route.children).some(([, childRoute]) => isActive(childRoute.pathname))
+						const active = isActive(route.pathname)
 
 						return (
 							<li
@@ -94,27 +96,31 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 								<NavLink
 									href={route.pathname}
 									label={route.title}
-									active={isActive(route.pathname)}
-									opened={isOpened}
+									active={active}
+									opened={opened || undefined}
 									component={Link}
 									className={twJoin(
 										"rounded",
-										hasChildren && "data-[expanded=true]:rounded-none data-[expanded=true]:rounded-l data-[expanded=true]:rounded-t"
+										active && hasChildren && "data-[expanded=true]:rounded-none data-[expanded=true]:rounded-l data-[expanded=true]:rounded-t"
 									)}
 									leftSection={<route.Icon className="text-base" />}
 									prefetch={false}
 								>
-									{hasChildren && Object.entries(route.children).map(([childKey, childRoute]) => (
-										<NavLink
-											href={childRoute.pathname}
-											label={childRoute.title}
-											component={Link}
-											className="rounded-b"
-											active={isActive(childRoute.pathname)}
-											prefetch={false}
-											key={childKey}
-										/>
-									))}
+									{hasChildren && Object.entries(route.children).map(([childKey, childRoute]) => {
+										const active = isActive(childRoute.pathname)
+
+										return (
+											<NavLink
+												href={childRoute.pathname}
+												label={childRoute.title}
+												component={Link}
+												className={twJoin(active ? "rounded-b" : "rounded")}
+												active={active}
+												prefetch={false}
+												key={childKey}
+											/>
+										)
+									})}
 								</NavLink>
 							</li>
 						)
