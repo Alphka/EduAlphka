@@ -24,27 +24,34 @@ const config: Config = {
 				xl: ["var(--mantine-font-size-xl)", {
 					lineHeight: "1.55"
 				}],
-				"6xl": ["var(--mantine-h1-font-size)", {
-					lineHeight: "1.3"
+				"1xl": ["var(--mantine-font-size-6xl)", {
+					lineHeight: "1.5"
 				}],
-				"5xl": ["var(--mantine-h2-font-size)", {
-					lineHeight: "1.35"
+				"2xl": ["var(--mantine-font-size-5xl)", {
+					lineHeight: "1.5"
 				}],
-				"4xl": ["var(--mantine-h3-font-size)", {
-					lineHeight: "1.4"
-				}],
-				"3xl": ["var(--mantine-h4-font-size)", {
+				"3xl": ["var(--mantine-font-size-4xl)", {
 					lineHeight: "1.45"
 				}],
-				"2xl": ["var(--mantine-h5-font-size)", {
-					lineHeight: "1.5"
+				"4xl": ["var(--mantine-font-size-3xl)", {
+					lineHeight: "1.4"
 				}],
-				"1xl": ["var(--mantine-h6-font-size)", {
-					lineHeight: "1.5"
+				"5xl": ["var(--mantine-font-size-2xl)", {
+					lineHeight: "1.35"
+				}],
+				"6xl": ["var(--mantine-font-size-1xl)", {
+					lineHeight: "1.3"
 				}],
 				DEFAULT: ["var(--mantine-font-size-md)", {
 					lineHeight: "1.55"
 				}]
+			},
+			spacing: {
+				"2xl": "1.5rem",
+				"3xl": "2rem",
+				"4xl": "2.5rem",
+				"5xl": "3rem",
+				"6xl": "4rem"
 			}
 		}
 	},

@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
+import { ActionIcon, Button, Divider, Fieldset, Group, Stack, Textarea, TextInput } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useRef, type ChangeEvent, type FocusEvent } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
@@ -50,8 +50,7 @@ export default function CreateExamForm(){
 	})
 
 	return (
-		<form
-			className="flex flex-col gap-8"
+		<Stack
 			onSubmit={handleSubmit(({
 				exam: {
 					title,
@@ -71,12 +70,13 @@ export default function CreateExamForm(){
 					...questionData
 				})))
 			})}
+			gap="3xl"
 		>
 			<Fieldset
 				legend="Informações do teste"
 				radius="md"
 			>
-				<div className="flex flex-col gap-md">
+				<Stack gap="md">
 					<TextInput
 						size="md"
 						type="text"
@@ -137,7 +137,7 @@ export default function CreateExamForm(){
 						autosize
 					/>
 
-					<div className="flex gap-md">
+					<Group gap="md">
 						<TextInput
 							size="md"
 							type="text"
@@ -207,8 +207,8 @@ export default function CreateExamForm(){
 							ref={durationInputRef}
 							withAsterisk
 						/>
-					</div>
-				</div>
+					</Group>
+				</Stack>
 			</Fieldset>
 
 			<Divider />
@@ -217,13 +217,21 @@ export default function CreateExamForm(){
 				legend="Questões"
 				radius="md"
 			>
-				<ul className="flex flex-col gap-xl">
+				<Stack
+					component="ul"
+					gap="3xl"
+				>
 					{questionFields.map(({ id }, index, { length }) => (
-						<li
+						<Stack
+							pos="relative"
 							className={twJoin(
-								"relative flex flex-col gap-md",
-								index !== length - 1 && "after:w-full after:bg-[var(--mantine-color-default-border)] after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4 after:translate-y-1/2"
+								index !== length - 1 && [
+									"after:w-full after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4",
+									"after:translate-y-1/2",
+									"after:bg-[var(--mantine-color-default-border)]"
+								]
 							)}
+							gap="md"
 							key={id}
 						>
 							<QuestionContainer
@@ -238,13 +246,13 @@ export default function CreateExamForm(){
 									index
 								}}
 							/>
-						</li>
+						</Stack>
 					))}
-				</ul>
+				</Stack>
 
 				<Divider my="lg" color="gray" />
 
-				<div className="flex justify-center">
+				<Group justify="center">
 					<Button
 						variant="default"
 						onClick={() => {
@@ -257,7 +265,7 @@ export default function CreateExamForm(){
 					>
 						Adicionar questão
 					</Button>
-				</div>
+				</Group>
 			</Fieldset>
 
 			<Button
@@ -268,6 +276,6 @@ export default function CreateExamForm(){
 			>
 				Cadastrar teste
 			</Button>
-		</form>
+		</Stack>
 	)
 }

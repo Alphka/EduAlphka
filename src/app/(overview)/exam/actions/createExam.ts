@@ -2,9 +2,12 @@
 
 import type { HydratedDocument } from "mongoose"
 import type { TQuestionOption } from "@models/typings/Exam"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import getDurationMinutes from "@helpers/getDurationMinutes"
 import connectDatabase from "@lib/connectDatabase"
 import getSessionUser from "@helpers/getSessionUser"
+import routes from "@app/routes"
 import Exam from "@models/Exam"
 
 export interface ExamData {
@@ -74,13 +77,16 @@ export default async function createExam({
 		if(examQuestion.type !== "multiple_choice") continue
 
 		examQuestion.correctAnswer = (examQuestion.options as HydratedDocument<TQuestionOption>[])[question.correct_answer!]._id
+		examQuestion.isRequired = true
 	}
 
 	await exam.save()
 
-	// revalidatePath(routes.exam)
-	// revalidatePath(routes.exam.pathname)
-	// redirect(routes.exam.pathname)
+	revalidatePath(routes.exam.pathname)
+	// revalidatePath(routes.exam_editar_template.pathname)
+	// TODO: Redirect to routes.exam_editar_template.pathname
+	redirect(routes.exam.pathname)
 
+	// TODO: Add expiresAt input in front-end
 	// expiresAt?: DateType
 }

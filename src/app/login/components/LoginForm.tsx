@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Anchor, Button, Checkbox, TextInput } from "@mantine/core"
+import { ActionIcon, Anchor, Button, Checkbox, Group, Stack, TextInput, Title } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { login, type UserLoginData } from "../actions/login"
 import { GenericFormValidation } from "@constants/forms"
@@ -22,8 +22,9 @@ export default function LoginForm(){
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
 	return (
-		<form
-			className="w-10/12 max-w-screen-sm flex flex-col gap-xl"
+		<Stack
+			w="80%"
+			className="max-w-screen-sm"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
 				handleServerAction(login({
 					username,
@@ -31,18 +32,33 @@ export default function LoginForm(){
 					keep_logged_in
 				}))
 			})}
+			gap="3xl"
 		>
-			<header>
-				<h1 className="text-6xl font-extrabold">
+			<Stack
+				gap="xs"
+				component="header"
+			>
+				<Title
+					order={1}
+					fz="6xl"
+					fw={800}
+				>
 					Acesse sua conta
-				</h1>
-				<h2 className="text-neutral-700 dark:text-gray-400 text-xl leading-tight tracking-tight">
-					Entre com seu endereço de email ou nome usuário
-				</h2>
-			</header>
+				</Title>
 
-			<div className="flex flex-col gap-xl">
-				<div className="flex flex-col gap-md">
+				<Title
+					order={2}
+					lts="-0.025em"
+					fz="4xl"
+					fw={500}
+					c="gray"
+				>
+					Entre com seu endereço de email ou nome usuário.
+				</Title>
+			</Stack>
+
+			<Stack gap="2xl">
+				<Stack gap="md">
 					<TextInput
 						size="md"
 						type="text"
@@ -107,9 +123,12 @@ export default function LoginForm(){
 						error={errors.password?.message}
 						withAsterisk
 					/>
-				</div>
+				</Stack>
 
-				<div className="flex items-center justify-between gap-md">
+				<Group
+					gap="md"
+					justify="space-between"
+				>
 					<Checkbox
 						size="sm"
 						label="Manter logado"
@@ -125,7 +144,7 @@ export default function LoginForm(){
 					>
 						Esqueceu sua senha?
 					</Anchor>
-				</div>
+				</Group>
 
 				<Button
 					type="submit"
@@ -135,7 +154,7 @@ export default function LoginForm(){
 				>
 					Continuar
 				</Button>
-			</div>
+			</Stack>
 
 			<Anchor
 				href="/register"
@@ -146,6 +165,6 @@ export default function LoginForm(){
 			>
 				Não tem uma conta? Crie uma agora mesmo!
 			</Anchor>
-		</form>
+		</Stack>
 	)
 }

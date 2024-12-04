@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Button, Checkbox, Text, TextInput } from "@mantine/core"
+import { ActionIcon, Button, Checkbox, Stack, Text, TextInput, Title } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { signIn, type UserSignInData } from "../actions/signIn"
 import { GenericFormValidation } from "@constants/forms"
@@ -22,8 +22,9 @@ export default function RegisterForm(){
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
 	return (
-		<form
-			className="w-10/12 max-w-screen-sm flex flex-col gap-xl"
+		<Stack
+			w="80%"
+			className="max-w-screen-sm"
 			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
 				handleServerAction(signIn({
 					name,
@@ -34,18 +35,33 @@ export default function RegisterForm(){
 					keep_logged_in
 				}))
 			})}
+			gap="3xl"
 		>
-			<header>
-				<h1 className="text-6xl font-extrabold">
+			<Stack
+				component="header"
+				gap="xs"
+			>
+				<Title
+					order={1}
+					fz="6xl"
+					fw={800}
+				>
 					Crie uma conta
-				</h1>
-				<h2 className="text-neutral-700 dark:text-gray-400 text-xl leading-tight tracking-tight">
-					Junte-se à nossa plataforma de testes online e comece sua jornada de aprendizado!
-				</h2>
-			</header>
+				</Title>
 
-			<div className="flex flex-col gap-xl">
-				<div className="flex flex-col gap-md">
+				<Title
+					order={2}
+					lts="-0.025em"
+					fz="4xl"
+					fw={500}
+					c="gray"
+				>
+					Junte-se à nossa plataforma de testes online e comece sua jornada de aprendizado!
+				</Title>
+			</Stack>
+
+			<Stack gap="2xl">
+				<Stack gap="md">
 					<TextInput
 						size="md"
 						type="text"
@@ -170,9 +186,9 @@ export default function RegisterForm(){
 						error={errors.password?.message}
 						withAsterisk
 					/>
-				</div>
+				</Stack>
 
-				<div className="flex flex-col gap-1">
+				<Stack gap="xs">
 					<Text size="md">
 						Tipo de conta
 					</Text>
@@ -193,7 +209,7 @@ export default function RegisterForm(){
 							Candidato
 						</Button>
 					</Button.Group>
-				</div>
+				</Stack>
 
 				<Checkbox
 					size="sm"
@@ -211,7 +227,7 @@ export default function RegisterForm(){
 				>
 					Continuar
 				</Button>
-			</div>
-		</form>
+			</Stack>
+		</Stack>
 	)
 }

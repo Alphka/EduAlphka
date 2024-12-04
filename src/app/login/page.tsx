@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { APPLICATION_NAME } from "@constants/index"
+import { Stack } from "@mantine/core"
 import LoginForm from "./components/LoginForm"
 import routes from "@app/routes"
 
@@ -17,8 +18,14 @@ export const metadata: Metadata = {
 
 export default function LoginPage(){
 	return (
-		<main className="flex flex-col items-center justify-center py-12 min-h-dvh">
+		<Stack
+			p="5xl"
+			align="center"
+			justify="center"
+			component="main"
+			className="min-h-dvh"
+		>
 			<LoginForm />
-		</main>
+		</Stack>
 	)
 }

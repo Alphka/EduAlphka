@@ -63,7 +63,7 @@ export default function OptionContainer({
 			size="lg"
 			color="red"
 			variant="light"
-			className="flex-shrink-0"
+			className="shrink-0"
 			aria-label={`Remover ${optionIndex + 1}ª opção`}
 			title="Remover opção"
 			onClick={() => {

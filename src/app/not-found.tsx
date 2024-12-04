@@ -1,9 +1,17 @@
+import { Stack, Title } from "@mantine/core"
+
 export default function NotFoundPage(){
 	return (
-		<main className="flex flex-col items-center justify-center min-h-dvh">
-			<h1>
+		<Stack
+			p="5xl"
+			align="center"
+			justify="center"
+			component="main"
+			className="min-h-dvh"
+		>
+			<Title order={1}>
 				Página não encontrada
-			</h1>
-		</main>
+			</Title>
+		</Stack>
 	)
 }

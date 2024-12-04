@@ -2,14 +2,13 @@
 
 import type { ReactNode } from "react"
 import type { IUser } from "@models/typings/User"
-import { AppShell, Burger, Avatar, NavLink } from "@mantine/core"
+import { AppShell, Burger, Avatar, NavLink, Stack, Group } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { usePathname } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
 import Link from "next/link"
-import getStringColor from "@helpers/getStringColor"
 
 interface LayoutShellProps {
 	user: Pick<IUser, "name">
@@ -35,7 +34,13 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 			padding="xl"
 		>
 			<AppShell.Header>
-				<div className="h-full flex items-center justify-between px-sm gap-md">
+				<Group
+					h="100%"
+					p="sm"
+					align="center"
+					justify="space-between"
+					gap="md"
+				>
 					<div>
 						<Burger
 							opened={burgerOpened}
@@ -45,7 +50,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						/>
 					</div>
 
-					<div className="flex items-center gap-md">
+					<Group gap="md">
 						<Avatar
 							name={user.name}
 							size="md"
@@ -68,12 +73,17 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						>
 							{getNameInitials(user.name)}
 						</Avatar>
-					</div>
-				</div>
+					</Group>
+				</Group>
 			</AppShell.Header>
 
 			<AppShell.Navbar p="md">
-				<ul className="flex-grow flex flex-col">
+				<Stack
+					h="100%"
+					gap={0}
+					justify="flex-end"
+					component="ul"
+				>
 					{Object.entries(routes).map(([key, route]) => {
 						if(!("Icon" in route)) return null
 
@@ -125,7 +135,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 							</li>
 						)
 					})}
-				</ul>
+				</Stack>
 			</AppShell.Navbar>
 
 			<AppShell.Main>

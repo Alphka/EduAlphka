@@ -9,7 +9,7 @@ import {
 	type UseFormRegister,
 	type UseFormSetValue
 } from "react-hook-form"
-import { ActionIcon, Button, Select, Textarea, Title } from "@mantine/core"
+import { ActionIcon, Button, Group, Select, Stack, Textarea, Title } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdOutlineDeleteForever } from "react-icons/md"
 import { QuestionTypes } from "@models/Exam"
@@ -52,11 +52,11 @@ export default function QuestionContainer({
 	}) || null) as keyof typeof QuestionTypes | null
 
 	return <>
-		<div className="flex items-start gap-xs">
+		<Group gap="xs">
 			<Title
 				className="flex-grow"
 				order={3}
-				size="lg"
+				fz="lg"
 				fw={500}
 			>
 				Questão {index + 1}
@@ -64,8 +64,10 @@ export default function QuestionContainer({
 
 			<ActionIcon
 				size="md"
-				variant="subtle"
-				className="flex-shrink-0"
+				color="blue"
+				radius="sm"
+				variant="light"
+				className="shrink-0"
 				aria-label={`Remover ${index + 1}ª questão`}
 				title="Remover questão"
 				onClick={() => {
@@ -75,7 +77,7 @@ export default function QuestionContainer({
 			>
 				<MdOutlineDeleteForever className="text-[1.25rem]" />
 			</ActionIcon>
-		</div>
+		</Group>
 
 		<Textarea
 			size="md"
@@ -109,7 +111,7 @@ export default function QuestionContainer({
 			autosize
 		/>
 
-		<div className="flex flex-col gap-md">
+		<Stack gap="md">
 			<Select
 				size="md"
 				label="Selecione o tipo da questão"
@@ -135,12 +137,16 @@ export default function QuestionContainer({
 			/>
 
 			{questionType && questionType === "multiple_choice" && <>
-				<ul className="flex flex-col gap-md">
+				<Stack gap="md">
 					{optionFields.map(({ id }, optionIndex, { length }) => {
 						const path = `question.${index}.correct_answer` as const
 
 						return (
-							<li className="flex items-center justify-between gap-sm" key={id}>
+							<Group
+								justify="space-between"
+								gap="sm"
+								key={id}
+							>
 								{optionIndex === 0 && (
 									<input
 										type="text"
@@ -174,12 +180,12 @@ export default function QuestionContainer({
 										errors
 									}}
 								/>
-							</li>
+							</Group>
 						)
 					})}
-				</ul>
+				</Stack>
 
-				<div className="flex justify-center">
+				<Group justify="center">
 					<Button
 						size="sm"
 						variant="subtle"
@@ -191,8 +197,8 @@ export default function QuestionContainer({
 					>
 						Adicionar opção
 					</Button>
-				</div>
+				</Group>
 			</>}
-		</div>
+		</Stack>
 	</>
 }
