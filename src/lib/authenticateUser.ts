@@ -22,7 +22,10 @@ export default async function authenticateUser({
 		const { usernameOrEmail, password } = data
 
 		const _user = await User.findOne({
-			[usernameOrEmail.includes("@") ? "email" : "username"]: usernameOrEmail
+			$or: [
+				{ email: usernameOrEmail },
+				{ username: usernameOrEmail }
+			]
 		})
 
 		if(!_user || !_user.validatePassword(password)) throw "Credenciais inválidas"

@@ -1,6 +1,5 @@
-import type { Model, Types } from "mongoose"
 import type { QuestionTypes } from "@models/Exam"
-import type { DateType } from "."
+import type { Model, Types } from "mongoose"
 
 interface IExamQuestion {
 	type: keyof typeof QuestionTypes
@@ -30,9 +29,9 @@ export interface IExam {
 	duration: number
 	questions: TQuestionOption[]
 	candidates: Types.ObjectId[]
-	createdAt: DateType
-	updatedAt?: DateType
-	expiresAt?: DateType
+	createdAt: Date
+	updatedAt?: Date
+	expiresAt?: Date
 }
 
 export type QuestionModel = Model<IExamQuestion>

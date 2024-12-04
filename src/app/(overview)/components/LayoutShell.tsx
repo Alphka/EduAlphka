@@ -57,19 +57,6 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 							radius="xl"
 							color="initials"
 							className="leading-none"
-							allowedInitialsColors={[
-								"red",
-								"pink",
-								"grape",
-								"violet",
-								"indigo",
-								"blue",
-								"cyan",
-								"green",
-								"yellow",
-								"orange",
-								"teal"
-							]}
 						>
 							{getNameInitials(user.name)}
 						</Avatar>

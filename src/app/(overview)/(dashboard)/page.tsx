@@ -1,7 +1,9 @@
 import type { Metadata } from "next"
-import { MdAddCircleOutline } from "react-icons/md"
 import { Button, Group, Stack, Title } from "@mantine/core"
-import ExamList from "./components/ExamList"
+import { MdAddCircleOutline } from "react-icons/md"
+import { Suspense } from "react"
+import ExamListSkeleton from "./components/ExamListSkeleton"
+import RecentExams from "./components/RecentExams"
 import routes from "@app/routes"
 import Link from "next/link"
 
@@ -13,6 +15,8 @@ export const metadata: Metadata = {
 		title
 	}
 }
+
+const recentExamsLimit = 6
 
 export default function Homepage(){
 	return (
@@ -40,7 +44,9 @@ export default function Homepage(){
 					</Button>
 				</Group>
 
-				<ExamList />
+				<Suspense fallback={<ExamListSkeleton limit={recentExamsLimit / 2} />}>
+					<RecentExams limit={recentExamsLimit} />
+				</Suspense>
 			</Stack>
 		</Stack>
 	)

@@ -1,6 +1,5 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import authenticateUser from "@lib/authenticateUser"
 import signInSchema from "../schemas/signIn"
@@ -55,6 +54,5 @@ export async function signIn({
 		return { errors: ["Falha ao registrar o usuário"] }
 	}
 
-	revalidatePath(routes.homepage.pathname)
 	redirect(routes.homepage.pathname)
 }

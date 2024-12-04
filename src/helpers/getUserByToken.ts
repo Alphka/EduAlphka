@@ -5,7 +5,14 @@ export default async function getUserByToken(token: string){
 	await connectDatabase()
 
 	const session = await Session.findOne({ token }).select("user")
-	const user = session && await User.findOne({ _id: session.user })
+	const user = session && await User.findById(session.user).lean()
 
-	return user || null
+	if(!user) return null
+
+	const { _id, ...rest } = user
+
+	return {
+		id: _id.toString(),
+		...rest
+	}
 }

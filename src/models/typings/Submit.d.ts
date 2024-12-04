@@ -1,14 +1,14 @@
-import type { Model, Types } from "mongoose"
-import type { DateType } from "."
+import type { HydratedDocument, Model, Types } from "mongoose"
+import type { IAnswer } from "./Answer"
 
 export interface ISubmit {
 	user: Types.ObjectId
 	exam: Types.ObjectId
-	createdAt: DateType
+	createdAt: Date
 }
 
 export interface ISubmitMethods {
-	getAnswers: () => any
+	getAnswers: () => HydratedDocument<IAnswer>
 }
 
 export type SubmitModel = Model<ISubmit, {}, ISubmitMethods>

@@ -1,6 +1,5 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import authenticateUser from "@lib/authenticateUser"
 import loginSchema from "../schemas/login"
@@ -50,6 +49,5 @@ export async function login({
 		return { errors: ["Falha ao autenticar o usuário"] }
 	}
 
-	revalidatePath(routes.homepage.pathname)
 	redirect(routes.homepage.pathname)
 }

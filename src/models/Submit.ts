@@ -1,6 +1,6 @@
-import Answer from "./Answer"
 import type { ISubmit, SubmitModel } from "./typings/Submit"
 import { model, models, Schema } from "mongoose"
+import Answer from "./Answer"
 
 const submitSchema = new Schema<ISubmit>({
 	user: {

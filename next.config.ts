@@ -29,7 +29,8 @@ const nextConfig: NextConfig = {
 			"@mantine/hooks"
 		],
 		staleTimes: {
-			dynamic: 5
+			dynamic: 120,
+			static: 300
 		}
 	},
 	sassOptions: {

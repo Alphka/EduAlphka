@@ -47,7 +47,7 @@ export default function OptionContainer({
 
 		<TextInput
 			size="md"
-			className="flex-grow"
+			flex={1}
 			placeholder={`Opção ${optionIndex + 1}`}
 			{...register(`question.${questionIndex}.option.${optionIndex}.text`, {
 				required: {

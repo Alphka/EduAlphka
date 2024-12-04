@@ -4,11 +4,11 @@ import type { HydratedDocument } from "mongoose"
 import type { TQuestionOption } from "@models/typings/Exam"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { Exam } from "@models"
 import getDurationMinutes from "@helpers/getDurationMinutes"
 import connectDatabase from "@lib/connectDatabase"
 import getSessionUser from "@helpers/getSessionUser"
 import routes from "@app/routes"
-import Exam from "@models/Exam"
 
 export interface ExamData {
 	title: string
@@ -82,11 +82,12 @@ export default async function createExam({
 
 	await exam.save()
 
+	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.pathname)
 	// revalidatePath(routes.exam_editar_template.pathname)
 	// TODO: Redirect to routes.exam_editar_template.pathname
 	redirect(routes.exam.pathname)
 
 	// TODO: Add expiresAt input in front-end
-	// expiresAt?: DateType
+	// expiresAt?: Date
 }

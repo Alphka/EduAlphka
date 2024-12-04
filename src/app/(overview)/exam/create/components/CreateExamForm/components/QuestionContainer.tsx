@@ -54,8 +54,8 @@ export default function QuestionContainer({
 	return <>
 		<Group gap="xs">
 			<Title
-				className="flex-grow"
 				order={3}
+				flex={1}
 				fz="lg"
 				fw={500}
 			>

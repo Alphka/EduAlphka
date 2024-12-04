@@ -1,46 +1,36 @@
-import Container from "./container"
+import type { ComponentPropsWithoutRef } from "react"
+import type { HydratedDocument } from "mongoose"
+import type { IExam } from "@models/typings/Exam"
+import { Grid, GridCol } from "@mantine/core"
 import ExamCard from "../ExamCard"
-import Exam from "@models/Exam"
-import getSessionUser from "@helpers/getSessionUser"
 
-export default async function ExamList(){
-	const date = new Date()
+interface ExamListProps {
+	exams: HydratedDocument<(IExam | ComponentPropsWithoutRef<typeof ExamCard>) & Pick<IExam, "candidates">>[]
+}
 
-	date.setDate(date.getDate() - 15)
-
-	const user = await getSessionUser()
-
-	const exams = await Exam
-		.find({
-			owner: user,
-			createdAt: {
-				$gte: date
-			}
-		}, {
-			title: 1,
-			subject: 1,
-			description: 1,
-			candidates: 1,
-			createdAt: 1,
-			updatedAt: 1
-		})
-		.sort({ createdAt: -1 })
-		.limit(6)
-
+export default async function ExamList({ exams }: ExamListProps){
 	return (
-		<Container>
+		<Grid gutter="md">
 			{exams.map(({ id, title, description, subject, candidates, createdAt, updatedAt }) => (
-				<ExamCard
-					active
-					title={title}
-					subject={subject}
-					description={description}
-					createdAt={createdAt as Date}
-					updatedAt={updatedAt as Date | undefined}
-					candidatesCount={candidates.length}
+				<GridCol
+					span={{
+						base: 12,
+						md: 6,
+						lg: 4
+					}}
 					key={id}
-				/>
+				>
+					<ExamCard
+						active
+						title={title}
+						subject={subject}
+						description={description}
+						createdAt={createdAt as Date}
+						updatedAt={updatedAt as Date | undefined}
+						candidatesCount={candidates.length}
+					/>
+				</GridCol>
 			))}
-		</Container>
+		</Grid>
 	)
 }

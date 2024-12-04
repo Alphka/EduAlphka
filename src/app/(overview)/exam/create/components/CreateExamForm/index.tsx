@@ -141,7 +141,7 @@ export default function CreateExamForm(){
 						<TextInput
 							size="md"
 							type="text"
-							className="flex-grow"
+							flex={1}
 							label="Disciplina"
 							placeholder="Disciplina do teste"
 							aria-label="Disciplina do teste"

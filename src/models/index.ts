@@ -1,4 +1,4 @@
-// export { default as Exam } from "./Exam"
+export { default as Exam } from "./Exam"
 export { default as User } from "./User"
 export { default as Session } from "./Session"
 export { default as Submit } from "./Submit"

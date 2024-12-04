@@ -1,27 +1,19 @@
 import type { IExam } from "@models/typings/Exam"
 import { Badge, Box, Card, Group, Stack, Text, Tooltip } from "@mantine/core"
 import { MdPerson } from "react-icons/md"
+import getHistoryMessage, { type HistoryMessageProps } from "./helpers/getHistoryMessage"
 import getStringColor from "@helpers/getStringColor"
 
-interface HistoryProps {
-	createdAt: Date | number
-	updatedAt?: Date | number
-}
-
-function getHistoryMessage({ createdAt, updatedAt }: HistoryProps){
-	return `${updatedAt ? "Atualizado em" : "Criado em"} ${new Date(updatedAt || createdAt).toLocaleDateString("pt-BR")}` as const
-}
-
-interface ExamCardProps extends Pick<IExam, "title" | "subject" | "description">, HistoryProps {
+interface ExamCardProps extends Pick<IExam, "title" | "subject" | "description">, HistoryMessageProps {
 	active: boolean
 	candidatesCount: number
 }
 
 export default function ExamCard({
 	title,
+	active,
 	subject,
 	description,
-	active,
 	createdAt,
 	updatedAt,
 	candidatesCount
@@ -86,8 +78,9 @@ export default function ExamCard({
 					</Group>
 
 					<Group
-						className="flex-1 overflow-hidden"
+						className="overflow-hidden"
 						justify="flex-end"
+						flex={1}
 						gap="md"
 					>
 						<Tooltip
@@ -125,3 +118,5 @@ export default function ExamCard({
 		</Card>
 	)
 }
+
+export { default as ExamCardSkeleton } from "./Skeleton"

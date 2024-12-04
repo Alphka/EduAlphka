@@ -1,5 +1,5 @@
-import getToken from "./getToken"
 import getUserByToken from "./getUserByToken"
+import getToken from "./getToken"
 
 export default async function getSessionUser(){
 	const token = await getToken()
