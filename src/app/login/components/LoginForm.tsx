@@ -32,6 +32,7 @@ export default function LoginForm(){
 					keep_logged_in
 				}))
 			})}
+			component="form"
 			gap="3xl"
 		>
 			<Stack

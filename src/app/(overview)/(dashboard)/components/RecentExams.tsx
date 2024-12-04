@@ -1,6 +1,7 @@
 import { Exam } from "@models"
 import getSessionUser from "@helpers/getSessionUser"
 import ExamList from "../../components/ExamList"
+import { Text } from "@mantine/core"
 
 interface RecentExamsProps {
 	limit: number
@@ -30,7 +31,11 @@ export default async function RecentExams({ limit }: RecentExamsProps){
 		.sort({ createdAt: -1 })
 		.limit(limit)
 
-	return (
+	return exams.length ? (
 		<ExamList exams={exams} />
+	) : (
+		<Text size="md" c="dimmed">
+			Não há testes recentemente criados.
+		</Text>
 	)
 }

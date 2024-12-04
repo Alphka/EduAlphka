@@ -70,6 +70,7 @@ export default function CreateExamForm(){
 					...questionData
 				})))
 			})}
+			component="form"
 			gap="3xl"
 		>
 			<Fieldset
