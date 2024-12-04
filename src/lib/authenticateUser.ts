@@ -43,7 +43,7 @@ export default async function authenticateUser({
 	await Session.create({
 		token,
 		user: user.id,
-		userAgent: headersStore.get("user-agent") || "",
+		userAgent: headersStore.get("user-agent")?.trim().substring(0, 255) || "",
 		expiresAt: tokenExpirationDate
 	})
 

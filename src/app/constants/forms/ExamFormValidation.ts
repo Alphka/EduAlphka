@@ -11,5 +11,5 @@ export default class ExamFormValidation {
 	static readonly maxDurationInMinutes = 420 // 7 hours
 
 	static readonly questionTextMinLength = 5
-	static readonly questionTextMaxLength = 120
+	static readonly questionTextMaxLength = 2000
 }

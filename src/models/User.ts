@@ -1,5 +1,6 @@
 import type { IUser, IUserMethods, UserModel } from "./typings/User"
 import { createHmac, randomBytes } from "crypto"
+import { GenericFormValidation } from "@constants/forms"
 import { Schema, model, models } from "mongoose"
 
 const { HASH_SALT } = process.env
@@ -11,16 +12,22 @@ export const ACCOUNT_TYPES = ["professor", "candidate"] as const
 const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 	name: {
 		type: String,
-		required: true
+		required: true,
+		minlength: GenericFormValidation.nameMinLength,
+		maxlength: GenericFormValidation.nameMaxLength
 	},
 	email: {
 		type: String,
 		required: true,
+		minlength: GenericFormValidation.emailMinLength,
+		maxlength: GenericFormValidation.emailMaxLength,
 		unique: true
 	},
 	username: {
 		type: String,
 		required: true,
+		minlength: GenericFormValidation.usernameMinLength,
+		maxlength: GenericFormValidation.usernameMaxLength,
 		index: {
 			unique: true,
 			collation: {
@@ -31,7 +38,9 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 	},
 	password: {
 		type: String,
-		required: true
+		required: true,
+		minlength: GenericFormValidation.passwordMinLength,
+		maxlength: GenericFormValidation.passwordMaxLength
 	},
 	accountType: {
 		type: String,

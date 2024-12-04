@@ -6,8 +6,8 @@ import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { Exam } from "@models"
 import getDurationMinutes from "@helpers/getDurationMinutes"
+import getSessionUserData from "@helpers/getSessionUserData"
 import connectDatabase from "@lib/connectDatabase"
-import getSessionUser from "@helpers/getSessionUser"
 import routes from "@app/routes"
 
 export interface ExamData {
@@ -36,12 +36,12 @@ export default async function createExam({
 }: ExamData, questions: QuestionData[]){
 	await connectDatabase()
 
-	const owner = await getSessionUser()
+	const user = await getSessionUserData()
 
-	if(!owner || owner.accountType !== "professor") return { errors: ["Acesso negado"] }
+	if(!user || user.accountType !== "professor") return { errors: ["Acesso negado"] }
 
 	const exam = new Exam({
-		owner,
+		owner: user.id,
 		title,
 		description,
 		subject,

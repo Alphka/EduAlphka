@@ -8,6 +8,7 @@ import type {
 	ExamMultipleChoiceQuestion,
 	ExamDissertativeQuestion
 } from "./typings/Exam"
+import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { model, models, Schema } from "mongoose"
 
 export enum QuestionTypes {
@@ -34,7 +35,9 @@ const QuestionSchema = new Schema<
 	},
 	text: {
 		type: String,
-		required: true
+		required: true,
+		minlength: ExamFormValidation.questionTextMinLength,
+		maxlength: ExamFormValidation.questionTextMaxLength
 	},
 	isRequired: {
 		type: Boolean,
@@ -52,13 +55,21 @@ export const examSchema = new Schema<IExam, ExamModel>({
 	},
 	title: {
 		type: String,
-		required: true
+		required: true,
+		minlength: ExamFormValidation.titleMinLength,
+		maxlength: ExamFormValidation.titleMaxLength
 	},
 	description: {
 		type: String,
-		required: true
+		required: true,
+		minlength: ExamFormValidation.descriptionMinLength,
+		maxlength: ExamFormValidation.descriptionMaxLength
 	},
-	subject: String,
+	subject: {
+		type: String,
+		minlength: GenericFormValidation.nameMinLength,
+		maxlength: GenericFormValidation.nameMaxLength
+	},
 	duration: {
 		type: Number,
 		required: true

@@ -5,7 +5,9 @@ export const sessionSchema = new Schema<ISession, SessionModel>({
 	token: {
 		type: String,
 		unique: true,
-		required: true
+		required: true,
+		minlength: 96,
+		maxlength: 96
 	},
 	user: {
 		type: Schema.ObjectId,
@@ -14,7 +16,8 @@ export const sessionSchema = new Schema<ISession, SessionModel>({
 	},
 	userAgent: {
 		type: String,
-		required: true
+		required: true,
+		maxlength: 255
 	},
 	createdAt: {
 		type: Date,

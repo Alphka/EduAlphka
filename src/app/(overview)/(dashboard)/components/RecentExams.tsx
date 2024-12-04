@@ -1,7 +1,7 @@
-import { Exam } from "@models"
-import getSessionUser from "@helpers/getSessionUser"
-import ExamList from "../../components/ExamList"
 import { Text } from "@mantine/core"
+import { Exam } from "@models"
+import getSessionUserData from "@helpers/getSessionUserData"
+import ExamList from "../../components/ExamList"
 
 interface RecentExamsProps {
 	limit: number
@@ -12,7 +12,7 @@ export default async function RecentExams({ limit }: RecentExamsProps){
 
 	date.setDate(date.getDate() - 15)
 
-	const user = (await getSessionUser())!
+	const user = (await getSessionUserData())!
 
 	const exams = await Exam
 		.find({
