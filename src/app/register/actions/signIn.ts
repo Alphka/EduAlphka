@@ -12,7 +12,7 @@ export interface UserSignInData {
 	username: string
 	password: string
 	account_type: string
-	keep_logged_in?: boolean
+	keep_logged_in: boolean
 }
 
 export async function signIn({
@@ -21,9 +21,16 @@ export async function signIn({
 	username,
 	password,
 	account_type,
-	keep_logged_in = false
+	keep_logged_in: keepLoggedIn
 }: UserSignInData){
-	const validatedFields = signInSchema.safeParse({ name, username, email, password, account_type })
+	const validatedFields = signInSchema.safeParse({
+		name,
+		email,
+		username,
+		password,
+		account_type,
+		keep_logged_in: keepLoggedIn
+	})
 
 	if(!validatedFields.success){
 		return {
@@ -37,12 +44,12 @@ export async function signIn({
 			email: validatedFields.data.email,
 			username: validatedFields.data.username,
 			password: validatedFields.data.password,
-			accountType: validatedFields.data.account_type
+			accountType: validatedFields.data.account_type,
 		})
 
 		await authenticateUser({
 			user,
-			keepLoggedIn: keep_logged_in
+			keepLoggedIn: keepLoggedIn
 		})
 	}catch(error){
 		if(typeof error === "string"){
