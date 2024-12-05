@@ -44,7 +44,7 @@ export async function signIn({
 			email: validatedFields.data.email,
 			username: validatedFields.data.username,
 			password: validatedFields.data.password,
-			accountType: validatedFields.data.account_type,
+			accountType: validatedFields.data.account_type
 		})
 
 		await authenticateUser({

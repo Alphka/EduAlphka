@@ -4,7 +4,7 @@ import { Stack } from "@mantine/core"
 import LoginForm from "./components/LoginForm"
 import routes from "@app/routes"
 
-const title = routes.register.title
+const title = routes.login.title
 const description = `Entre ou registre-se na plataforma ${APPLICATION_NAME}` as const
 
 export const metadata: Metadata = {

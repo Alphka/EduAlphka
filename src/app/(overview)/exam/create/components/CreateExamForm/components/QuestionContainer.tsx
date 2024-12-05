@@ -7,13 +7,18 @@ import {
 	type UseFieldArrayRemove,
 	type UseFormClearErrors,
 	type UseFormRegister,
-	type UseFormSetValue
+	type UseFormSetValue,
+	type UseFormWatch
 } from "react-hook-form"
 import { ActionIcon, Button, Group, Select, Stack, Textarea, Title } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdOutlineDeleteForever } from "react-icons/md"
 import { QuestionTypes } from "@models/Exam"
 import OptionContainer from "./OptionContainer"
+
+const defaultQuestionOption: NonNullable<ExamFormData["question"][number]["option"]>[number] = {
+	text: ""
+}
 
 export interface QuestionContainerProps {
 	removeQuestion: UseFieldArrayRemove
@@ -23,6 +28,7 @@ export interface QuestionContainerProps {
 	setValue: UseFormSetValue<ExamFormData>
 	control: Control<ExamFormData, any>
 	errors: FieldErrors<ExamFormData>
+	watch: UseFormWatch<ExamFormData>
 	index: number
 }
 
@@ -34,6 +40,7 @@ export default function QuestionContainer({
 	setValue,
 	control,
 	errors,
+	watch,
 	index
 }: QuestionContainerProps){
 	const {
@@ -169,15 +176,15 @@ export default function QuestionContainer({
 
 								<OptionContainer
 									questionIndex={index}
-									canDelete={length === 1}
+									canDelete={length !== 1}
 									{...{
 										removeOption,
 										optionIndex,
 										clearErrors,
 										register,
 										setValue,
-										control,
-										errors
+										errors,
+										watch
 									}}
 								/>
 							</Group>
@@ -191,7 +198,7 @@ export default function QuestionContainer({
 						variant="subtle"
 						aria-label={`Adicionar opção de múltipla escolha à ${index}ª questão`}
 						onClick={() => {
-							appendOption({ text: "" })
+							appendOption(defaultQuestionOption)
 						}}
 						disabled={optionFields.length === 50}
 					>

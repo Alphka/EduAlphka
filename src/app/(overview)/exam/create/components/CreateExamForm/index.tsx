@@ -8,6 +8,7 @@ import { MdAccessTime } from "react-icons/md"
 import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
 import createExam, { type ExamData, type QuestionData } from "../../../actions/createExam"
+import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import QuestionContainer from "./components/QuestionContainer"
 
@@ -18,10 +19,18 @@ export interface ExamFormData {
 	})[]
 }
 
+const defaultExamData: ExamFormData["question"][number] = {
+	question_type: "",
+	text: "",
+	option: [{ text: "" }]
+}
+
 export default function CreateExamForm(){
+	const { isPending, handleServerAction } = useServerActionHandler()
 	const durationInputRef = useRef<HTMLInputElement>(null)
 
 	const {
+		watch,
 		control,
 		setValue,
 		register,
@@ -31,11 +40,7 @@ export default function CreateExamForm(){
 	} = useForm<ExamFormData>({
 		reValidateMode: "onChange",
 		defaultValues: {
-			question: [{
-				question_type: "",
-				text: "",
-				option: [{ text: "" }]
-			}]
+			question: [defaultExamData]
 		},
 		mode: "onSubmit"
 	})
@@ -58,17 +63,19 @@ export default function CreateExamForm(){
 					subject,
 					duration
 				},
-				question: questions
+				question
 			}) => {
-				createExam({
+				const questions = question.map(({ question_type, ...questionData }) => ({
+					type: question_type,
+					...questionData
+				}))
+
+				handleServerAction(createExam({
 					title,
 					description,
 					subject,
 					duration
-				}, questions.map(({ question_type, ...questionData }) => ({
-					type: question_type,
-					...questionData
-				})))
+				}, questions))
 			})}
 			component="form"
 			gap="3xl"
@@ -82,8 +89,8 @@ export default function CreateExamForm(){
 						size="md"
 						type="text"
 						label="Título do teste"
-						placeholder="Descrição do teste"
-						aria-label="Descrição do teste"
+						placeholder="Título do teste"
+						aria-label="Título do teste"
 						autoComplete="off"
 						{...register("exam.title", {
 							minLength: {
@@ -244,6 +251,7 @@ export default function CreateExamForm(){
 									setValue,
 									control,
 									errors,
+									watch,
 									index
 								}}
 							/>
@@ -257,11 +265,7 @@ export default function CreateExamForm(){
 					<Button
 						variant="default"
 						onClick={() => {
-							appendQuestion({
-								text: "",
-								question_type: "",
-								option: [{ text: "" }]
-							})
+							appendQuestion(defaultExamData)
 						}}
 					>
 						Adicionar questão
@@ -274,6 +278,7 @@ export default function CreateExamForm(){
 				size="sm"
 				variant="filled"
 				className="self-start"
+				loading={isPending}
 			>
 				Cadastrar teste
 			</Button>
