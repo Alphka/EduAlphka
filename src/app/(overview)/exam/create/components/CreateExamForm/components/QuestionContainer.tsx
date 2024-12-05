@@ -176,9 +176,11 @@ export default function QuestionContainer({
 
 								<OptionContainer
 									questionIndex={index}
+									defaultOption={defaultQuestionOption}
 									canDelete={length !== 1}
 									{...{
 										removeOption,
+										appendOption,
 										optionIndex,
 										clearErrors,
 										register,

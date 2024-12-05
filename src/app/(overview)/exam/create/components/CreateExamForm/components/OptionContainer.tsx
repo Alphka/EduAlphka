@@ -1,18 +1,23 @@
-import type { UseFieldArrayRemove } from "react-hook-form"
+import type { UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form"
 import type { QuestionContainerProps } from "./QuestionContainer"
+import type { ExamFormData } from ".."
 import { ActionIcon, Radio, TextInput } from "@mantine/core"
 import { useCallback, useRef } from "react"
 import { MdDeleteOutline } from "react-icons/md"
 
 interface OptionContainerProps extends Pick<QuestionContainerProps, "clearErrors" | "register" | "setValue" | "errors" | "watch"> {
+	defaultOption: NonNullable<ExamFormData["question"][number]["option"]>[number]
 	questionIndex: number
 	removeOption: UseFieldArrayRemove
+	appendOption: UseFieldArrayAppend<ExamFormData, `question.${number}.option`>
 	optionIndex: number
 	canDelete: boolean
 }
 
 export default function OptionContainer({
+	defaultOption,
 	questionIndex,
+	appendOption,
 	removeOption: _removeOption,
 	clearErrors,
 	optionIndex,
@@ -66,6 +71,38 @@ export default function OptionContainer({
 					message: "O conteúdo da opção é obrigatório"
 				}
 			})}
+			onKeyDown={event => {
+				const getTextInput = (index: number) => {
+					return document.querySelector<HTMLInputElement>(`input[name="question.${questionIndex}.option.${index}.text"]`)
+				}
+
+				switch(event.key){
+					case "Delete":
+					case "Backspace":
+						if(canDelete && !event.currentTarget.value){
+							event.preventDefault()
+
+							const previousTextInput = getTextInput(optionIndex - 1)
+
+							previousTextInput?.focus()
+							removeOption(optionIndex)
+						}
+					break
+					case "Enter": {
+						event.preventDefault()
+
+						const nextTextInput = getTextInput(optionIndex + 1)
+
+						if(nextTextInput){
+							nextTextInput.focus()
+						}else{
+							appendOption(defaultOption)
+						}
+					}
+					break
+				}
+			}}
+			enterKeyHint="next"
 			title={contentError || "Conteúdo da opção"}
 			error={!!contentError}
 		/>
