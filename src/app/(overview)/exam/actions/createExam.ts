@@ -26,6 +26,7 @@ export interface QuestionData {
 	}[]
 	/** Option's index */
 	correct_answer?: number
+	required: boolean
 }
 
 export default async function createExam({
@@ -46,13 +47,13 @@ export default async function createExam({
 		description,
 		subject,
 		duration: getDurationMinutes(duration),
-		questions: questions.map(({ type, text, option: options/*, isRequired */ }) => {
+		questions: questions.map(({ type, text, option: options, required }) => {
 			switch(type){
 				case "dissertative":
 					return {
 						type,
 						text,
-						// isRequired
+						isRequired: required
 					}
 				case "multiple_choice":
 					if(!options) return { errors: ["As questões de múltipla escolha devem possuir opções definidas"] }
@@ -61,7 +62,7 @@ export default async function createExam({
 						type,
 						text,
 						options,
-						// isRequired
+						isRequired: required
 					}
 				default:
 					return { errors: ["Tipo de questão inválido: " + type] }
@@ -84,9 +85,9 @@ export default async function createExam({
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.pathname)
-	// revalidatePath(routes.exam_editar_template.pathname)
-	// TODO: Redirect to routes.exam_editar_template.pathname
-	redirect(routes.exam.pathname)
+	revalidatePath(routes.exam.children.template.pathname)
+	// revalidatePath(routes.exam.children.edit.template.pathname)
+	redirect(routes.homepage.pathname)
 
 	// TODO: Add expiresAt input in front-end
 	// expiresAt?: Date

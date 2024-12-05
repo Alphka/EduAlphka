@@ -6,6 +6,7 @@ import { AppShell, Burger, Avatar, NavLink, Stack, Group } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { usePathname } from "next/navigation"
 import { twJoin } from "tailwind-merge"
+import { omit } from "lodash"
 import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
 import Link from "next/link"
@@ -79,8 +80,9 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 							return route === pathname || pathname.startsWith(route) // || route.startsWith(pathname + "/")
 						}
 
-						const hasChildren = "children" in route && !!Object.keys(route.children).length
-						const opened = hasChildren && Object.entries(route.children).some(([, childRoute]) => isActive(childRoute.pathname))
+						const childrenWithoutTemplate = "children" in route && omit(route.children, "template")
+						const hasChildren = "children" in route && !!Object.keys(childrenWithoutTemplate).length
+						const opened = hasChildren && Object.entries(childrenWithoutTemplate).some(([, childRoute]) => isActive(childRoute.pathname))
 						const active = isActive(route.pathname)
 
 						return (
@@ -103,7 +105,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 									leftSection={<route.Icon className="text-base" />}
 									prefetch={false}
 								>
-									{hasChildren && Object.entries(route.children).map(([childKey, childRoute]) => {
+									{hasChildren && Object.entries(childrenWithoutTemplate).map(([childKey, childRoute]) => {
 										const active = isActive(childRoute.pathname)
 
 										return (

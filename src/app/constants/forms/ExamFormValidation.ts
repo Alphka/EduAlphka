@@ -7,6 +7,9 @@ export default class ExamFormValidation {
 	static readonly descriptionMinLength = GenericFormValidation.nameMinLength
 	static readonly descriptionMaxLength = 355
 
+	static readonly subjectMinLength = GenericFormValidation.nameMinLength
+	static readonly subjectMaxLength = 255
+
 	static readonly minDurationInMinutes = 5
 	static readonly maxDurationInMinutes = 420 // 7 hours
 

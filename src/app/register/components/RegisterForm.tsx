@@ -136,7 +136,7 @@ export default function RegisterForm(){
 							},
 							pattern: {
 								value: new RegExp(GenericFormValidation.validEmailPattern),
-								message: "O email contém caracteres inválidos"
+								message: "E-mail inválido"
 							},
 							required: {
 								value: true,

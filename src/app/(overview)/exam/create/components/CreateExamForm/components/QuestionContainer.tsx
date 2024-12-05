@@ -10,7 +10,7 @@ import {
 	type UseFormSetValue,
 	type UseFormWatch
 } from "react-hook-form"
-import { ActionIcon, Button, Group, Select, Stack, Textarea, Title } from "@mantine/core"
+import { ActionIcon, Button, Group, Select, Stack, Switch, Textarea, Title } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdOutlineDeleteForever } from "react-icons/md"
 import { QuestionTypes } from "@models/Exam"
@@ -60,14 +60,29 @@ export default function QuestionContainer({
 
 	return <>
 		<Group gap="xs">
-			<Title
-				order={3}
+			<Stack
 				flex={1}
-				fz="lg"
-				fw={500}
+				gap="md"
 			>
-				Questão {index + 1}
-			</Title>
+				<Title
+					order={3}
+					flex={1}
+					fz="lg"
+					fw={500}
+				>
+					Questão {index + 1}
+				</Title>
+
+				<Switch
+					size="xs"
+					radius="xl"
+					color="blue"
+					label="Questão obrigatória"
+					labelPosition="right"
+					{...register(`question.${index}.required`)}
+					defaultChecked
+				/>
+			</Stack>
 
 			<ActionIcon
 				size="md"

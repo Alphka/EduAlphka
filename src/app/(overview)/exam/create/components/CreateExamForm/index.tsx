@@ -22,7 +22,8 @@ export interface ExamFormData {
 const defaultExamData: ExamFormData["question"][number] = {
 	question_type: "",
 	text: "",
-	option: [{ text: "" }]
+	option: [{ text: "" }],
+	required: false
 }
 
 export default function CreateExamForm(){
@@ -65,8 +66,12 @@ export default function CreateExamForm(){
 				},
 				question
 			}) => {
-				const questions = question.map(({ question_type, ...questionData }) => ({
+				const questions = question.map(({ question_type, option, correct_answer, ...questionData }) => ({
 					type: question_type,
+					...(question_type === "multiple_choice" ? {
+						option,
+						correct_answer
+					} : undefined),
 					...questionData
 				}))
 
@@ -125,11 +130,11 @@ export default function CreateExamForm(){
 						{...register("exam.description", {
 							minLength: {
 								value: ExamFormValidation.descriptionMinLength,
-								message: `A descrição do teste deve ter no mínimo ${ExamFormValidation.descriptionMinLength} minutos`
+								message: `A descrição do teste deve ter no mínimo ${ExamFormValidation.descriptionMinLength} caracteres`
 							},
 							maxLength: {
 								value: ExamFormValidation.descriptionMaxLength,
-								message: `A descrição do teste deve ter no máximo ${ExamFormValidation.descriptionMaxLength} minutos`
+								message: `A descrição do teste deve ter no máximo ${ExamFormValidation.descriptionMaxLength} caracteres`
 							},
 							pattern: {
 								value: new RegExp(GenericFormValidation.validDescriptionPattern),
@@ -145,7 +150,10 @@ export default function CreateExamForm(){
 						autosize
 					/>
 
-					<Group gap="md">
+					<Group
+						align="flex-start"
+						gap="md"
+					>
 						<TextInput
 							size="md"
 							type="text"
@@ -156,12 +164,12 @@ export default function CreateExamForm(){
 							autoComplete="off"
 							{...register("exam.subject", {
 								minLength: {
-									value: GenericFormValidation.nameMinLength,
-									message: `O nome da disciplina deve ter no mínimo ${GenericFormValidation.nameMinLength} caracteres`
+									value: ExamFormValidation.subjectMinLength,
+									message: `O nome da disciplina deve ter no mínimo ${ExamFormValidation.subjectMinLength} caracteres`
 								},
 								maxLength: {
-									value: GenericFormValidation.nameMaxLength,
-									message: `O nome da disciplina deve ter no máximo ${GenericFormValidation.nameMaxLength} caracteres`
+									value: ExamFormValidation.subjectMaxLength,
+									message: `O nome da disciplina deve ter no máximo ${ExamFormValidation.subjectMaxLength} caracteres`
 								},
 								pattern: {
 									value: new RegExp(GenericFormValidation.validSpecialNamePattern),
