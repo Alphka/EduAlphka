@@ -1,6 +1,7 @@
 import type { UseFieldArrayAppend, UseFieldArrayRemove } from "react-hook-form"
 import type { QuestionContainerProps } from "./QuestionContainer"
 import type { ExamFormData } from ".."
+import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { ActionIcon, Radio, TextInput } from "@mantine/core"
 import { useCallback, useRef } from "react"
 import { MdDeleteOutline } from "react-icons/md"
@@ -66,6 +67,18 @@ export default function OptionContainer({
 			flex={1}
 			placeholder={`Opção ${optionIndex + 1}`}
 			{...register(`question.${questionIndex}.option.${optionIndex}.text`, {
+				minLength: {
+					value: ExamFormValidation.questionOptionMinLength,
+					message: `O texto da opção deve ter no mínimo ${ExamFormValidation.questionOptionMinLength} caracteres`
+				},
+				maxLength: {
+					value: ExamFormValidation.questionOptionMaxLength,
+					message: `O texto da opção deve ter no máximo ${ExamFormValidation.questionOptionMaxLength} caracteres`
+				},
+				pattern: {
+					value: new RegExp(GenericFormValidation.validDescriptionPattern),
+					message: "O texto da opção contém caracteres inválidos"
+				},
 				required: {
 					value: true,
 					message: "O conteúdo da opção é obrigatório"

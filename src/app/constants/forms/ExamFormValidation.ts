@@ -15,4 +15,10 @@ export default class ExamFormValidation {
 
 	static readonly questionTextMinLength = 5
 	static readonly questionTextMaxLength = 2000
+
+	static readonly questionOptionMinLength = 1
+	static readonly questionOptionMaxLength = 400
+
+	static readonly maxQuestionsNumber = 100
+	static readonly maxOptionsNumber = 50
 }

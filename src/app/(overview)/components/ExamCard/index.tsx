@@ -22,11 +22,16 @@ export default function ExamCard({
 
 	return (
 		<Card
+			h="100%"
 			p="lg"
 			radius="sm"
 			shadow="xs"
 		>
-			<Stack gap="md">
+			<Stack
+				h="100%"
+				justify="flex-end"
+				gap="md"
+			>
 				<Group justify="space-between">
 					<Text
 						fz="2xl"
@@ -58,7 +63,12 @@ export default function ExamCard({
 					{description}
 				</Text>
 
-				<Group justify="space-between">
+				<Group
+					mt="auto"
+					align="flex-end"
+					justify="space-between"
+					flex={1}
+				>
 					<Group gap="xs">
 						{!!subject && (
 							<Group

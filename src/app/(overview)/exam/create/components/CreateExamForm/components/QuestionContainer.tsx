@@ -54,7 +54,7 @@ export default function QuestionContainer({
 
 	const questionType = (useWatch({
 		name: `question.${index}.question_type`,
-		defaultValue: "",
+		defaultValue: "" as keyof typeof QuestionTypes,
 		control
 	}) || null) as keyof typeof QuestionTypes | null
 
@@ -150,7 +150,7 @@ export default function QuestionContainer({
 					}
 				})}
 				onChange={value => {
-					setValue(`question.${index}.question_type`, value || "")
+					setValue(`question.${index}.question_type`, (value || "") as keyof typeof QuestionTypes)
 				}}
 				error={errors.question?.[index]?.question_type?.message}
 				allowDeselect={false}
@@ -217,7 +217,7 @@ export default function QuestionContainer({
 						onClick={() => {
 							appendOption(defaultQuestionOption)
 						}}
-						disabled={optionFields.length === 50}
+						disabled={optionFields.length === ExamFormValidation.maxOptionsNumber}
 					>
 						Adicionar opção
 					</Button>

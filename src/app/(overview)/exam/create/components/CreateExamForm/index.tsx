@@ -1,5 +1,10 @@
 "use client"
 
+import type { QuestionTypes } from "@models/Exam"
+import type { z } from "zod"
+import type questionSchema from "../../../schemas/question"
+import type optionSchema from "../../../schemas/option"
+import type examSchema from "../../../schemas/exam"
 import { ActionIcon, Button, Divider, Fieldset, Group, Stack, Textarea, TextInput } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useRef, type ChangeEvent, type FocusEvent } from "react"
@@ -7,20 +12,21 @@ import { useFieldArray, useForm } from "react-hook-form"
 import { MdAccessTime } from "react-icons/md"
 import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
-import createExam, { type ExamData, type QuestionData } from "../../../actions/createExam"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import QuestionContainer from "./components/QuestionContainer"
+import createExam from "../../../actions/createExam"
 
 export interface ExamFormData {
-	exam: ExamData
-	question: (Omit<QuestionData, "type"> & {
-		question_type: QuestionData["type"]
+	exam: z.infer<typeof examSchema>
+	question: (Omit<z.infer<typeof questionSchema>, "type" | "option"> & {
+		question_type: keyof typeof QuestionTypes
+		option: z.infer<typeof optionSchema>[]
 	})[]
 }
 
 const defaultExamData: ExamFormData["question"][number] = {
-	question_type: "",
+	question_type: "" as keyof typeof QuestionTypes,
 	text: "",
 	option: [{ text: "" }],
 	required: false
@@ -66,10 +72,15 @@ export default function CreateExamForm(){
 				},
 				question
 			}) => {
-				const questions = question.map(({ question_type, option, correct_answer, ...questionData }) => ({
-					type: question_type,
-					...(question_type === "multiple_choice" ? {
-						option,
+				const questions = question.map(({
+					question_type: type,
+					option: options,
+					correct_answer,
+					...questionData
+				}) => ({
+					type,
+					...(type === "multiple_choice" ? {
+						options,
 						correct_answer
 					} : undefined),
 					...questionData
@@ -77,10 +88,11 @@ export default function CreateExamForm(){
 
 				handleServerAction(createExam({
 					title,
-					description,
 					subject,
-					duration
-				}, questions))
+					duration,
+					questions,
+					description
+				}))
 			})}
 			component="form"
 			gap="3xl"
@@ -275,6 +287,7 @@ export default function CreateExamForm(){
 						onClick={() => {
 							appendQuestion(defaultExamData)
 						}}
+						disabled={questionFields.length === ExamFormValidation.maxQuestionsNumber}
 					>
 						Adicionar questão
 					</Button>
