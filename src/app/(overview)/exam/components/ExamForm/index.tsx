@@ -6,18 +6,20 @@ import type questionSchema from "@schemas/question"
 import type optionSchema from "@schemas/option"
 import type examSchema from "@schemas/exam"
 import { ActionIcon, Button, Divider, Fieldset, Group, Stack, Textarea, TextInput } from "@mantine/core"
-import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
-import { useRef, type ChangeEvent, type FocusEvent } from "react"
 import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
+import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
+import { useCallback, useRef, type ChangeEvent } from "react"
+import { useMediaQuery } from "@mantine/hooks"
 import { MdAccessTime } from "react-icons/md"
+import { useParams } from "next/navigation"
 import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
+import getDurationMinutes from "@helpers/getDurationMinutes"
 import QuestionContainer from "./components/QuestionContainer"
 import createExamAction from "../../actions/createExam"
 import editExamAction from "../../actions/editExam"
-import { useParams } from "next/navigation"
 
 export interface ExamFormData {
 	exam: Omit<z.infer<typeof examSchema>, "questions">
@@ -49,12 +51,14 @@ export default function ExamForm({
 	const { id } = useParams()
 	const { isPending, handleServerAction } = useServerActionHandler()
 	const durationInputRef = useRef<HTMLInputElement>(null)
+	const isMobile = useMediaQuery("(max-width: 600px)")
 
 	const {
 		watch,
 		control,
-		setValue,
 		register,
+		setValue,
+		setError,
 		clearErrors,
 		handleSubmit,
 		formState: { errors }
@@ -74,6 +78,36 @@ export default function ExamForm({
 		control,
 		name: "question"
 	})
+
+	const handleDurationChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+		const { target: { value } } = event
+
+		if(value){
+			const duration = getDurationMinutes(value)
+
+			if(duration > ExamFormValidation.maxDurationInMinutes){
+				setError("exam.duration", {
+					message: `A duração do teste deve ser no máximo ${formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}`,
+					type: "max"
+				})
+
+				return
+			}else if(duration < ExamFormValidation.minDurationInMinutes){
+				setError("exam.duration", {
+					message: `A duração do teste deve ser no mínimo ${formatTimeDuration(ExamFormValidation.minDurationInMinutes)}`,
+					type: "min"
+				})
+
+				return
+			}
+
+			clearErrors("exam.duration")
+		}
+
+		setValue("exam.duration", value, {
+			shouldValidate: true
+		})
+	}, [clearErrors, setError, setValue])
 
 	return (
 		<Stack
@@ -151,6 +185,7 @@ export default function ExamForm({
 								message: "O título do teste é obrigatório"
 							}
 						})}
+						defaultValue={watch("exam.title")}
 						error={errors.exam?.title?.message}
 						disabled={loading}
 						withAsterisk
@@ -182,15 +217,18 @@ export default function ExamForm({
 								message: "A descrição do teste é obrigatória"
 							}
 						})}
+						defaultValue={watch("exam.description")}
 						error={errors.exam?.description?.message}
 						disabled={loading}
 						withAsterisk
 						autosize
 					/>
 
-					<Group
-						align="flex-start"
-						gap="md"
+					<div
+						className={twJoin(
+							"flex items-start gap-md",
+							isMobile && "flex-col items-stretch"
+						)}
 					>
 						<TextInput
 							size="md"
@@ -216,12 +254,13 @@ export default function ExamForm({
 									message: "O nome da disciplina contém caracteres inválidos"
 								}
 							})}
+							defaultValue={watch("exam.subject")}
 							error={errors.exam?.subject?.message}
 							disabled={loading}
 						/>
 
 						<TimeInput
-							className="basis-1/5"
+							className={twJoin(!isMobile && "basis-1/5")}
 							size="md"
 							label="Duração"
 							aria-label="Duração do teste"
@@ -243,23 +282,8 @@ export default function ExamForm({
 							minTime={formatTimeDuration(ExamFormValidation.minDurationInMinutes)}
 							maxTime={formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}
 							{...register("exam.duration", {
-								onBlur(event: FocusEvent<HTMLInputElement>){
-									const { target: input } = event
-									const value = input.value === "00:00" ? "" : input.value
-
-									setValue("exam.duration", value, {
-										shouldDirty: true,
-										shouldValidate: true
-									})
-								},
-								onChange(event: ChangeEvent<HTMLInputElement>){
-									const { target: input } = event
-									const value = input.value === "00:00" ? "" : input.value
-
-									setValue("exam.duration", value, {
-										shouldValidate: true
-									})
-								},
+								onBlur: handleDurationChange,
+								onChange: handleDurationChange,
 								required: {
 									value: true,
 									message: "A duração do teste é obrigatória"
@@ -271,7 +295,7 @@ export default function ExamForm({
 							disabled={loading}
 							withAsterisk
 						/>
-					</Group>
+					</div>
 				</Stack>
 			</Fieldset>
 

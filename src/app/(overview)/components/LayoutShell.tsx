@@ -113,7 +113,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 												href={childRoute.pathname}
 												label={childRoute.title}
 												component={Link}
-												className={twJoin(active ? "rounded-b" : "rounded")}
+												className="rounded-b"
 												active={active}
 												prefetch={false}
 												key={childKey}

@@ -13,6 +13,7 @@ import {
 import { ActionIcon, Button, Group, Select, Stack, Switch, Textarea, Title } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdOutlineDeleteForever } from "react-icons/md"
+import { useMediaQuery } from "@mantine/hooks"
 import { QuestionTypes } from "@models/Exam"
 import OptionContainer from "./OptionContainer"
 
@@ -45,6 +46,8 @@ export default function QuestionContainer({
 	watch,
 	index
 }: QuestionContainerProps){
+	const isMobile = useMediaQuery("(max-width: 400px)")
+
 	const {
 		fields: optionFields,
 		append: appendOption,
@@ -61,7 +64,7 @@ export default function QuestionContainer({
 	}) || null) as keyof typeof QuestionTypes | null
 
 	return <>
-		<Group gap="xs">
+		<Group align="flex-start" gap="xs">
 			<Stack
 				flex={1}
 				gap="md"
@@ -79,10 +82,10 @@ export default function QuestionContainer({
 					size="xs"
 					radius="xl"
 					color="blue"
-					label="Questão obrigatória"
+					label={isMobile ? "Obrigatória" : "Questão obrigatória"}
 					labelPosition="right"
 					{...register(`question.${index}.required`)}
-					defaultChecked
+					defaultChecked={watch(`question.${index}.required`, true)}
 					disabled={disabled}
 				/>
 			</Stack>
@@ -130,6 +133,7 @@ export default function QuestionContainer({
 					message: "O conteúdo da questão é obrigatório"
 				}
 			})}
+			defaultValue={watch(`question.${index}.text`)}
 			error={errors.question?.[index]?.text?.message}
 			disabled={disabled}
 			withAsterisk
@@ -191,6 +195,7 @@ export default function QuestionContainer({
 												message: "Nenhuma opção foi selecionada como a resposta correta"
 											}
 										})}
+										defaultValue={watch(path, undefined)}
 										name={undefined}
 									/>
 								)}

@@ -17,7 +17,8 @@ const questionSchema = z.object({
 		.max(ExamFormValidation.questionTextMaxLength, `O texto da pergunta deve ter no máximo ${ExamFormValidation.questionTextMaxLength} caracteres`)
 		.regex(new RegExp(GenericFormValidation.validDescriptionPattern), "O texto da pergunta contém caracteres inválidos"),
 	options: z.array(optionSchema)
-		.max(ExamFormValidation.maxOptionsNumber, `O número máximo de opções é ${ExamFormValidation.maxOptionsNumber}`)
+		.min(ExamFormValidation.minOptionsNumber, `A questão deve ter no mínimo ${ExamFormValidation.minOptionsNumber} opções`)
+		.max(ExamFormValidation.maxOptionsNumber, `A questão deve ter no máximo ${ExamFormValidation.maxOptionsNumber} opções`)
 		.optional(),
 	required: z.boolean({
 		invalid_type_error: "Valor inválido para o campo 'Questão obrigatória'",

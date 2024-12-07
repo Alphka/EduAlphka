@@ -23,10 +23,11 @@ export default async function RecentExams({ limit }: RecentExamsProps){
 		}, {
 			title: 1,
 			subject: 1,
-			description: 1,
-			candidates: 1,
+			duration: 1,
 			createdAt: 1,
-			updatedAt: 1
+			updatedAt: 1,
+			candidates: 1,
+			description: 1
 		})
 		.sort({ createdAt: -1 })
 		.limit(limit)

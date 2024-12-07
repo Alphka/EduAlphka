@@ -84,6 +84,7 @@ export default function OptionContainer({
 					message: "O conteúdo da opção é obrigatório"
 				}
 			})}
+			defaultValue={watch(`question.${questionIndex}.option.${optionIndex}.text`)}
 			onKeyDown={event => {
 				const getTextInput = (index: number) => {
 					return document.querySelector<HTMLInputElement>(`input[name="question.${questionIndex}.option.${index}.text"]`)

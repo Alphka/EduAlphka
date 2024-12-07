@@ -27,7 +27,9 @@ const examSchema = z.object({
 		.max(ExamFormValidation.subjectMaxLength, `O nome da disciplina deve ter no máximo ${ExamFormValidation.subjectMaxLength} caracteres`)
 		.regex(new RegExp(GenericFormValidation.validSpecialNamePattern), "O nome da disciplina contém caracteres inválidos")
 		.optional(),
-	questions: z.array(questionSchema),
+	questions: z.array(questionSchema)
+		.min(ExamFormValidation.minQuestionsNumber, `O teste deve ter no mínimo ${ExamFormValidation.minQuestionsNumber} questões`)
+		.max(ExamFormValidation.maxQuestionsNumber, `O teste deve ter no máximo ${ExamFormValidation.maxQuestionsNumber} questões`),
 	duration: z.string({
 		invalid_type_error: "Duração do teste inválida",
 		required_error: "A duração do teste é obrigatória"
