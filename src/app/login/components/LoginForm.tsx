@@ -2,7 +2,7 @@
 
 import { ActionIcon, Anchor, Button, Checkbox, Group, Stack, TextInput, Title } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
-import { login, type UserLoginData } from "../actions/login"
+import { loginAction, type UserLoginData } from "../actions/login"
 import { GenericFormValidation } from "@constants/forms"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -26,7 +26,7 @@ export default function LoginForm(){
 			w="80%"
 			className="max-w-screen-sm"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
-				handleServerAction(login({
+				handleServerAction(loginAction({
 					username,
 					password,
 					keep_logged_in

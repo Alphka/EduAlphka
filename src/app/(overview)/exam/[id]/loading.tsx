@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import ExamForm from "../components/ExamForm"
 import routes from "@app/routes"
 
-const title = routes.exam.title
+const title = routes.exam.children.template.title
 
 export const metadata: Metadata = {
 	title,
@@ -11,8 +11,11 @@ export const metadata: Metadata = {
 	}
 }
 
-export default function CreateExamPage(){
+export default function EditExamPageSkeleton(){
 	return (
-		<ExamForm />
+		<ExamForm
+			type="edit"
+			loading
+		/>
 	)
 }

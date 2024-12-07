@@ -1,4 +1,4 @@
-import { emailString, keepLoggedInSchema, passwordString, usernameString } from "@app/login/schemas/login"
+import { emailString, keepLoggedInSchema, passwordString, usernameString } from "@app/schemas/login"
 import { GenericFormValidation } from "@constants/forms"
 import { ACCOUNT_TYPES } from "@models/User"
 import { z } from "zod"

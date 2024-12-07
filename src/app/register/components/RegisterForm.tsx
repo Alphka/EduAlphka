@@ -2,7 +2,7 @@
 
 import { ActionIcon, Button, Checkbox, Stack, Text, TextInput, Title } from "@mantine/core"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
-import { signIn, type UserSignInData } from "../actions/signIn"
+import { signInAction, type UserSignInData } from "../actions/signIn"
 import { GenericFormValidation } from "@constants/forms"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -26,7 +26,7 @@ export default function RegisterForm(){
 			w="80%"
 			className="max-w-screen-sm"
 			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
-				handleServerAction(signIn({
+				handleServerAction(signInAction({
 					name,
 					email,
 					username,

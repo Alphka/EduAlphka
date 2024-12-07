@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation"
 import authenticateUser from "@lib/authenticateUser"
-import loginSchema from "../schemas/login"
+import loginSchema from "@schemas/login"
 import routes from "@app/routes"
 
 export interface UserLoginData {
@@ -11,7 +11,7 @@ export interface UserLoginData {
 	keep_logged_in: boolean
 }
 
-export async function login({
+export async function loginAction({
 	username: usernameOrEmail,
 	password,
 	keep_logged_in: keepLoggedIn

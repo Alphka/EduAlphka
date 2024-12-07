@@ -2,24 +2,26 @@
 
 import type { QuestionTypes } from "@models/Exam"
 import type { z } from "zod"
-import type questionSchema from "../../../schemas/question"
-import type optionSchema from "../../../schemas/option"
-import type examSchema from "../../../schemas/exam"
+import type questionSchema from "@schemas/question"
+import type optionSchema from "@schemas/option"
+import type examSchema from "@schemas/exam"
 import { ActionIcon, Button, Divider, Fieldset, Group, Stack, Textarea, TextInput } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useRef, type ChangeEvent, type FocusEvent } from "react"
-import { useFieldArray, useForm } from "react-hook-form"
+import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
 import { MdAccessTime } from "react-icons/md"
 import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import QuestionContainer from "./components/QuestionContainer"
-import createExam from "../../../actions/createExam"
+import createExamAction from "../../actions/createExam"
+import editExamAction from "../../actions/editExam"
+import { useParams } from "next/navigation"
 
 export interface ExamFormData {
-	exam: z.infer<typeof examSchema>
-	question: (Omit<z.infer<typeof questionSchema>, "type" | "option"> & {
+	exam: Omit<z.infer<typeof examSchema>, "questions">
+	question: (Omit<z.infer<typeof questionSchema>, "type" | "options"> & {
 		question_type: keyof typeof QuestionTypes
 		option: z.infer<typeof optionSchema>[]
 	})[]
@@ -32,7 +34,19 @@ const defaultExamData: ExamFormData["question"][number] = {
 	required: false
 }
 
-export default function CreateExamForm(){
+interface ExamFormProps {
+	/** @default "create" */
+	type?: "create" | "edit"
+	loading?: boolean
+	defaultValues?: DefaultValues<ExamFormData>
+}
+
+export default function ExamForm({
+	type,
+	loading,
+	defaultValues
+}: ExamFormProps){
+	const { id } = useParams()
 	const { isPending, handleServerAction } = useServerActionHandler()
 	const durationInputRef = useRef<HTMLInputElement>(null)
 
@@ -46,7 +60,7 @@ export default function CreateExamForm(){
 		formState: { errors }
 	} = useForm<ExamFormData>({
 		reValidateMode: "onChange",
-		defaultValues: {
+		defaultValues: defaultValues || {
 			question: [defaultExamData]
 		},
 		mode: "onSubmit"
@@ -86,13 +100,23 @@ export default function CreateExamForm(){
 					...questionData
 				}))
 
-				handleServerAction(createExam({
-					title,
-					subject,
-					duration,
-					questions,
-					description
-				}))
+				const promise = type === "create"
+					? createExamAction({
+						title,
+						subject,
+						duration,
+						questions,
+						description
+					})
+					: editExamAction(id as string, {
+						title,
+						subject,
+						duration,
+						questions,
+						description
+					})
+
+				handleServerAction(promise)
 			})}
 			component="form"
 			gap="3xl"
@@ -128,6 +152,7 @@ export default function CreateExamForm(){
 							}
 						})}
 						error={errors.exam?.title?.message}
+						disabled={loading}
 						withAsterisk
 					/>
 
@@ -158,6 +183,7 @@ export default function CreateExamForm(){
 							}
 						})}
 						error={errors.exam?.description?.message}
+						disabled={loading}
 						withAsterisk
 						autosize
 					/>
@@ -174,6 +200,8 @@ export default function CreateExamForm(){
 							placeholder="Disciplina do teste"
 							aria-label="Disciplina do teste"
 							autoComplete="off"
+							minLength={ExamFormValidation.subjectMinLength}
+							maxLength={ExamFormValidation.subjectMaxLength}
 							{...register("exam.subject", {
 								minLength: {
 									value: ExamFormValidation.subjectMinLength,
@@ -189,6 +217,7 @@ export default function CreateExamForm(){
 								}
 							})}
 							error={errors.exam?.subject?.message}
+							disabled={loading}
 						/>
 
 						<TimeInput
@@ -201,7 +230,12 @@ export default function CreateExamForm(){
 									color={errors.exam?.duration ? "currentColor" : "gray"}
 									variant="subtle"
 									aria-label="Escolha o horário"
-									onClick={() => durationInputRef.current?.showPicker?.()}
+									onClick={event => {
+										if(!event.currentTarget.disabled){
+											durationInputRef.current?.showPicker?.()
+										}
+									}}
+									disabled={loading}
 								>
 									<MdAccessTime className="text-[1.25rem]" />
 								</ActionIcon>
@@ -231,8 +265,10 @@ export default function CreateExamForm(){
 									message: "A duração do teste é obrigatória"
 								}
 							})}
+							defaultValue={watch("exam.duration")}
 							error={errors.exam?.duration?.message}
 							ref={durationInputRef}
+							disabled={loading}
 							withAsterisk
 						/>
 					</Group>
@@ -274,6 +310,7 @@ export default function CreateExamForm(){
 									watch,
 									index
 								}}
+								disabled={loading}
 							/>
 						</Stack>
 					))}
@@ -287,7 +324,7 @@ export default function CreateExamForm(){
 						onClick={() => {
 							appendQuestion(defaultExamData)
 						}}
-						disabled={questionFields.length === ExamFormValidation.maxQuestionsNumber}
+						disabled={loading || questionFields.length === ExamFormValidation.maxQuestionsNumber}
 					>
 						Adicionar questão
 					</Button>
@@ -295,13 +332,14 @@ export default function CreateExamForm(){
 			</Fieldset>
 
 			<Button
-				type="submit"
-				size="sm"
-				variant="filled"
 				className="self-start"
+				size="sm"
+				type="submit"
+				variant="filled"
 				loading={isPending}
+				disabled={loading}
 			>
-				Cadastrar teste
+				{type === "create" ? "Cadastrar teste" : "Editar teste"}
 			</Button>
 		</Stack>
 	)

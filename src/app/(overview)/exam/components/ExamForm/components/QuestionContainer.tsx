@@ -24,6 +24,7 @@ export interface QuestionContainerProps {
 	removeQuestion: UseFieldArrayRemove
 	clearErrors: UseFormClearErrors<ExamFormData>
 	canDelete: boolean
+	disabled?: boolean
 	register: UseFormRegister<ExamFormData>
 	setValue: UseFormSetValue<ExamFormData>
 	control: Control<ExamFormData, any>
@@ -36,6 +37,7 @@ export default function QuestionContainer({
 	removeQuestion,
 	clearErrors,
 	canDelete,
+	disabled,
 	register,
 	setValue,
 	control,
@@ -81,6 +83,7 @@ export default function QuestionContainer({
 					labelPosition="right"
 					{...register(`question.${index}.required`)}
 					defaultChecked
+					disabled={disabled}
 				/>
 			</Stack>
 
@@ -95,7 +98,7 @@ export default function QuestionContainer({
 				onClick={() => {
 					removeQuestion(index)
 				}}
-				disabled={!canDelete}
+				disabled={disabled || !canDelete}
 			>
 				<MdOutlineDeleteForever className="text-[1.25rem]" />
 			</ActionIcon>
@@ -128,6 +131,7 @@ export default function QuestionContainer({
 				}
 			})}
 			error={errors.question?.[index]?.text?.message}
+			disabled={disabled}
 			withAsterisk
 			spellCheck
 			autosize
@@ -149,10 +153,12 @@ export default function QuestionContainer({
 						message: "O tipo da questão é obrigatório"
 					}
 				})}
+				defaultValue={watch(`question.${index}.question_type`)}
 				onChange={value => {
 					setValue(`question.${index}.question_type`, (value || "") as keyof typeof QuestionTypes)
 				}}
 				error={errors.question?.[index]?.question_type?.message}
+				disabled={disabled}
 				allowDeselect={false}
 				clearable={false}
 				withAsterisk
@@ -217,7 +223,7 @@ export default function QuestionContainer({
 						onClick={() => {
 							appendOption(defaultQuestionOption)
 						}}
-						disabled={optionFields.length === ExamFormValidation.maxOptionsNumber}
+						disabled={disabled || optionFields.length === ExamFormValidation.maxOptionsNumber}
 					>
 						Adicionar opção
 					</Button>

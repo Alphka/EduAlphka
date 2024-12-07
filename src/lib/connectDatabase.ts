@@ -23,6 +23,8 @@ export default async function connectDatabase(){
 
 	if(!cached.promise){
 		const options: ConnectOptions = {
+			w: "majority",
+			retryWrites: true,
 			bufferCommands: false,
 			dbName: DATABASE_NAME || NODE_ENV
 		}

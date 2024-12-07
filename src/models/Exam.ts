@@ -1,12 +1,12 @@
 import type {
 	IExam,
 	ExamModel,
-	IExamQuestion,
-	QuestionModel,
 	OptionModel,
-	TQuestionOption,
-	ExamMultipleChoiceQuestion,
-	ExamDissertativeQuestion
+	QuestionModel,
+	IQuestionOption,
+	ExamQuestionBase,
+	ExamDissertativeQuestion,
+	ExamMultipleChoiceQuestion
 } from "./typings/Exam"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { model, models, Schema } from "mongoose"
@@ -16,7 +16,7 @@ export enum QuestionTypes {
 	dissertative = "Dissertativa"
 }
 
-const OptionSchema = new Schema<TQuestionOption, OptionModel>({
+const OptionSchema = new Schema<IQuestionOption, OptionModel>({
 	text: {
 		type: String,
 		required: true
@@ -24,9 +24,11 @@ const OptionSchema = new Schema<TQuestionOption, OptionModel>({
 })
 
 const QuestionSchema = new Schema<
-	& IExamQuestion
+	& ExamQuestionBase
 	& Omit<ExamMultipleChoiceQuestion, "type">
 	& Omit<ExamDissertativeQuestion, "type">
+	// & Partial<Omit<ExamMultipleChoiceQuestion, "type">>
+	// & Partial<Omit<ExamDissertativeQuestion, "type">>
 , QuestionModel>({
 	type: {
 		type: String,
@@ -41,7 +43,7 @@ const QuestionSchema = new Schema<
 	},
 	isRequired: {
 		type: Boolean,
-		// required: true
+		required: true
 	},
 	options: [OptionSchema],
 	correctAnswer: Schema.ObjectId
