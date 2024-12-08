@@ -1,4 +1,5 @@
 import type { NextConfig } from "next"
+import routes from "@app/routes"
 
 const nextConfig: NextConfig = {
 	productionBrowserSourceMaps: true,
@@ -9,6 +10,19 @@ const nextConfig: NextConfig = {
 			fullUrl: true,
 			hmrRefreshes: true
 		}
+	},
+	async redirects(){
+		const redirects = Object.values(routes).map(route => {
+			if(!("redirect" in route)) return
+
+			return {
+				source: route.pathname,
+				destination: route.redirect,
+				permanent: true
+			} satisfies Awaited<ReturnType<NonNullable<NextConfig["redirects"]>>>[number]
+		})
+
+		return redirects.filter(Boolean) as (NonNullable<typeof redirects[number]>)[]
 	},
 	async headers(){
 		return [
