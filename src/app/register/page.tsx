@@ -1,6 +1,5 @@
 import type { Metadata } from "next"
 import { APPLICATION_NAME } from "@constants/index"
-import { Stack } from "@mantine/core"
 import RegisterForm from "./components/RegisterForm"
 import routes from "@app/routes"
 
@@ -18,14 +17,8 @@ export const metadata: Metadata = {
 
 export default function RegisterPage(){
 	return (
-		<Stack
-			p="5xl"
-			align="center"
-			justify="center"
-			component="main"
-			className="min-h-dvh"
-		>
+		<main className="flex flex-col items-center justify-center p-5xl min-h-dvh">
 			<RegisterForm />
-		</Stack>
+		</main>
 	)
 }

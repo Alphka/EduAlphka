@@ -1,6 +1,6 @@
 import type { Metadata } from "next"
-import { Button, Group, Stack, Title } from "@mantine/core"
 import { MdAddCircleOutline } from "react-icons/md"
+import { Button, Title } from "@mantine/core"
 import { Suspense } from "react"
 import ExamListSkeleton from "./components/ExamListSkeleton"
 import RecentExams from "./components/RecentExams"
@@ -20,13 +20,9 @@ const recentExamsLimit = 6
 
 export default function Homepage(){
 	return (
-		<Stack gap="2xl">
-			<Stack gap="lg">
-				<Group
-					component="header"
-					justify="space-between"
-					gap="md"
-				>
+		<div className="flex flex-col gap-2xl">
+			<div className="flex flex-col gap-lg">
+				<header className="flex justify-between gap-md">
 					<Title
 						order={1}
 						fz="4xl"
@@ -42,12 +38,12 @@ export default function Homepage(){
 					>
 						Criar teste
 					</Button>
-				</Group>
+				</header>
 
 				<Suspense fallback={<ExamListSkeleton limit={recentExamsLimit / 2} />}>
 					<RecentExams limit={recentExamsLimit} />
 				</Suspense>
-			</Stack>
-		</Stack>
+			</div>
+		</div>
 	)
 }

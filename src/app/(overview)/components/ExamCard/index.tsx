@@ -52,7 +52,7 @@ export default function ExamCard({
 				/>
 
 				<div className="h-full flex flex-col gap-md">
-					<div className="flex items-start justify-between">
+					<div className="flex items-start justify-between gap-md">
 						<Text
 							fz="2xl"
 							fw="bold"

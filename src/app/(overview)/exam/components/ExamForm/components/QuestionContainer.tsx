@@ -10,7 +10,7 @@ import {
 	type UseFormSetValue,
 	type UseFormWatch
 } from "react-hook-form"
-import { ActionIcon, Button, Group, Select, Stack, Switch, Textarea, Title } from "@mantine/core"
+import { ActionIcon, Button, Select, Switch, Textarea, Title } from "@mantine/core"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { MdOutlineDeleteForever } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
@@ -64,11 +64,8 @@ export default function QuestionContainer({
 	}) || null) as keyof typeof QuestionTypes | null
 
 	return <>
-		<Group align="flex-start" gap="xs">
-			<Stack
-				flex={1}
-				gap="md"
-			>
+		<div className="flex items-start gap-xs">
+			<div className="flex-grow flex flex-col gap-md">
 				<Title
 					order={3}
 					flex={1}
@@ -88,7 +85,7 @@ export default function QuestionContainer({
 					defaultChecked={watch(`question.${index}.required`, true)}
 					disabled={disabled}
 				/>
-			</Stack>
+			</div>
 
 			<ActionIcon
 				size="md"
@@ -105,7 +102,7 @@ export default function QuestionContainer({
 			>
 				<MdOutlineDeleteForever className="text-[1.25rem]" />
 			</ActionIcon>
-		</Group>
+		</div>
 
 		<Textarea
 			size="md"
@@ -141,7 +138,7 @@ export default function QuestionContainer({
 			autosize
 		/>
 
-		<Stack gap="md">
+		<div className="flex flex-col gap-md">
 			<Select
 				size="md"
 				label="Selecione o tipo da questão"
@@ -169,14 +166,13 @@ export default function QuestionContainer({
 			/>
 
 			{questionType && questionType === "multiple_choice" && <>
-				<Stack gap="md">
+				<div className="flex flex-col gap-md">
 					{optionFields.map(({ id }, optionIndex, { length }) => {
 						const path = `question.${index}.correct_answer` as const
 
 						return (
-							<Group
-								justify="space-between"
-								gap="sm"
+							<div
+								className="flex justify-between gap-sm"
 								key={id}
 							>
 								{optionIndex === 0 && (
@@ -215,12 +211,12 @@ export default function QuestionContainer({
 										watch
 									}}
 								/>
-							</Group>
+							</div>
 						)
 					})}
-				</Stack>
+				</div>
 
-				<Group justify="center">
+				<div className="flex justify-center">
 					<Button
 						size="sm"
 						variant="subtle"
@@ -232,8 +228,8 @@ export default function QuestionContainer({
 					>
 						Adicionar opção
 					</Button>
-				</Group>
+				</div>
 			</>}
-		</Stack>
+		</div>
 	</>
 }

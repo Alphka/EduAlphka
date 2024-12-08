@@ -1,8 +1,8 @@
 "use client"
 
-import { ActionIcon, Anchor, Button, Checkbox, Group, Stack, TextInput, Title } from "@mantine/core"
-import { MdVisibility, MdVisibilityOff } from "react-icons/md"
+import { ActionIcon, Anchor, Button, Checkbox, TextInput, Title } from "@mantine/core"
 import { loginAction, type UserLoginData } from "../actions/login"
+import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { GenericFormValidation } from "@constants/forms"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -22,9 +22,8 @@ export default function LoginForm(){
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
 	return (
-		<Stack
-			w="80%"
-			className="max-w-screen-sm"
+		<form
+			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
 				handleServerAction(loginAction({
 					username,
@@ -32,13 +31,8 @@ export default function LoginForm(){
 					keep_logged_in
 				}))
 			})}
-			component="form"
-			gap="3xl"
 		>
-			<Stack
-				gap="xs"
-				component="header"
-			>
+			<header className="flex flex-col gap-xs">
 				<Title
 					order={1}
 					fz="6xl"
@@ -56,10 +50,10 @@ export default function LoginForm(){
 				>
 					Entre com seu endereço de email ou nome usuário.
 				</Title>
-			</Stack>
+			</header>
 
-			<Stack gap="2xl">
-				<Stack gap="md">
+			<div className="flex flex-col gap-2xl">
+				<div className="flex flex-col gap-md">
 					<TextInput
 						size="md"
 						type="text"
@@ -124,12 +118,9 @@ export default function LoginForm(){
 						error={errors.password?.message}
 						withAsterisk
 					/>
-				</Stack>
+				</div>
 
-				<Group
-					gap="md"
-					justify="space-between"
-				>
+				<div className="flex justify-between gap-md">
 					<Checkbox
 						size="sm"
 						label="Manter logado"
@@ -145,7 +136,7 @@ export default function LoginForm(){
 					>
 						Esqueceu sua senha?
 					</Anchor>
-				</Group>
+				</div>
 
 				<Button
 					type="submit"
@@ -155,7 +146,7 @@ export default function LoginForm(){
 				>
 					Continuar
 				</Button>
-			</Stack>
+			</div>
 
 			<Anchor
 				href="/register"
@@ -166,6 +157,6 @@ export default function LoginForm(){
 			>
 				Não tem uma conta? Crie uma agora mesmo!
 			</Anchor>
-		</Stack>
+		</form>
 	)
 }

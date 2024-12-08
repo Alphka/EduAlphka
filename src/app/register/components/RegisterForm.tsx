@@ -1,8 +1,8 @@
 "use client"
 
-import { ActionIcon, Button, Checkbox, Stack, Text, TextInput, Title } from "@mantine/core"
-import { MdVisibility, MdVisibilityOff } from "react-icons/md"
+import { ActionIcon, Button, Checkbox, Text, TextInput, Title } from "@mantine/core"
 import { signInAction, type UserSignInData } from "../actions/signIn"
+import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { GenericFormValidation } from "@constants/forms"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
@@ -22,9 +22,8 @@ export default function RegisterForm(){
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
 	return (
-		<Stack
-			w="80%"
-			className="max-w-screen-sm"
+		<form
+			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
 				handleServerAction(signInAction({
 					name,
@@ -35,13 +34,8 @@ export default function RegisterForm(){
 					keep_logged_in
 				}))
 			})}
-			component="form"
-			gap="3xl"
 		>
-			<Stack
-				component="header"
-				gap="xs"
-			>
+			<header className="flex flex-col gap-xs">
 				<Title
 					order={1}
 					fz="6xl"
@@ -59,10 +53,10 @@ export default function RegisterForm(){
 				>
 					Junte-se à nossa plataforma de testes online e comece sua jornada de aprendizado!
 				</Title>
-			</Stack>
+			</header>
 
-			<Stack gap="2xl">
-				<Stack gap="md">
+			<div className="flex flex-col gap-2xl">
+				<div className="flex flex-col gap-md">
 					<TextInput
 						size="md"
 						type="text"
@@ -187,9 +181,9 @@ export default function RegisterForm(){
 						error={errors.password?.message}
 						withAsterisk
 					/>
-				</Stack>
+				</div>
 
-				<Stack gap="xs">
+				<div className="flex flex-col gap-xs">
 					<Text size="md">
 						Tipo de conta
 					</Text>
@@ -210,7 +204,7 @@ export default function RegisterForm(){
 							Candidato
 						</Button>
 					</Button.Group>
-				</Stack>
+				</div>
 
 				<Checkbox
 					size="sm"
@@ -228,7 +222,7 @@ export default function RegisterForm(){
 				>
 					Continuar
 				</Button>
-			</Stack>
-		</Stack>
+			</div>
+		</form>
 	)
 }

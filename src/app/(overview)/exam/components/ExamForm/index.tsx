@@ -5,7 +5,7 @@ import type { z } from "zod"
 import type questionSchema from "@schemas/question"
 import type optionSchema from "@schemas/option"
 import type examSchema from "@schemas/exam"
-import { ActionIcon, Button, Divider, Fieldset, Group, Stack, Textarea, TextInput } from "@mantine/core"
+import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
 import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useCallback, useRef, type ChangeEvent } from "react"
@@ -110,7 +110,8 @@ export default function ExamForm({
 	}, [clearErrors, setError, setValue])
 
 	return (
-		<Stack
+		<form
+			className="flex flex-col gap-3xl"
 			onSubmit={handleSubmit(({
 				exam: {
 					title,
@@ -152,14 +153,12 @@ export default function ExamForm({
 
 				handleServerAction(promise)
 			})}
-			component="form"
-			gap="3xl"
 		>
 			<Fieldset
 				legend="Informações do teste"
 				radius="md"
 			>
-				<Stack gap="md">
+				<div className="flex flex-col gap-md">
 					<TextInput
 						size="md"
 						type="text"
@@ -296,7 +295,7 @@ export default function ExamForm({
 							withAsterisk
 						/>
 					</div>
-				</Stack>
+				</div>
 			</Fieldset>
 
 			<Divider />
@@ -305,21 +304,17 @@ export default function ExamForm({
 				legend="Questões"
 				radius="md"
 			>
-				<Stack
-					component="ul"
-					gap="3xl"
-				>
+				<ul className="flex flex-col gap-3xl">
 					{questionFields.map(({ id }, index, { length }) => (
-						<Stack
-							pos="relative"
+						<div
 							className={twJoin(
+								"relative flex flex-col gap-md",
 								index !== length - 1 && [
 									"after:w-full after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4",
 									"after:translate-y-1/2",
 									"after:bg-[var(--mantine-color-default-border)]"
 								]
 							)}
-							gap="md"
 							key={id}
 						>
 							<QuestionContainer
@@ -336,13 +331,13 @@ export default function ExamForm({
 								}}
 								disabled={loading}
 							/>
-						</Stack>
+						</div>
 					))}
-				</Stack>
+				</ul>
 
 				<Divider my="lg" color="gray" />
 
-				<Group justify="center">
+				<div className="flex justify-center">
 					<Button
 						variant="default"
 						onClick={() => {
@@ -352,7 +347,7 @@ export default function ExamForm({
 					>
 						Adicionar questão
 					</Button>
-				</Group>
+				</div>
 			</Fieldset>
 
 			<Button
@@ -365,6 +360,6 @@ export default function ExamForm({
 			>
 				{type === "create" ? "Cadastrar teste" : "Editar teste"}
 			</Button>
-		</Stack>
+		</form>
 	)
 }
