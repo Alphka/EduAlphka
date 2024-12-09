@@ -23,7 +23,6 @@ const routes = {
 	exam: {
 		title: "Gerenciar testes",
 		pathname: "/exam",
-		// TODO: Use next.config.ts headers property to redirect this
 		redirect: "/",
 		Icon: MdOutlineMenuBook,
 		children: {

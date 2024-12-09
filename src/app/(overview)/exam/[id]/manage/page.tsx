@@ -42,6 +42,14 @@ export default async function ManageExamPage({ params }: PageProps){
 			<CandidatesTable
 				data={[
 					{
+						name: "Alice Codereader",
+						email: "alice.reader@gmail.com",
+						username: "alicer",
+						pendingCorrection: false,
+						answered: false,
+						expired: false
+					},
+					{
 						name: "Alice Codewriter",
 						email: "alice.writer@gmail.com",
 						username: "alicew",

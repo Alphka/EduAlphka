@@ -1,5 +1,6 @@
 "use client"
 
+import { getAnswerStatus, statusColors, statusPriority, type AnswerStatus } from "./getAnswerStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
 import { Table, Text, TextInput, Title } from "@mantine/core"
 import { MdSearch } from "react-icons/md"
@@ -10,11 +11,7 @@ const filters = ["name", "status", "startedAt"] as const
 
 type FilterTypes = typeof filters[number]
 
-export interface RowData extends Pick<CandidatesRowData, "name" | "username" | "startedAt" | "expired" | "answered" | "pendingCorrection"> {
-	status: string
-}
-
-interface CandidatesRowData {
+export interface CandidatesRowData {
 	name: string
 	email: string
 	username: string
@@ -24,8 +21,17 @@ interface CandidatesRowData {
 	expired: boolean
 }
 
+export interface RowData extends Pick<CandidatesRowData, "name" | "username" | "startedAt" | "expired" | "answered" | "pendingCorrection"> {
+	status: AnswerStatus
+}
+
 interface CandidatesTableProps {
 	data: CandidatesRowData[]
+}
+
+function parseDate(date: string){
+	const [day, month, year] = date.split("/").map(Number)
+	return Date.UTC(year, month - 1, day)
 }
 
 function sortData(data: RowData[], { search, sortBy, reversed }: {
@@ -38,24 +44,27 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 	return data
 		.toSorted((a, b) => {
 			if(!sortBy) return 0
-			return ((reversed ? b : a)[sortBy] || "").localeCompare((reversed ? a : b)[sortBy] || "")
+
+			if(sortBy === "startedAt"){
+				const dateA = a.startedAt ? parseDate(a.startedAt) : 0
+				const dateB = b.startedAt ? parseDate(b.startedAt) : 0
+
+				return reversed ? dateB - dateA : dateA - dateB
+			}
+
+			if(sortBy === "status"){
+				const statusA = statusPriority[a.status as AnswerStatus]
+				const statusB = statusPriority[b.status as AnswerStatus]
+
+				return reversed ? statusB - statusA : statusA - statusB
+			}
+
+			return (reversed ? b : a)[sortBy].localeCompare((reversed ? a : b)[sortBy])
 		})
 		.filter(item => {
-			const keys = Object.keys(item).filter(key => filters.includes(key as FilterTypes)) as Array<FilterTypes>
+			const keys = Object.keys(item).filter(key => filters.includes(key as FilterTypes)) as FilterTypes[]
 			return keys.some(key => (item[key] || "").toLocaleLowerCase().includes(query))
 		})
-}
-
-export function getAnswerStatus({ startedAt, pendingCorrection, answered, expired }: Pick<CandidatesRowData, "startedAt" | "pendingCorrection" | "answered" | "expired">){
-	return startedAt
-		? pendingCorrection
-			? "Pendente"
-			: expired
-				? "Expirado"
-				: answered
-					? "Finalizado"
-					: "Ativo"
-		: "Não iniciado"
 }
 
 export default function CandidatesTable({ data }: CandidatesTableProps){
@@ -162,6 +171,7 @@ export default function CandidatesTable({ data }: CandidatesTableProps){
 										startedAt,
 										pendingCorrection
 									}}
+									statusColor={statusColors[status]}
 									key={name}
 								/>
 							)

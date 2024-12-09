@@ -71,7 +71,11 @@ export async function generateMetadata(){
 
 export default function RootLayout({ children }: RootLayoutProps){
 	return (
-		<html lang="pt-BR" suppressHydrationWarning>
+		<html
+			lang="pt-BR"
+			data-mantine-color-scheme="dark"
+			suppressHydrationWarning
+		>
 			<head>
 				<ColorSchemeScript forceColorScheme="dark" />
 			</head>

@@ -2,14 +2,19 @@ import type { RowData } from "."
 import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Table, Text } from "@mantine/core"
 import { MdMenu, MdEdit, MdChecklist, MdDeleteOutline } from "react-icons/md"
 
+interface TrProps extends Pick<RowData, "name" | "username" | "status" | "startedAt" | "answered" | "expired" | "pendingCorrection"> {
+	statusColor: string
+}
+
 export default function Tr({
 	pendingCorrection,
+	statusColor,
 	startedAt,
 	answered,
 	username,
 	status,
 	name
-}: Pick<RowData, "name" | "username" | "status" | "startedAt" | "answered" | "expired" | "pendingCorrection">){
+}: TrProps){
 	return (
 		<Table.Tr>
 			<Table.Td>
@@ -41,15 +46,7 @@ export default function Tr({
 
 			<Table.Td>
 				<Badge
-					color={
-						status === "Ativo"
-							? "green"
-							: status === "Pendente"
-								? "orange"
-								: status === "Expirado"
-									? "red"
-									: "gray"
-					}
+					color={statusColor}
 					variant="light"
 					fullWidth
 				>
