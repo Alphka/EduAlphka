@@ -31,6 +31,7 @@ export default function Homepage(){
 					</Title>
 
 					<Button
+						className="flex-shrink-0"
 						href={routes.exam.children.create.pathname}
 						variant="filled"
 						component={Link}

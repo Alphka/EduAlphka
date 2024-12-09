@@ -5,6 +5,7 @@ import type { IUser } from "@models/typings/User"
 import { AppShell, Burger, Avatar, NavLink } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import { usePathname } from "next/navigation"
+import { useEffect } from "react"
 import { twJoin } from "tailwind-merge"
 import { omit } from "lodash"
 import getNameInitials from "@helpers/getNameInitials"
@@ -17,8 +18,12 @@ interface LayoutShellProps {
 }
 
 export default function LayoutShell({ user, children }: LayoutShellProps){
-	const [burgerOpened, { toggle: toggleBurger }] = useDisclosure()
+	const [burgerOpened, { close, toggle: toggleBurger }] = useDisclosure()
 	const pathname = usePathname()
+
+	useEffect(() => {
+		close()
+	}, [pathname])
 
 	return (
 		<AppShell
@@ -35,13 +40,13 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 			padding="xl"
 		>
 			<AppShell.Header>
-				<div className="h-full flex items-center justify-between p-sm gap-md">
+				<div className="h-full flex items-center justify-between p-md gap-md">
 					<div>
 						<Burger
 							opened={burgerOpened}
 							onClick={toggleBurger}
 							hiddenFrom="sm"
-							size="sm"
+							size="md"
 						/>
 					</div>
 

@@ -27,8 +27,6 @@ const QuestionSchema = new Schema<
 	& ExamQuestionBase
 	& Omit<ExamMultipleChoiceQuestion, "type">
 	& Omit<ExamDissertativeQuestion, "type">
-	// & Partial<Omit<ExamMultipleChoiceQuestion, "type">>
-	// & Partial<Omit<ExamDissertativeQuestion, "type">>
 , QuestionModel>({
 	type: {
 		type: String,

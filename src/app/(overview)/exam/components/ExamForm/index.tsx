@@ -46,7 +46,7 @@ interface ExamFormProps {
 }
 
 export default function ExamForm({
-	type,
+	type = "create",
 	loading,
 	defaultValues
 }: ExamFormProps){
@@ -113,17 +113,18 @@ export default function ExamForm({
 	}, [clearErrors, setError, setValue])
 
 	return (
-		<div className="flex flex-col gap-3xl">
-			{type === "edit" && <>
-				<header className="flex justify-between gap-md">
-					<Title
-						order={1}
-						fz="4xl"
-					>
-						{defaultValues?.exam?.title || "Teste sem nome"}
-					</Title>
+		<div className="flex flex-col gap-2xl">
+			<header className="flex justify-between gap-md">
+				<Title
+					order={1}
+					fz="4xl"
+				>
+					{type === "edit" ? defaultValues?.exam?.title || "Teste sem nome" : "Criar teste"}
+				</Title>
 
+				{type === "edit" && (
 					<Button
+						className="flex-shrink-0"
 						href={routes.exam.children.template.children.manage.pathname.replace("[id]", id as string)}
 						variant="filled"
 						component={Link}
@@ -131,10 +132,10 @@ export default function ExamForm({
 					>
 						Gerenciar teste
 					</Button>
-				</header>
+				)}
+			</header>
 
-				<Divider />
-			</>}
+			<Divider />
 
 			<form
 				className="flex flex-col gap-3xl"
@@ -384,7 +385,7 @@ export default function ExamForm({
 					loading={isPending}
 					disabled={loading}
 				>
-					{type === "create" ? "Cadastrar teste" : "Editar teste"}
+					{type === "edit" ? "Editar teste" : "Cadastrar teste"}
 				</Button>
 			</form>
 		</div>

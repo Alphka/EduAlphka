@@ -43,9 +43,9 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 						isRequired: required
 					}
 				case "multiple_choice":
-					if(!options?.length) return { errors: ["As questões de múltipla escolha devem possuir opções definidas"] }
-					if(typeof correct_answer !== "number") return { errors: ["As questões de múltipla escolha devem possuir uma resposta correta"] }
-					if(correct_answer < 0 || correct_answer >= options.length) return { errors: [`A resposta correta da questão ${questionIndex + 1} não é válida`] }
+					if(!options?.length) throw "As questões de múltipla escolha devem possuir opções definidas"
+					if(typeof correct_answer !== "number") throw "As questões de múltipla escolha devem possuir uma resposta correta"
+					if(correct_answer < 0 || correct_answer >= options.length) throw `A resposta correta da questão ${questionIndex + 1} não é válida`
 
 					return {
 						type,

@@ -3,6 +3,7 @@ import type { Metadata } from "next"
 import { Divider, Title } from "@mantine/core"
 import { notFound } from "next/navigation"
 import { Exam } from "@models"
+import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import routes from "@app/routes"
@@ -21,7 +22,10 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const { id } = await params
 
-	const exam = await Exam.findById(id)
+	const [exam] = await Promise.all([
+		Exam.findById(id).lean(),
+		verifyAuthorization({ accountType: "professor" })
+	])
 
 	if(!exam) notFound()
 

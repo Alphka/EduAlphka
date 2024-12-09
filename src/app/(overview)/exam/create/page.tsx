@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import verifyAuthorization from "@helpers/verifyAuthorization"
 import ExamForm from "../components/ExamForm"
 import routes from "@app/routes"
 
@@ -11,7 +12,9 @@ export const metadata: Metadata = {
 	}
 }
 
-export default function CreateExamPage(){
+export default async function CreateExamPage(){
+	await verifyAuthorization({ accountType: "professor" })
+
 	return (
 		<ExamForm />
 	)
