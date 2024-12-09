@@ -29,10 +29,16 @@ const routes = {
 		children: {
 			template: {
 				title: "Teste",
-				pathname: "/exam/[id]"
+				pathname: "/exam/[id]",
+				children: {
+					manage: {
+						title: "Gerenciar teste",
+						pathname: "/exam/[id]/manage"
+					}
+				}
 			},
 			create: {
-				title: "Criar testes",
+				title: "Criar teste",
 				pathname: "/exam/create"
 			}
 		}

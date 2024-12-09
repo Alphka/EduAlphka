@@ -5,12 +5,12 @@ import type { z } from "zod"
 import type questionSchema from "@schemas/question"
 import type optionSchema from "@schemas/option"
 import type examSchema from "@schemas/exam"
-import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
+import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput, Title } from "@mantine/core"
 import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useCallback, useRef, type ChangeEvent } from "react"
+import { MdAccessTime, MdSettings } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
-import { MdAccessTime } from "react-icons/md"
 import { useParams } from "next/navigation"
 import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
@@ -20,6 +20,8 @@ import getDurationMinutes from "@helpers/getDurationMinutes"
 import QuestionContainer from "./components/QuestionContainer"
 import createExamAction from "../../actions/createExam"
 import editExamAction from "../../actions/editExam"
+import routes from "@app/routes"
+import Link from "next/link"
 
 export interface ExamFormData {
 	exam: Omit<z.infer<typeof examSchema>, "questions">
@@ -67,6 +69,7 @@ export default function ExamForm({
 		defaultValues: defaultValues || {
 			question: [defaultExamData]
 		},
+		progressive: true,
 		mode: "onSubmit"
 	})
 
@@ -110,256 +113,280 @@ export default function ExamForm({
 	}, [clearErrors, setError, setValue])
 
 	return (
-		<form
-			className="flex flex-col gap-3xl"
-			onSubmit={handleSubmit(({
-				exam: {
-					title,
-					description,
-					subject,
-					duration
-				},
-				question
-			}) => {
-				const questions = question.map(({
-					question_type: type,
-					option: options,
-					correct_answer,
-					...questionData
-				}) => ({
-					type,
-					...(type === "multiple_choice" ? {
-						options,
-						correct_answer
-					} : undefined),
-					...questionData
-				}))
-
-				const promise = type === "create"
-					? createExamAction({
-						title,
-						subject,
-						duration,
-						questions,
-						description
-					})
-					: editExamAction(id as string, {
-						title,
-						subject,
-						duration,
-						questions,
-						description
-					})
-
-				handleServerAction(promise)
-			})}
-		>
-			<Fieldset
-				legend="Informações do teste"
-				radius="md"
-			>
-				<div className="flex flex-col gap-md">
-					<TextInput
-						size="md"
-						type="text"
-						label="Título do teste"
-						placeholder="Título do teste"
-						aria-label="Título do teste"
-						autoComplete="off"
-						{...register("exam.title", {
-							minLength: {
-								value: ExamFormValidation.titleMinLength,
-								message: `O título do teste deve ter no mínimo ${ExamFormValidation.titleMinLength} caracteres`
-							},
-							maxLength: {
-								value: ExamFormValidation.titleMaxLength,
-								message: `O título do teste deve ter no máximo ${ExamFormValidation.titleMaxLength} caracteres`
-							},
-							pattern: {
-								value: new RegExp(GenericFormValidation.validSpecialNamePattern),
-								message: "O título do teste contém caracteres inválidos"
-							},
-							required: {
-								value: true,
-								message: "O título do teste é obrigatório"
-							}
-						})}
-						defaultValue={watch("exam.title")}
-						error={errors.exam?.title?.message}
-						disabled={loading}
-						withAsterisk
-					/>
-
-					<Textarea
-						size="md"
-						minRows={2}
-						maxRows={12}
-						label="Descrição"
-						placeholder="Descrição do teste"
-						aria-label="Descrição do teste"
-						autoComplete="off"
-						{...register("exam.description", {
-							minLength: {
-								value: ExamFormValidation.descriptionMinLength,
-								message: `A descrição do teste deve ter no mínimo ${ExamFormValidation.descriptionMinLength} caracteres`
-							},
-							maxLength: {
-								value: ExamFormValidation.descriptionMaxLength,
-								message: `A descrição do teste deve ter no máximo ${ExamFormValidation.descriptionMaxLength} caracteres`
-							},
-							pattern: {
-								value: new RegExp(GenericFormValidation.validDescriptionPattern),
-								message: "A descrição do teste contém caracteres inválidos"
-							},
-							required: {
-								value: true,
-								message: "A descrição do teste é obrigatória"
-							}
-						})}
-						defaultValue={watch("exam.description")}
-						error={errors.exam?.description?.message}
-						disabled={loading}
-						withAsterisk
-						autosize
-					/>
-
-					<div
-						className={twJoin(
-							"flex items-start gap-md",
-							isMobile && "flex-col items-stretch"
-						)}
+		<div className="flex flex-col gap-3xl">
+			{type === "edit" && <>
+				<header className="flex justify-between gap-md">
+					<Title
+						order={1}
+						fz="4xl"
 					>
+						{defaultValues?.exam?.title || "Teste sem nome"}
+					</Title>
+
+					<Button
+						href={routes.exam.children.template.children.manage.pathname.replace("[id]", id as string)}
+						variant="filled"
+						component={Link}
+						leftSection={<MdSettings className="text-lg" />}
+					>
+						Gerenciar teste
+					</Button>
+				</header>
+
+				<Divider />
+			</>}
+
+			<form
+				className="flex flex-col gap-3xl"
+				onSubmit={handleSubmit(({
+					exam: {
+						title,
+						description,
+						subject,
+						duration
+					},
+					question
+				}) => {
+					const questions = question.map(({
+						question_type: type,
+						option: options,
+						correct_answer,
+						...questionData
+					}) => ({
+						type,
+						...(type === "multiple_choice" ? {
+							options,
+							correct_answer
+						} : undefined),
+						...questionData
+					}))
+
+					const promise = type === "create"
+						? createExamAction({
+							title,
+							subject,
+							duration,
+							questions,
+							description
+						})
+						: editExamAction(id as string, {
+							title,
+							subject,
+							duration,
+							questions,
+							description
+						})
+
+					handleServerAction(promise)
+				})}
+			>
+				<Fieldset
+					legend="Informações do teste"
+					radius="md"
+				>
+					<div className="flex flex-col gap-md">
 						<TextInput
 							size="md"
 							type="text"
-							flex={1}
-							label="Disciplina"
-							placeholder="Disciplina do teste"
-							aria-label="Disciplina do teste"
+							label="Título do teste"
+							placeholder="Título do teste"
+							aria-label="Título do teste"
 							autoComplete="off"
-							minLength={ExamFormValidation.subjectMinLength}
-							maxLength={ExamFormValidation.subjectMaxLength}
-							{...register("exam.subject", {
+							{...register("exam.title", {
 								minLength: {
-									value: ExamFormValidation.subjectMinLength,
-									message: `O nome da disciplina deve ter no mínimo ${ExamFormValidation.subjectMinLength} caracteres`
+									value: ExamFormValidation.titleMinLength,
+									message: `O título do teste deve ter no mínimo ${ExamFormValidation.titleMinLength} caracteres`
 								},
 								maxLength: {
-									value: ExamFormValidation.subjectMaxLength,
-									message: `O nome da disciplina deve ter no máximo ${ExamFormValidation.subjectMaxLength} caracteres`
+									value: ExamFormValidation.titleMaxLength,
+									message: `O título do teste deve ter no máximo ${ExamFormValidation.titleMaxLength} caracteres`
 								},
 								pattern: {
 									value: new RegExp(GenericFormValidation.validSpecialNamePattern),
-									message: "O nome da disciplina contém caracteres inválidos"
-								}
-							})}
-							defaultValue={watch("exam.subject")}
-							error={errors.exam?.subject?.message}
-							disabled={loading}
-						/>
-
-						<TimeInput
-							className={twJoin(!isMobile && "basis-1/5")}
-							size="md"
-							label="Duração"
-							aria-label="Duração do teste"
-							rightSection={(
-								<ActionIcon
-									color={errors.exam?.duration ? "currentColor" : "gray"}
-									variant="subtle"
-									aria-label="Escolha o horário"
-									onClick={event => {
-										if(!event.currentTarget.disabled){
-											durationInputRef.current?.showPicker?.()
-										}
-									}}
-									disabled={loading}
-								>
-									<MdAccessTime className="text-[1.25rem]" />
-								</ActionIcon>
-							)}
-							minTime={formatTimeDuration(ExamFormValidation.minDurationInMinutes)}
-							maxTime={formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}
-							{...register("exam.duration", {
-								onBlur: handleDurationChange,
-								onChange: handleDurationChange,
+									message: "O título do teste contém caracteres inválidos"
+								},
 								required: {
 									value: true,
-									message: "A duração do teste é obrigatória"
+									message: "O título do teste é obrigatório"
 								}
 							})}
-							defaultValue={watch("exam.duration")}
-							error={errors.exam?.duration?.message}
-							ref={durationInputRef}
+							defaultValue={watch("exam.title")}
+							error={errors.exam?.title?.message}
 							disabled={loading}
 							withAsterisk
 						/>
-					</div>
-				</div>
-			</Fieldset>
 
-			<Divider />
+						<Textarea
+							size="md"
+							minRows={2}
+							maxRows={12}
+							label="Descrição"
+							placeholder="Descrição do teste"
+							aria-label="Descrição do teste"
+							autoComplete="off"
+							{...register("exam.description", {
+								minLength: {
+									value: ExamFormValidation.descriptionMinLength,
+									message: `A descrição do teste deve ter no mínimo ${ExamFormValidation.descriptionMinLength} caracteres`
+								},
+								maxLength: {
+									value: ExamFormValidation.descriptionMaxLength,
+									message: `A descrição do teste deve ter no máximo ${ExamFormValidation.descriptionMaxLength} caracteres`
+								},
+								pattern: {
+									value: new RegExp(GenericFormValidation.validDescriptionPattern),
+									message: "A descrição do teste contém caracteres inválidos"
+								},
+								required: {
+									value: true,
+									message: "A descrição do teste é obrigatória"
+								}
+							})}
+							defaultValue={watch("exam.description")}
+							error={errors.exam?.description?.message}
+							disabled={loading}
+							withAsterisk
+							autosize
+						/>
 
-			<Fieldset
-				legend="Questões"
-				radius="md"
-			>
-				<ul className="flex flex-col gap-3xl">
-					{questionFields.map(({ id }, index, { length }) => (
 						<div
 							className={twJoin(
-								"relative flex flex-col gap-md",
-								index !== length - 1 && [
-									"after:w-full after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4",
-									"after:translate-y-1/2",
-									"after:bg-[var(--mantine-color-default-border)]"
-								]
+								"flex items-start gap-md",
+								isMobile && "flex-col items-stretch"
 							)}
-							key={id}
 						>
-							<QuestionContainer
-								canDelete={length !== 1}
-								{...{
-									removeQuestion,
-									clearErrors,
-									register,
-									setValue,
-									control,
-									errors,
-									watch,
-									index
-								}}
+							<TextInput
+								size="md"
+								type="text"
+								flex={1}
+								label="Disciplina"
+								placeholder="Disciplina do teste"
+								aria-label="Disciplina do teste"
+								autoComplete="off"
+								minLength={ExamFormValidation.subjectMinLength}
+								maxLength={ExamFormValidation.subjectMaxLength}
+								{...register("exam.subject", {
+									minLength: {
+										value: ExamFormValidation.subjectMinLength,
+										message: `O nome da disciplina deve ter no mínimo ${ExamFormValidation.subjectMinLength} caracteres`
+									},
+									maxLength: {
+										value: ExamFormValidation.subjectMaxLength,
+										message: `O nome da disciplina deve ter no máximo ${ExamFormValidation.subjectMaxLength} caracteres`
+									},
+									pattern: {
+										value: new RegExp(GenericFormValidation.validSpecialNamePattern),
+										message: "O nome da disciplina contém caracteres inválidos"
+									}
+								})}
+								defaultValue={watch("exam.subject")}
+								error={errors.exam?.subject?.message}
 								disabled={loading}
 							/>
+
+							<TimeInput
+								className={twJoin(!isMobile && "basis-1/5")}
+								size="md"
+								label="Duração"
+								aria-label="Duração do teste"
+								rightSection={(
+									<ActionIcon
+										color={errors.exam?.duration ? "currentColor" : "gray"}
+										variant="subtle"
+										aria-label="Escolha o horário"
+										onClick={event => {
+											if(!event.currentTarget.disabled){
+												durationInputRef.current?.showPicker?.()
+											}
+										}}
+										disabled={loading}
+									>
+										<MdAccessTime className="text-[1.25rem]" />
+									</ActionIcon>
+								)}
+								minTime={formatTimeDuration(ExamFormValidation.minDurationInMinutes)}
+								maxTime={formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}
+								{...register("exam.duration", {
+									onBlur: handleDurationChange,
+									onChange: handleDurationChange,
+									required: {
+										value: true,
+										message: "A duração do teste é obrigatória"
+									}
+								})}
+								defaultValue={watch("exam.duration")}
+								error={errors.exam?.duration?.message}
+								ref={durationInputRef}
+								disabled={loading}
+								withAsterisk
+							/>
 						</div>
-					))}
-				</ul>
+					</div>
+				</Fieldset>
 
-				<Divider my="lg" color="gray" />
+				<Divider />
 
-				<div className="flex justify-center">
-					<Button
-						variant="default"
-						onClick={() => {
-							appendQuestion(defaultExamData)
-						}}
-						disabled={loading || questionFields.length === ExamFormValidation.maxQuestionsNumber}
-					>
-						Adicionar questão
-					</Button>
-				</div>
-			</Fieldset>
+				<Fieldset
+					legend="Questões"
+					radius="md"
+				>
+					<ul className="flex flex-col gap-3xl">
+						{questionFields.map(({ id }, index, { length }) => (
+							<div
+								className={twJoin(
+									"relative flex flex-col gap-md",
+									index !== length - 1 && [
+										"after:w-full after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4",
+										"after:translate-y-1/2",
+										"after:bg-[var(--mantine-color-default-border)]"
+									]
+								)}
+								key={id}
+							>
+								<QuestionContainer
+									canDelete={length !== 1}
+									{...{
+										removeQuestion,
+										clearErrors,
+										register,
+										setValue,
+										control,
+										errors,
+										watch,
+										index
+									}}
+									disabled={loading}
+								/>
+							</div>
+						))}
+					</ul>
 
-			<Button
-				className="self-start"
-				size="sm"
-				type="submit"
-				variant="filled"
-				loading={isPending}
-				disabled={loading}
-			>
-				{type === "create" ? "Cadastrar teste" : "Editar teste"}
-			</Button>
-		</form>
+					<Divider my="lg" color="gray" />
+
+					<div className="flex justify-center">
+						<Button
+							variant="default"
+							onClick={() => {
+								appendQuestion(defaultExamData)
+							}}
+							disabled={loading || questionFields.length === ExamFormValidation.maxQuestionsNumber}
+						>
+							Adicionar questão
+						</Button>
+					</div>
+				</Fieldset>
+
+				<Button
+					className="self-start"
+					size="sm"
+					type="submit"
+					variant="filled"
+					loading={isPending}
+					disabled={loading}
+				>
+					{type === "create" ? "Cadastrar teste" : "Editar teste"}
+				</Button>
+			</form>
+		</div>
 	)
 }

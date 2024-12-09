@@ -1,7 +1,19 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { createTheme, MantineProvider, NumberInput, Textarea, TextInput, Select, rem, Group, Badge } from "@mantine/core"
+import {
+	rem,
+	Badge,
+	Group,
+	Button,
+	Select,
+	Textarea,
+	TextInput,
+	NumberInput,
+	createTheme,
+	UnstyledButton,
+	MantineProvider
+} from "@mantine/core"
 import { TimeInput } from "@mantine/dates"
 
 interface ProviderProps {
@@ -18,6 +30,11 @@ export default function Providers({ fontFamily, children }: ProviderProps){
 					root: "select-none"
 				}
 			}),
+			Button: Button.extend({
+				classNames: {
+					root: "select-none"
+				}
+			}),
 			Group: Group.extend({
 				defaultProps: {
 					wrap: "nowrap"
@@ -25,28 +42,38 @@ export default function Providers({ fontFamily, children }: ProviderProps){
 			}),
 			TextInput: TextInput.extend({
 				classNames: {
-					label: "mb-1"
+					label: "mb-1",
+					error: "mt-1"
 				}
 			}),
 			Textarea: Textarea.extend({
 				classNames: {
-					label: "mb-1"
+					label: "mb-1",
+					error: "mt-1"
 				}
 			}),
 			NumberInput: NumberInput.extend({
 				classNames: {
-					label: "mb-1"
+					label: "mb-1",
+					error: "mt-1"
 				}
 			}),
 			TimeInput: TimeInput.extend({
 				classNames: {
 					label: "mb-1",
+					error: "mt-1",
 					input: "[&::-webkit-calendar-picker-indicator]:hidden"
 				}
 			}),
 			Select: Select.extend({
 				classNames: {
-					label: "mb-1"
+					label: "mb-1",
+					error: "mt-1"
+				}
+			}),
+			UnstyledButton: UnstyledButton.extend({
+				classNames: {
+					root: "[text-align:inherit] select-none"
 				}
 			})
 		},
