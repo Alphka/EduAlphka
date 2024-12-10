@@ -1,5 +1,6 @@
 import type { AnswerModel, IAnswer } from "./typings/Answer"
 import { model, models, Schema } from "mongoose"
+import { ExamFormValidation } from "@constants/forms"
 import { QuestionTypes } from "./Exam"
 
 export const answerSchema = new Schema<IAnswer>({
@@ -18,7 +19,11 @@ export const answerSchema = new Schema<IAnswer>({
 		required: true
 	},
 	option: Schema.ObjectId,
-	content: String,
+	content: {
+		type: String,
+		minlength: ExamFormValidation.answerContentMinLength,
+		maxlength: ExamFormValidation.answerContentMaxLength
+	},
 	isCorrect: Boolean,
 	createdAt: {
 		type: Date,
