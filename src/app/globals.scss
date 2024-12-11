@@ -44,3 +44,7 @@ button,
 :root{
 	font-size: 16px;
 }
+
+::-ms-reveal{
+	display: none;
+}

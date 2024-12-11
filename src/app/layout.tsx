@@ -91,8 +91,9 @@ export default function RootLayout({ children }: RootLayoutProps){
 					{children}
 
 					<ToastContainer
+						theme="dark"
 						autoClose={5e3}
-						pauseOnHover={false}
+						pauseOnHover
 						pauseOnFocusLoss={false}
 					/>
 				</Providers>

@@ -22,7 +22,7 @@ export async function signInAction({
 	password,
 	account_type,
 	keep_logged_in: keepLoggedIn
-}: UserSignInData){
+}: UserSignInData, redirectTo?: string | null){
 	const validatedFields = signInSchema.safeParse({
 		name,
 		email,
@@ -56,10 +56,18 @@ export async function signInAction({
 			return { errors: [error] }
 		}
 
-		console.error(error)
+		if(error instanceof Error && error.name === "MongoServerError"){
+			if("code" in error && error.code === 11000){
+				return { errors: ["Esse nome de usuário já está em uso"] }
+			}
+
+			const logError = new Error("Mongoose server error: " + error.message)
+			logError.stack = error.stack
+			console.error(logError)
+		}else console.error(error)
 
 		return { errors: ["Falha ao registrar o usuário"] }
 	}
 
-	redirect(routes.homepage.pathname)
+	redirect(redirectTo && /^\/(?!.*\/\/)([a-zA-Z-\/]+)$/.test(redirectTo) && redirectTo || routes.homepage.pathname)
 }

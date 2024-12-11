@@ -1,6 +1,7 @@
 import type { AccountType } from "@typings/api"
 import { redirect } from "next/navigation"
 import getUserByToken from "./getUserByToken"
+import getRequestURL from "./getRequestURL"
 import getToken from "./getToken"
 import routes from "@app/routes"
 
@@ -11,15 +12,28 @@ interface AuthorizationOptions {
 export default async function verifyAuthorization(options: AuthorizationOptions = {}){
 	const token = await getToken()
 
-	if(!token) redirect(routes.login.pathname)
+	if(!token) return await redirectToLogin()
 
 	const user = await getUserByToken(token)
 
-	if(!user) redirect(routes.login.pathname)
+	if(!user) return await redirectToLogin()
 
 	if(options.accountType){
 		if(user.accountType !== options.accountType) redirect(routes.accessDenied.pathname)
 	}
 
 	return user
+}
+
+async function redirectToLogin(): Promise<never> {
+	let url: URL
+
+	try{
+		url = new URL((await getRequestURL())!)
+	}catch(error){
+		console.error("Failed to get page URL:", error)
+		redirect(routes.login.pathname)
+	}
+
+	redirect(`${routes.login.pathname}?redirect=${encodeURIComponent(url.pathname)}`)
 }

@@ -8,7 +8,11 @@ import { useState } from "react"
 import { useForm } from "react-hook-form"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 
-export default function RegisterForm(){
+interface RegisterFormProps {
+	redirectURL: string | undefined
+}
+
+export default function RegisterForm({ redirectURL }: RegisterFormProps){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 	const [isProfessor, setIsMasterSelected] = useState(true)
 	const { isPending, handleServerAction } = useServerActionHandler()
@@ -32,7 +36,7 @@ export default function RegisterForm(){
 					password,
 					account_type: isProfessor ? "professor" : "candidate",
 					keep_logged_in
-				}))
+				}, redirectURL))
 			})}
 		>
 			<header className="flex flex-col gap-xs">

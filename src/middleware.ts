@@ -10,9 +10,10 @@ function getToken(request: NextRequest){
 
 export default function middleware(request: NextRequest){
 	const requestHeaders = new Headers(request.headers)
+	const token = getToken(request)
 
 	requestHeaders.set("X-Url", request.url)
-	requestHeaders.set("Authorization", "Bearer " + getToken(request))
+	if(token) requestHeaders.set("Authorization", "Bearer " + token)
 
 	const response = NextResponse.next({
 		request: {

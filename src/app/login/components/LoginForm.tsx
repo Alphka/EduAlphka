@@ -4,14 +4,33 @@ import { ActionIcon, Anchor, Button, Checkbox, TextInput, Title } from "@mantine
 import { loginAction, type UserLoginData } from "../actions/login"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { GenericFormValidation } from "@constants/forms"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import Link from "next/link"
 
-export default function LoginForm(){
+interface LoginFormProps {
+	redirectURL: string | undefined
+}
+
+export default function LoginForm({ redirectURL }: LoginFormProps){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 	const { isPending, handleServerAction } = useServerActionHandler()
+
+	const registerURL = useMemo(() => {
+		const searchParams = new URLSearchParams()
+
+		if(
+			redirectURL &&
+			redirectURL !== "/" &&
+			redirectURL !== "/login" &&
+			/^\/(?!.*\/\/)([a-zA-Z-\/]+)$/.test(redirectURL)
+		){
+			searchParams.set("redirect", redirectURL)
+		}
+
+		return "/register" + searchParams
+	}, [redirectURL])
 
 	const {
 		register,
@@ -29,7 +48,7 @@ export default function LoginForm(){
 					username,
 					password,
 					keep_logged_in
-				}))
+				}, redirectURL))
 			})}
 		>
 			<header className="flex flex-col gap-xs">
@@ -149,7 +168,7 @@ export default function LoginForm(){
 			</div>
 
 			<Anchor
-				href="/register"
+				href={registerURL}
 				className="self-center text-current text-center px-2 rounded-sm"
 				aria-label="Criar uma conta"
 				component={Link}

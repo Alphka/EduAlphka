@@ -15,7 +15,7 @@ export async function loginAction({
 	username: usernameOrEmail,
 	password,
 	keep_logged_in: keepLoggedIn
-}: UserLoginData){
+}: UserLoginData, redirectTo?: string | null){
 	const isEmail = usernameOrEmail.includes("@")
 
 	const validatedFields = loginSchema.safeParse({
@@ -49,5 +49,5 @@ export async function loginAction({
 		return { errors: ["Falha ao autenticar o usuário"] }
 	}
 
-	redirect(routes.homepage.pathname)
+	redirect(redirectTo && /^\/(?!.*\/\/)([a-zA-Z-\/]+)$/.test(redirectTo) && redirectTo || routes.homepage.pathname)
 }

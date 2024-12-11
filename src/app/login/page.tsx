@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { APPLICATION_NAME } from "@constants/index"
+import getRequestURL from "@helpers/getRequestURL"
 import LoginForm from "./components/LoginForm"
 import routes from "@app/routes"
 
@@ -15,10 +16,13 @@ export const metadata: Metadata = {
 	}
 }
 
-export default function LoginPage(){
+export default async function LoginPage(){
+	const url = await getRequestURL()
+	const redirectURL = url && new URL(url).searchParams.get("redirect") || undefined
+
 	return (
 		<main className="flex flex-col items-center justify-center p-5xl min-h-dvh">
-			<LoginForm />
+			<LoginForm redirectURL={redirectURL} />
 		</main>
 	)
 }
