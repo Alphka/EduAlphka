@@ -7,7 +7,7 @@ export interface IUser {
 	username: string
 	password: string
 	accountType: typeof ACCOUNT_TYPES[number]
-	startedTests: {
+	startedExams: {
 		exam: Types.ObjectId
 		startedAt: Date
 	}[]

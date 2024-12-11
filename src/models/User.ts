@@ -47,7 +47,7 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		enum: ACCOUNT_TYPES,
 		required: true
 	},
-	startedTests: [{
+	startedExams: [{
 		exam: {
 			type: Schema.ObjectId,
 			ref: "Exam"

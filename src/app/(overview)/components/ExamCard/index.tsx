@@ -91,7 +91,11 @@ export default function ExamCard({
 									className="w-2.5 h-2.5 rounded-full"
 								/>
 
-								<Text fz="xs" fw={500}>
+								<Text
+									fz="xs"
+									fw={500}
+									lh={1}
+								>
 									{subject}
 								</Text>
 							</div>

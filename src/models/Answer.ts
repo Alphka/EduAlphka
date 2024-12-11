@@ -3,7 +3,7 @@ import { model, models, Schema } from "mongoose"
 import { ExamFormValidation } from "@constants/forms"
 import { QuestionTypes } from "./Exam"
 
-export const answerSchema = new Schema<IAnswer>({
+const answerSchema = new Schema<IAnswer>({
 	type: {
 		type: String,
 		enum: Object.keys(QuestionTypes),

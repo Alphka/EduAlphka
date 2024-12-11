@@ -47,7 +47,7 @@ const QuestionSchema = new Schema<
 	correctAnswer: Schema.ObjectId
 })
 
-export const examSchema = new Schema<IExam, ExamModel>({
+const examSchema = new Schema<IExam, ExamModel>({
 	owner: {
 		type: Schema.ObjectId,
 		ref: "User",
