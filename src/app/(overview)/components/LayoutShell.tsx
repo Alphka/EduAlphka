@@ -13,7 +13,7 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface LayoutShellProps {
-	user: Pick<IUser, "name">
+	user: Pick<IUser, "name" | "accountType">
 	children: ReactNode
 }
 
@@ -68,6 +68,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 				<ul className="h-full flex flex-col justify-end">
 					{Object.entries(routes).map(([key, route]) => {
 						if(!("Icon" in route)) return null
+						if("access" in route && user.accountType !== route.access) return null
 
 						const isActive = (route: string) => {
 							if(pathname === "/" || route === "/") return route === pathname

@@ -24,6 +24,7 @@ const routes = {
 		title: "Gerenciar testes",
 		pathname: "/exam",
 		redirect: "/",
+		access: "professor",
 		Icon: MdOutlineMenuBook,
 		children: {
 			template: {
