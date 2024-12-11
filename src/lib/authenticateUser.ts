@@ -26,7 +26,7 @@ export default async function authenticateUser({
 				{ email: usernameOrEmail },
 				{ username: usernameOrEmail }
 			]
-		})
+		}).collation({ locale: "en", strength: 2 })
 
 		if(!_user || !_user.validatePassword(password)) throw "Credenciais inválidas"
 
