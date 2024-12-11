@@ -10,28 +10,41 @@ interface ExamListProps {
 export default async function ExamList({ exams }: ExamListProps){
 	return (
 		<Grid gutter="md">
-			{exams.map(({ id, title, description, subject, duration, candidates, createdAt, updatedAt }) => (
-				<GridCol
-					span={{
-						base: 12,
-						md: 6,
-						lg: 4
-					}}
-					key={id}
-				>
-					<ExamCard
-						title={title}
-						active
-						examId={id}
-						subject={subject}
-						duration={formatTimeDuration(duration)}
-						createdAt={createdAt}
-						updatedAt={updatedAt}
-						description={description}
-						candidatesCount={candidates.length}
-					/>
-				</GridCol>
-			))}
+			{exams.map(({
+				_id,
+				title,
+				description,
+				subject,
+				duration,
+				candidates,
+				createdAt,
+				updatedAt
+			}) => {
+				const id = _id.toString()
+
+				return (
+					<GridCol
+						span={{
+							base: 12,
+							md: 6,
+							lg: 4
+						}}
+						key={id}
+					>
+						<ExamCard
+							title={title}
+							active
+							examId={id}
+							subject={subject}
+							duration={formatTimeDuration(duration)}
+							createdAt={createdAt}
+							updatedAt={updatedAt}
+							description={description}
+							candidatesCount={candidates.length}
+						/>
+					</GridCol>
+				)
+			})}
 		</Grid>
 	)
 }

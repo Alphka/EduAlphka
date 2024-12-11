@@ -1,7 +1,7 @@
 import { Text } from "@mantine/core"
 import { Exam } from "@models"
 import getSessionUserData from "@helpers/getSessionUserData"
-import ExamList from "../../components/ExamList"
+import ExamList from "../../../components/ExamList"
 
 interface RecentExamsProps {
 	limit: number
@@ -31,6 +31,7 @@ export default async function RecentExams({ limit }: RecentExamsProps){
 		})
 		.sort({ createdAt: -1 })
 		.limit(limit)
+		.lean<InstanceType<typeof Exam>[]>()
 
 	return exams.length ? (
 		<ExamList exams={exams} />
