@@ -47,17 +47,6 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		enum: ACCOUNT_TYPES,
 		required: true
 	},
-	startedExams: [{
-		exam: {
-			type: Schema.ObjectId,
-			ref: "Exam"
-		},
-		startedAt: {
-			type: Date,
-			default: Date.now,
-			required: true
-		}
-	}],
 	createdAt: {
 		type: Date,
 		default: Date.now,

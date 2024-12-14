@@ -4,7 +4,7 @@ import type formatTimeDuration from "@helpers/formatTimeDuration"
 import { Badge, Box, Card, Text, Tooltip } from "@mantine/core"
 import { MdOutlineTimer, MdPerson } from "react-icons/md"
 import { twJoin } from "tailwind-merge"
-import getHistoryMessage, { type HistoryMessageProps } from "./helpers/getHistoryMessage"
+import getHistoryMessage, { type HistoryMessageProps } from "../ExamCard/helpers/getHistoryMessage"
 import getStringColor from "@helpers/getStringColor"
 import Link from "next/link"
 
@@ -157,5 +157,3 @@ export default function ExamCard({
 		</Link>
 	)
 }
-
-export { default as ExamCardSkeleton } from "./Skeleton"

@@ -24,6 +24,7 @@ export interface ExamDissertativeQuestion extends ExamQuestionBase {
 export type ExamQuestion = ExamMultipleChoiceQuestion | ExamDissertativeQuestion
 
 export interface IExam {
+	_id: Types.ObjectId
 	owner: Types.ObjectId
 	title: string
 	description: string

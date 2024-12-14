@@ -1,7 +1,7 @@
 import type { Exam } from "@models"
 import { Grid, GridCol } from "@mantine/core"
 import formatTimeDuration from "@helpers/formatTimeDuration"
-import ExamCard from "../ExamCard"
+import ExamCard from "./ExamCard"
 
 interface ExamListProps {
 	exams: InstanceType<typeof Exam>[]
@@ -10,17 +10,8 @@ interface ExamListProps {
 export default async function ExamList({ exams }: ExamListProps){
 	return (
 		<Grid gutter="md">
-			{exams.map(({
-				_id,
-				title,
-				description,
-				subject,
-				duration,
-				candidates,
-				createdAt,
-				updatedAt
-			}) => {
-				const id = _id.toString()
+			{exams.map(exam => {
+				const id = exam._id.toString()
 
 				return (
 					<GridCol
@@ -32,15 +23,15 @@ export default async function ExamList({ exams }: ExamListProps){
 						key={id}
 					>
 						<ExamCard
-							title={title}
+							title={exam.title}
 							active
 							examId={id}
-							subject={subject}
-							duration={formatTimeDuration(duration)}
-							createdAt={createdAt}
-							updatedAt={updatedAt}
-							description={description}
-							candidatesCount={candidates.length}
+							subject={exam.subject}
+							duration={formatTimeDuration(exam.duration)}
+							createdAt={exam.createdAt}
+							updatedAt={exam.updatedAt}
+							description={exam.description}
+							candidatesCount={exam.candidates.length}
 						/>
 					</GridCol>
 				)

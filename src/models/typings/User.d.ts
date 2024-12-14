@@ -2,15 +2,12 @@ import type { ACCOUNT_TYPES } from "@models/User"
 import type { Model, Types } from "mongoose"
 
 export interface IUser {
+	_id: Types.ObjectId
 	name: string
 	email: string
 	username: string
 	password: string
 	accountType: typeof ACCOUNT_TYPES[number]
-	startedExams: {
-		exam: Types.ObjectId
-		startedAt: Date
-	}[]
 	createdAt: Date
 	updatedAt?: Date
 }

@@ -1,6 +1,6 @@
 "use client"
 
-import { getAnswerStatus, statusColors, statusPriority, type AnswerStatus } from "./getAnswerStatus"
+import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
 import { Table, Text, TextInput, Title } from "@mantine/core"
 import { MdSearch } from "react-icons/md"
@@ -22,7 +22,7 @@ export interface CandidatesRowData {
 }
 
 export interface RowData extends Pick<CandidatesRowData, "name" | "username" | "startedAt" | "expired" | "answered" | "pendingCorrection"> {
-	status: AnswerStatus
+	status: SubmitStatus
 }
 
 interface CandidatesTableProps {
@@ -53,8 +53,8 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 			}
 
 			if(sortBy === "status"){
-				const statusA = statusPriority[a.status as AnswerStatus]
-				const statusB = statusPriority[b.status as AnswerStatus]
+				const statusA = submitStatusPriority[a.status as SubmitStatus]
+				const statusB = submitStatusPriority[b.status as SubmitStatus]
 
 				return reversed ? statusB - statusA : statusA - statusB
 			}
@@ -75,7 +75,12 @@ export default function CandidatesTable({ data }: CandidatesTableProps){
 		username,
 		startedAt,
 		pendingCorrection,
-		status: getAnswerStatus({ startedAt, pendingCorrection, answered, expired })
+		status: getSubmitStatus({
+			pendingCorrection,
+			hasStartedExam: !!startedAt,
+			hasAnswer: answered,
+			isExpired: expired
+		})
 	})), [data])
 
 	const [reverseSortDirection, setReverseSortDirection] = useState(false)
@@ -158,7 +163,12 @@ export default function CandidatesTable({ data }: CandidatesTableProps){
 
 					<Table.Tbody>
 						{sortedData.length > 0 ? sortedData.map(({ name, username, startedAt, expired, answered, pendingCorrection }) => {
-							const status = getAnswerStatus({ startedAt, pendingCorrection, answered, expired })
+							const status = getSubmitStatus({
+								pendingCorrection,
+								hasStartedExam: !!startedAt,
+								hasAnswer: answered,
+								isExpired: expired
+							})
 
 							return (
 								<Tr
@@ -171,7 +181,7 @@ export default function CandidatesTable({ data }: CandidatesTableProps){
 										startedAt,
 										pendingCorrection
 									}}
-									statusColor={statusColors[status]}
+									statusColor={submitStatusColors[status]}
 									key={name}
 								/>
 							)

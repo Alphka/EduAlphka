@@ -1,18 +1,16 @@
+import type { ProfessorDashboardProps } from "."
 import { Text } from "@mantine/core"
 import { Exam } from "@models"
-import getSessionUserData from "@helpers/getSessionUserData"
-import ExamList from "../../../components/ExamList"
+import ExamList from "../../../components/Professor/ExamList"
 
-interface RecentExamsProps {
+interface RecentExamsProps extends Pick<ProfessorDashboardProps, "user"> {
 	limit: number
 }
 
-export default async function RecentExams({ limit }: RecentExamsProps){
+export default async function RecentExams({ user, limit }: RecentExamsProps){
 	const date = new Date
 
 	date.setDate(date.getDate() - 15)
-
-	const user = (await getSessionUserData())!
 
 	const exams = await Exam
 		.find({

@@ -19,9 +19,14 @@ export default async function Homepage(){
 	return (
 		<div className="flex flex-col gap-2xl">
 			{user.accountType === "professor" ? (
-				<ProfessorDashboard recentExamsLimit={6} />
+				<ProfessorDashboard
+					user={user}
+					recentExamsLimit={6}
+				/>
 			) : (
-				<CandidateDashboard user={user} />
+				<CandidateDashboard
+					user={user}
+				/>
 			)}
 		</div>
 	)
