@@ -152,6 +152,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 						href="/recover-password"
 						className="px-0.5 rounded-sm"
 						component={Link}
+						prefetch={false}
 					>
 						Esqueceu sua senha?
 					</Anchor>

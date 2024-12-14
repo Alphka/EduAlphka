@@ -39,28 +39,33 @@ const defaultExamData: ExamFormData["question"][number] = {
 }
 
 interface ExamFormProps {
+	defaultValues?: DefaultValues<ExamFormData>
+	canEdit?: boolean
+	loading?: boolean
 	/** @default "create" */
 	type?: "create" | "edit"
-	loading?: boolean
-	defaultValues?: DefaultValues<ExamFormData>
 }
 
 export default function ExamForm({
-	type = "create",
+	defaultValues,
+	canEdit,
 	loading,
-	defaultValues
+	type = "create"
 }: ExamFormProps){
 	const { id } = useParams()
 	const { isPending, handleServerAction } = useServerActionHandler()
 	const durationInputRef = useRef<HTMLInputElement>(null)
 	const isMobile = useMediaQuery("(max-width: 600px)")
 
+	const formDisabled = loading || !canEdit
+
 	const {
 		watch,
 		control,
-		register,
 		setValue,
+		register,
 		setError,
+		getValues,
 		clearErrors,
 		handleSubmit,
 		formState: { errors }
@@ -70,6 +75,7 @@ export default function ExamForm({
 			question: [defaultExamData]
 		},
 		progressive: true,
+		disabled: formDisabled,
 		mode: "onSubmit"
 	})
 
@@ -111,6 +117,17 @@ export default function ExamForm({
 			shouldValidate: true
 		})
 	}, [clearErrors, setError, setValue])
+
+	const examDuration = register("exam.duration", {
+		onBlur: handleDurationChange,
+		onChange: handleDurationChange,
+		required: {
+			value: true,
+			message: "A duração do teste é obrigatória"
+		}
+	})
+
+	examDuration.ref(durationInputRef.current)
 
 	return (
 		<div className="flex flex-col gap-2xl">
@@ -213,7 +230,6 @@ export default function ExamForm({
 							})}
 							defaultValue={watch("exam.title")}
 							error={errors.exam?.title?.message}
-							disabled={loading}
 							withAsterisk
 						/>
 
@@ -245,7 +261,6 @@ export default function ExamForm({
 							})}
 							defaultValue={watch("exam.description")}
 							error={errors.exam?.description?.message}
-							disabled={loading}
 							withAsterisk
 							autosize
 						/>
@@ -282,7 +297,6 @@ export default function ExamForm({
 								})}
 								defaultValue={watch("exam.subject")}
 								error={errors.exam?.subject?.message}
-								disabled={loading}
 							/>
 
 							<TimeInput
@@ -300,25 +314,16 @@ export default function ExamForm({
 												durationInputRef.current?.showPicker?.()
 											}
 										}}
-										disabled={loading}
+										disabled={formDisabled || typeof getValues("exam.duration") === "undefined"}
 									>
 										<MdAccessTime className="text-[1.25rem]" />
 									</ActionIcon>
 								)}
 								minTime={formatTimeDuration(ExamFormValidation.minDurationInMinutes)}
 								maxTime={formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}
-								{...register("exam.duration", {
-									onBlur: handleDurationChange,
-									onChange: handleDurationChange,
-									required: {
-										value: true,
-										message: "A duração do teste é obrigatória"
-									}
-								})}
-								defaultValue={watch("exam.duration")}
+								{...examDuration}
 								error={errors.exam?.duration?.message}
 								ref={durationInputRef}
-								disabled={loading}
 								withAsterisk
 							/>
 						</div>
@@ -356,7 +361,7 @@ export default function ExamForm({
 										watch,
 										index
 									}}
-									disabled={loading}
+									disabled={formDisabled}
 								/>
 							</div>
 						))}
@@ -370,7 +375,7 @@ export default function ExamForm({
 							onClick={() => {
 								appendQuestion(defaultExamData)
 							}}
-							disabled={loading || questionFields.length === ExamFormValidation.maxQuestionsNumber}
+							disabled={formDisabled || questionFields.length === ExamFormValidation.maxQuestionsNumber}
 						>
 							Adicionar questão
 						</Button>
@@ -383,7 +388,7 @@ export default function ExamForm({
 					type="submit"
 					variant="filled"
 					loading={isPending}
-					disabled={loading}
+					disabled={formDisabled}
 				>
 					{type === "edit" ? "Editar teste" : "Cadastrar teste"}
 				</Button>

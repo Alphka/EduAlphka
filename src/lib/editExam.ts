@@ -1,5 +1,6 @@
 import type { z } from "zod"
 import { Exam, type User } from "@models"
+import { Types } from "mongoose"
 import getDurationMinutes from "@helpers/getDurationMinutes"
 import examSchema from "@app/schemas/exam"
 
@@ -15,7 +16,7 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 		throw validatedFields.error.errors.map(error => error.message)
 	}
 
-	if(user?.accountType !== "professor" || (exam && !exam.owner.equals(user.id))) throw "Acesso negado"
+	if(user?.accountType !== "professor" || (exam && !(exam.owner instanceof Types.ObjectId ? exam.owner : exam.owner._id).equals(user.id))) throw "Acesso negado"
 	if(exam === null) throw "Teste não encontrado"
 
 	const { title, subject, description, duration, questions } = validatedFields.data

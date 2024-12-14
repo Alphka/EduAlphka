@@ -34,7 +34,6 @@ export default async function ExamCard({
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!submit
 	const isExamExpired = isExamStarted && !isExamSubmitted && await startedExam.isExpired({
-		// @ts-ignore
 		exam,
 		submit
 	})

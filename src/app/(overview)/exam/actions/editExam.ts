@@ -1,22 +1,29 @@
 "use server"
 
 import type { z } from "zod"
+import { Exam, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { Exam } from "@models"
 import getSessionUserData from "@helpers/getSessionUserData"
+import connectDatabase from "@lib/connectDatabase"
 import examSchema from "@schemas/exam"
 import editExam from "@lib/editExam"
 import routes from "@app/routes"
 
 export default async function editExamAction(id: string, examData: z.infer<typeof examSchema>){
 	try{
+		await connectDatabase()
+
 		const [user, exam] = await Promise.all([
 			getSessionUserData(),
 			Exam.findById(id)
 		])
 
-		console.log(user, exam, examData)
+		const hasSubmit = await Submit.exists({ exam: id })
+		const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
+
+		if(hasSubmit) return { errors: ["Não é possível editar um teste que possui respostas"] }
+		if(hasStartedBySomeone) return { errors: ["Não é possível editar um teste que já foi iniciado"] }
 
 		editExam(user, exam, examData)
 

@@ -25,7 +25,7 @@ export default async function registerUser({
 	})
 
 	if(user){
-		if(user.username === username) throw "Esse nome de usuário já está em uso"
+		if(user.username.toLowerCase() === username.toLowerCase()) throw "Esse nome de usuário já está em uso"
 		if(user.email === email) throw "Esse e-mail já está em uso"
 		throw "Essas credenciais já estão em uso"
 	}

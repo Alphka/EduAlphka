@@ -6,7 +6,7 @@ import { ActionIcon, Radio, TextInput } from "@mantine/core"
 import { useCallback, useRef } from "react"
 import { MdDeleteOutline } from "react-icons/md"
 
-interface OptionContainerProps extends Pick<QuestionContainerProps, "clearErrors" | "register" | "setValue" | "errors" | "watch"> {
+interface OptionContainerProps extends Pick<QuestionContainerProps, "clearErrors" | "disabled" | "register" | "setValue" | "errors" | "watch"> {
 	defaultOption: NonNullable<ExamFormData["question"][number]["option"]>[number]
 	questionIndex: number
 	removeOption: UseFieldArrayRemove
@@ -23,6 +23,7 @@ export default function OptionContainer({
 	clearErrors,
 	optionIndex,
 	canDelete,
+	disabled,
 	setValue,
 	register,
 	errors,
@@ -58,6 +59,7 @@ export default function OptionContainer({
 			defaultChecked={watch(`question.${questionIndex}.correct_answer`) === optionIndex}
 			aria-label="Definir como a resposta correta"
 			title={optionError || "Definir como a resposta correta"}
+			disabled={disabled || typeof watch("exam.duration", undefined) === "undefined"}
 			error={!!optionError}
 			ref={optionRef}
 		/>
@@ -131,7 +133,7 @@ export default function OptionContainer({
 			onClick={() => {
 				removeOption(optionIndex)
 			}}
-			disabled={!canDelete}
+			disabled={disabled || !canDelete}
 		>
 			<MdDeleteOutline className="text-[1.5rem]" />
 		</ActionIcon>

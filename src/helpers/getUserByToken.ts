@@ -4,7 +4,7 @@ import connectDatabase from "@lib/connectDatabase"
 export default async function getUserByToken(token: string){
 	await connectDatabase()
 
-	const session = await Session.findOne({ token }).select("user").lean()
+	const session = await Session.findOne({ token }, { user: 1 }).lean()
 	const user = session && await User.findById(session.user).lean()
 
 	if(!user) return null

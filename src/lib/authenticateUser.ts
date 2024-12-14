@@ -1,36 +1,47 @@
-import type { HydratedDocument } from "mongoose"
-import type { IUser } from "@models/typings/User"
 import { cookies, headers } from "next/headers"
 import { Session, User } from "@models"
 import { TOKEN_KEY } from "@constants"
 import connectDatabase from "./connectDatabase"
 
+type LoginProps = {
+	usernameOrEmail: string
+	password: string
+}
+
+type SigninProps = {
+	user: InstanceType<typeof User>
+}
+
 export default async function authenticateUser({
 	keepLoggedIn = true,
 	...data
-}: { keepLoggedIn: boolean } & ({
-	usernameOrEmail: string
-	password: string
-} | { user: HydratedDocument<IUser> })){
+}: (LoginProps | SigninProps) & {
+	keepLoggedIn: boolean
+}){
 	await connectDatabase()
 
-	let user: HydratedDocument<IUser>
+	let user: InstanceType<typeof User>
 
 	if("user" in data){
 		user = data.user
 	}else{
 		const { usernameOrEmail, password } = data
 
-		const _user = await User.findOne({
-			$or: [
-				{ email: usernameOrEmail },
-				{ username: usernameOrEmail }
-			]
-		}).collation({ locale: "en", strength: 2 })
+		try{
+			user = await User
+				.findOne({
+					$or: [
+						{ email: usernameOrEmail },
+						{ username: usernameOrEmail }
+					]
+				})
+				.collation({ locale: "en", strength: 2 })
+				.orFail(new Error("Usuário não existe"))
 
-		if(!_user || !_user.validatePassword(password)) throw "Credenciais inválidas"
-
-		user = _user
+			if(!user.validatePassword(password)) throw "Senha inválida"
+		}catch{
+			throw "Credenciais inválidas"
+		}
 	}
 
 	const headersStore = await headers()

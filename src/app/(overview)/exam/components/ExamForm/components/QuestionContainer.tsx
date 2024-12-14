@@ -83,7 +83,6 @@ export default function QuestionContainer({
 					labelPosition="right"
 					{...register(`question.${index}.required`)}
 					defaultChecked={watch(`question.${index}.required`, true)}
-					disabled={disabled}
 				/>
 			</div>
 
@@ -132,7 +131,6 @@ export default function QuestionContainer({
 			})}
 			defaultValue={watch(`question.${index}.text`)}
 			error={errors.question?.[index]?.text?.message}
-			disabled={disabled}
 			withAsterisk
 			spellCheck
 			autosize
@@ -159,7 +157,6 @@ export default function QuestionContainer({
 					setValue(`question.${index}.question_type`, (value || "") as keyof typeof QuestionTypes)
 				}}
 				error={errors.question?.[index]?.question_type?.message}
-				disabled={disabled}
 				allowDeselect={false}
 				clearable={false}
 				withAsterisk
@@ -172,7 +169,7 @@ export default function QuestionContainer({
 
 						return (
 							<div
-								className="flex justify-between gap-sm"
+								className="flex items-center justify-between gap-sm"
 								key={id}
 							>
 								{optionIndex === 0 && (
@@ -205,6 +202,7 @@ export default function QuestionContainer({
 										appendOption,
 										optionIndex,
 										clearErrors,
+										disabled,
 										register,
 										setValue,
 										errors,

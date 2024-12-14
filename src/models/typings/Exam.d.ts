@@ -1,5 +1,6 @@
+import type { Model, PopulatedDoc, Types } from "mongoose"
 import type { QuestionTypes } from "@models/Exam"
-import type { Model, Types } from "mongoose"
+import type { IUser } from "./User"
 
 export interface ExamQuestionBase {
 	type: keyof typeof QuestionTypes
@@ -25,13 +26,14 @@ export type ExamQuestion = ExamMultipleChoiceQuestion | ExamDissertativeQuestion
 
 export interface IExam {
 	_id: Types.ObjectId
-	owner: Types.ObjectId
+	owner: NonNullable<PopulatedDoc<IUser>>
 	title: string
 	description: string
 	subject?: string
 	duration: number
 	questions: Types.DocumentArray<ExamQuestion>
-	candidates: Types.ObjectId[]
+	// TODO: Check if this can be undefined
+	candidates: NonNullable<PopulatedDoc<IUser>>[]
 	createdAt: Date
 	updatedAt?: Date
 	expiresAt?: Date

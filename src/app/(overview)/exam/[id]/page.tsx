@@ -1,8 +1,8 @@
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { Types } from "mongoose"
+import { Exam, StartedExam, Submit } from "@models"
 import { notFound } from "next/navigation"
-import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
@@ -45,9 +45,13 @@ export default async function EditExamPage({ params }: PageProps){
 		description
 	} = exam
 
+	const hasSubmit = await Submit.exists({ exam: id })
+	const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
+
 	return (
 		<ExamForm
 			type="edit"
+			canEdit={!hasSubmit || !hasStartedBySomeone}
 			defaultValues={{
 				exam: {
 					title: exam.title,
