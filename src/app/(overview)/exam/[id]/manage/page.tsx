@@ -1,8 +1,13 @@
+import { HydratedDocument, Types } from "mongoose"
+import type { IStartedExam } from "@models/typings/StartedExam"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
+import type { IAnswer } from "@models/typings/Answer"
+import type { ISubmit } from "@models/typings/Submit"
+import type { IUser } from "@models/typings/User"
+import { Exam, StartedExam } from "@models"
 import { Divider, Title } from "@mantine/core"
 import { notFound } from "next/navigation"
-import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
@@ -23,11 +28,80 @@ export default async function ManageExamPage({ params }: PageProps){
 	const { id } = await params
 
 	const [exam] = await Promise.all([
-		Exam.findById(id).lean(),
+		Exam
+			.findById(id, {
+				title: 1,
+				candidates: 1
+			})
+			.populate<{
+				candidates: Types.DocumentArray<Pick<IUser, "_id" | "name" | "email" | "username">>
+			}>("candidates", {
+				name: 1,
+				email: 1,
+				username: 1
+			})
+			.lean(),
 		verifyAuthorization({ accountType: "professor" })
 	])
 
 	if(!exam) notFound()
+
+	const startedExams = await StartedExam.aggregate<HydratedDocument<IStartedExam> & {
+		submit: (HydratedDocument<ISubmit> & {
+			answers: HydratedDocument<IAnswer>[]
+		}) | null
+	}>([
+		{
+			$match: {
+				exam,
+				user: { $in: exam.candidates }
+			}
+		},
+		{
+			$lookup: {
+				as: "submit",
+				from: "submits",
+				let: {
+					userId: "$user",
+					examId: "$exam"
+				},
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{ $eq: ["$user", "$$userId"] },
+									{ $eq: ["$exam", "$$examId"] }
+								]
+							}
+						}
+					},
+					{
+						$lookup: {
+							as: "answers",
+							from: "answers",
+							localField: "_id",
+							foreignField: "submit"
+						}
+					},
+					{
+						$limit: 1
+					}
+				]
+			}
+		},
+		{
+			$set: {
+				submit: { $arrayElemAt: ["$submit", 0] }
+			}
+		}
+	])
+
+	const candidatesStartedExams = new Map<string, typeof startedExams[number]>
+
+	for(const startedExam of startedExams){
+		candidatesStartedExams.set((startedExam.user as Types.ObjectId).toString(), startedExam)
+	}
 
 	return (
 		<div className="flex flex-col gap-3xl">
@@ -40,124 +114,26 @@ export default async function ManageExamPage({ params }: PageProps){
 			<Divider />
 
 			<CandidatesTable
-				data={[
-					{
-						name: "Alice Codereader",
-						email: "alice.reader@gmail.com",
-						username: "alicer",
-						pendingCorrection: false,
-						answered: false,
-						expired: false
-					},
-					{
-						name: "Alice Codewriter",
-						email: "alice.writer@gmail.com",
-						username: "alicew",
-						startedAt: "07/12/2024",
-						pendingCorrection: false,
-						answered: true,
-						expired: false
-					},
-					{
-						name: "Bob Builder",
-						email: "bob.builder@gmail.com",
-						username: "bobb",
-						startedAt: "08/12/2024",
-						pendingCorrection: true,
-						answered: true,
-						expired: false
-					},
-					{
-						name: "Cathy Debugger",
-						email: "cathy.debug@gmail.com",
-						username: "cathydb",
-						startedAt: "09/12/2024",
-						pendingCorrection: false,
-						answered: false,
-						expired: true
-					},
-					{
-						name: "David Scriptlover",
-						email: "david.script@gmail.com",
-						username: "davids",
-						startedAt: "06/12/2024",
-						pendingCorrection: false,
-						answered: false,
-						expired: false
-					},
-					{
-						name: "Ella Errorfinder",
-						email: "ella.error@gmail.com",
-						username: "ellae",
-						startedAt: "07/12/2024",
-						pendingCorrection: false,
-						answered: true,
-						expired: false
-					},
-					{
-						name: "Frank Codebreaker",
-						email: "frank.breaker@gmail.com",
-						username: "frankc",
-						startedAt: "10/12/2024",
-						pendingCorrection: false,
-						answered: false,
-						expired: true
-					},
-					{
-						name: "Grace Debugqueen",
-						email: "grace.queen@gmail.com",
-						username: "gracedq",
-						startedAt: "08/12/2024",
-						pendingCorrection: true,
-						answered: true,
-						expired: false
-					},
-					{
-						name: "Henry Scriptking",
-						email: "henry.king@gmail.com",
-						username: "henrysk",
-						startedAt: "06/12/2024",
-						pendingCorrection: false,
-						answered: true,
-						expired: false
-					},
-					{
-						name: "Ivy Algorithm",
-						email: "ivy.algo@gmail.com",
-						username: "ivya",
-						startedAt: "05/12/2024",
-						pendingCorrection: false,
-						answered: false,
-						expired: true
-					},
-					{
-						name: "Jack Loopmaster",
-						email: "jack.loop@gmail.com",
-						username: "jacklm",
-						startedAt: "09/12/2024",
-						pendingCorrection: true,
-						answered: false,
-						expired: false
-					},
-					{
-						name: "Karen Scriptgenius",
-						email: "karen.genius@gmail.com",
-						username: "karensg",
-						startedAt: "07/12/2024",
-						pendingCorrection: false,
-						answered: true,
-						expired: false
-					},
-					{
-						name: "Leo Bytecoder",
-						email: "leo.byte@gmail.com",
-						username: "leobc",
-						startedAt: "08/12/2024",
-						pendingCorrection: true,
-						answered: true,
-						expired: false
+				examId={id}
+				data={exam.candidates.map(({ _id, name, email, username }) => {
+					const id = _id.toString()
+					const startedExam = candidatesStartedExams.get(id)
+					const hasAnswer = !!startedExam?.submit
+					const pendingCorrection = hasAnswer && startedExam.submit!.answers.some(answer => {
+						return !("isCorrect" in answer) || answer.isCorrect === undefined
+					})
+
+					return {
+						id,
+						name,
+						email,
+						username,
+						startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
+						hasAnswer,
+						isExpired: hasAnswer ? Date.now() > startedExam.submit!.createdAt.getTime() : false,
+						pendingCorrection
 					}
-				]}
+				})}
 			/>
 		</div>
 	)

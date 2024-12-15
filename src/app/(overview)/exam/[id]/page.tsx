@@ -1,5 +1,6 @@
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
+import type { IExam } from "@models/typings/Exam"
 import type { Types } from "mongoose"
 import { Exam, StartedExam, Submit } from "@models"
 import { notFound } from "next/navigation"
@@ -32,7 +33,7 @@ export default async function EditExamPage({ params }: PageProps){
 				questions: 1,
 				description: 1
 			})
-			.lean<InstanceType<typeof Exam>>(),
+			.lean<IExam>(),
 		verifyAuthorization({ accountType: "professor" })
 	])
 

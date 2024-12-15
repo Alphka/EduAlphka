@@ -12,20 +12,23 @@ const filters = ["name", "status", "startedAt"] as const
 type FilterTypes = typeof filters[number]
 
 export interface CandidatesRowData {
+	id: string
 	name: string
 	email: string
 	username: string
+	/** Started exam date */
 	startedAt?: string
+	hasAnswer: boolean
+	isExpired: boolean
 	pendingCorrection: boolean
-	answered: boolean
-	expired: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "name" | "username" | "startedAt" | "expired" | "answered" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "hasAnswer" | "pendingCorrection"> {
 	status: SubmitStatus
 }
 
-interface CandidatesTableProps {
+export interface CandidatesTableProps {
+	examId: string
 	data: CandidatesRowData[]
 }
 
@@ -67,21 +70,22 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 		})
 }
 
-export default function CandidatesTable({ data }: CandidatesTableProps){
-	const rowsData: RowData[] = useMemo(() => data.map(({ name, username, startedAt, pendingCorrection, answered, expired }) => ({
+export default function CandidatesTable({ examId, data }: CandidatesTableProps){
+	const rowsData = useMemo(() => data.map(({ id, name, username, startedAt, pendingCorrection, hasAnswer, isExpired }) => ({
+		id,
 		name,
-		expired,
-		answered,
-		username,
-		startedAt,
-		pendingCorrection,
 		status: getSubmitStatus({
 			pendingCorrection,
 			hasStartedExam: !!startedAt,
-			hasAnswer: answered,
-			isExpired: expired
-		})
-	})), [data])
+			hasAnswer,
+			isExpired
+		}),
+		username,
+		startedAt,
+		isExpired,
+		hasAnswer,
+		pendingCorrection
+	} as RowData)), [data])
 
 	const [reverseSortDirection, setReverseSortDirection] = useState(false)
 	const [sortedData, setSortedData] = useState(rowsData)
@@ -117,6 +121,7 @@ export default function CandidatesTable({ data }: CandidatesTableProps){
 				aria-label="Pesquisar"
 				leftSection={<MdSearch className="text-base" />}
 				onChange={handleSearchChange}
+				disabled={!data.length}
 			/>
 
 			<Table.ScrollContainer minWidth={500}>
@@ -162,27 +167,37 @@ export default function CandidatesTable({ data }: CandidatesTableProps){
 					</Table.Thead>
 
 					<Table.Tbody>
-						{sortedData.length > 0 ? sortedData.map(({ name, username, startedAt, expired, answered, pendingCorrection }) => {
+						{sortedData.length > 0 ? sortedData.map(({
+							id,
+							name,
+							username,
+							startedAt,
+							isExpired,
+							hasAnswer,
+							pendingCorrection
+						}) => {
 							const status = getSubmitStatus({
 								pendingCorrection,
 								hasStartedExam: !!startedAt,
-								hasAnswer: answered,
-								isExpired: expired
+								hasAnswer,
+								isExpired
 							})
 
 							return (
 								<Tr
+									examId={examId}
 									{...{
+										id,
 										name,
 										status,
-										expired,
-										answered,
 										username,
 										startedAt,
+										isExpired,
+										hasAnswer,
 										pendingCorrection
 									}}
 									statusColor={submitStatusColors[status]}
-									key={name}
+									key={id}
 								/>
 							)
 						}) : (

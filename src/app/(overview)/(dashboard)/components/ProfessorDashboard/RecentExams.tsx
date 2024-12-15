@@ -1,4 +1,5 @@
 import type { ProfessorDashboardProps } from "."
+import type { IExam } from "@models/typings/Exam"
 import { Text } from "@mantine/core"
 import { Exam } from "@models"
 import ExamList from "../../../components/Professor/ExamList"
@@ -29,7 +30,7 @@ export default async function RecentExams({ user, limit }: RecentExamsProps){
 		})
 		.sort({ createdAt: -1 })
 		.limit(limit)
-		.lean<InstanceType<typeof Exam>[]>()
+		.lean<IExam[]>()
 
 	return exams.length ? (
 		<ExamList exams={exams} />

@@ -1,10 +1,10 @@
-import type { Exam } from "@models"
+import type { IExam } from "@models/typings/Exam"
 import { Grid, GridCol } from "@mantine/core"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import ExamCard from "./ExamCard"
 
 interface ExamListProps {
-	exams: InstanceType<typeof Exam>[]
+	exams: IExam[]
 }
 
 export default async function ExamList({ exams }: ExamListProps){

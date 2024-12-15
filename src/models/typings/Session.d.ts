@@ -1,8 +1,9 @@
-import type { Model, Types } from "mongoose"
+import type { Model, PopulatedDoc, Types } from "mongoose"
+import type { IUser } from "./User"
 
 export interface ISession {
 	token: string
-	user: Types.ObjectId
+	user: NonNullable<PopulatedDoc<IUser>>
 	userAgent: string
 	createdAt: Date
 	expiresAt: Date

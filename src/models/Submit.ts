@@ -26,7 +26,7 @@ submitSchema.method("getAnswers", async function getAnswers(){
 
 submitSchema.method("isPendingCorrection", async function isPendingCorrection(){
 	const answers = await this.getAnswers()
-	return answers.some(answer => !("isCorrect" in answer) || typeof answer.isCorrect === "undefined")
+	return answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
 })
 
 const Submit: SubmitModel = models?.Submit || model<ISubmit, SubmitModel>("Submit", submitSchema)

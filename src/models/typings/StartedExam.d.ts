@@ -1,10 +1,11 @@
-import type { Document, Model, Types } from "mongoose"
+import type { Document, Model, PopulatedDoc, Types } from "mongoose"
 import type { ISubmit } from "./Submit"
 import type { IExam } from "./Exam"
+import type { IUser } from "./User"
 
 export interface IStartedExam {
-	user: Types.ObjectId
-	exam: Types.ObjectId
+	user: NonNullable<PopulatedDoc<IUser>>
+	exam: NonNullable<PopulatedDoc<IExam>>
 	startedAt: Date
 }
 

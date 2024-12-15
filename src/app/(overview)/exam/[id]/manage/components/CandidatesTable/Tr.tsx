@@ -1,8 +1,11 @@
-import type { RowData } from "."
+import type { CandidatesTableProps, RowData } from "."
 import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Table, Text } from "@mantine/core"
 import { MdMenu, MdEdit, MdChecklist, MdDeleteOutline } from "react-icons/md"
+import { removeExamCandidate } from "../../actions/tableActions"
 
-interface TrProps extends Pick<RowData, "name" | "username" | "status" | "startedAt" | "answered" | "expired" | "pendingCorrection"> {
+interface TrProps extends
+	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "hasAnswer" | "isExpired" | "pendingCorrection">,
+	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
 
@@ -10,10 +13,12 @@ export default function Tr({
 	pendingCorrection,
 	statusColor,
 	startedAt,
-	answered,
+	hasAnswer,
 	username,
+	examId,
 	status,
-	name
+	name,
+	id
 }: TrProps){
 	return (
 		<Table.Tr>
@@ -63,7 +68,7 @@ export default function Tr({
 						openDelay={100}
 						closeDelay={400}
 						menuItemTabIndex={0}
-						withinPortal={false}
+						withinPortal
 						withArrow
 					>
 						<MenuTarget>
@@ -84,7 +89,7 @@ export default function Tr({
 								>
 									Corrigir respostas
 								</MenuItem>
-							) : answered && (
+							) : hasAnswer && (
 								<MenuItem
 									px="md"
 									py="sm"
@@ -98,6 +103,7 @@ export default function Tr({
 								px="md"
 								py="sm"
 								color="red"
+								onClick={() => removeExamCandidate(examId, id)}
 								leftSection={<MdDeleteOutline className="text-base" />}
 								disabled={!!startedAt}
 							>

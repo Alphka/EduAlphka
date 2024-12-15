@@ -59,7 +59,7 @@ export default function OptionContainer({
 			defaultChecked={watch(`question.${questionIndex}.correct_answer`) === optionIndex}
 			aria-label="Definir como a resposta correta"
 			title={optionError || "Definir como a resposta correta"}
-			disabled={disabled || typeof watch("exam.duration", undefined) === "undefined"}
+			disabled={disabled || watch("exam.duration", undefined) === undefined}
 			error={!!optionError}
 			ref={optionRef}
 		/>

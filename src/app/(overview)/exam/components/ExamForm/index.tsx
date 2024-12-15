@@ -314,7 +314,7 @@ export default function ExamForm({
 												durationInputRef.current?.showPicker?.()
 											}
 										}}
-										disabled={formDisabled || typeof getValues("exam.duration") === "undefined"}
+										disabled={formDisabled || getValues("exam.duration") === undefined}
 									>
 										<MdAccessTime className="text-[1.25rem]" />
 									</ActionIcon>
