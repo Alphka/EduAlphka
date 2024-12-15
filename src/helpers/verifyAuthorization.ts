@@ -35,5 +35,8 @@ async function redirectToLogin(): Promise<never> {
 		redirect(routes.login.pathname)
 	}
 
-	redirect(`${routes.login.pathname}?redirect=${encodeURIComponent(url.pathname)}`)
+	redirect(url.pathname !== "/" && url.pathname !== "/login"
+		? `${routes.login.pathname}?redirect=${encodeURIComponent(url.pathname)}`
+		: routes.login.pathname
+	)
 }

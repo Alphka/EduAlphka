@@ -1,15 +1,33 @@
-import { Session, User } from "@models"
+import type { HydratedDocument } from "mongoose"
+import type { IUser } from "@models/typings/User"
+import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"
 
 export default async function getUserByToken(token: string){
 	await connectDatabase()
 
-	const session = await Session.findOne({ token }, { user: 1 }).lean()
-	const user = session && await User.findById(session.user).lean()
+	const session = await Session
+		.findOne({ token }, { user: 1 })
+		.populate<{ user: HydratedDocument<IUser> }>("user")
+		.lean()
 
-	if(!user) return null
+	if(!session?.user){
+		if(session && !session.user){
+			const { id, user } = (await Session.findById(session._id, { user: 1 }))!
 
-	const { _id, ...rest } = user
+			console.error(
+				"Session user not found, deleting user sessions." +
+				`\n\tSession ID: ${id}` +
+				`\n\tUser ID: ${user}`
+			)
+
+			await Session.deleteMany({ $or: [{ _id: id }, { user }] })
+		}
+
+		return null
+	}
+
+	const { _id, ...rest } = session.user
 
 	return {
 		id: _id.toString(),

@@ -1,13 +1,14 @@
 import type { ISession, SessionModel } from "./typings/Session"
 import { model, models, Schema } from "mongoose"
+import { TOKEN_LENGTH } from "@constants/index"
 
 export const sessionSchema = new Schema<ISession, SessionModel>({
 	token: {
 		type: String,
 		unique: true,
 		required: true,
-		minlength: 96,
-		maxlength: 96
+		minlength: TOKEN_LENGTH,
+		maxlength: TOKEN_LENGTH
 	},
 	user: {
 		type: Schema.ObjectId,
