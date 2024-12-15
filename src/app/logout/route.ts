@@ -1,11 +1,11 @@
+import { NextResponse, type NextRequest } from "next/server"
 import { TOKEN_KEY, TOKEN_LENGTH } from "@constants/index"
-import { NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
 
-export async function GET(){
+export async function GET(request: NextRequest){
 	const [cookiesStore] = await Promise.all([
 		cookies(),
 		await connectDatabase()
@@ -18,5 +18,5 @@ export async function GET(){
 		cookiesStore.delete(TOKEN_KEY)
 	}
 
-	return NextResponse.redirect(routes.login.pathname)
+	return NextResponse.redirect(new URL(routes.login.pathname, request.url))
 }
