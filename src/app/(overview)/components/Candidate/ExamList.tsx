@@ -18,11 +18,11 @@ export default async function ExamList({ user, exams }: ExamListProps){
 					StartedExam.findOne({
 						user: user.id,
 						exam: exam._id
-					}),
+					}, { _id: 1 }),
 					Submit.findOne({
 						user: user.id,
 						exam: exam._id
-					})
+					}, { _id: 1 })
 				])
 
 				const pendingCorrection = submit ? await submit.isPendingCorrection() : false

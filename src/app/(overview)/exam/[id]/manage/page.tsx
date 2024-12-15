@@ -11,6 +11,7 @@ import { notFound } from "next/navigation"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
+import AddCandidate from "./components/CandidatesTable/components/AddCandidate"
 import routes from "@app/routes"
 
 const title = routes.exam.children.template.children.manage.title
@@ -114,29 +115,33 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<Divider />
 
-			<CandidatesTable
-				examId={id}
-				data={exam.candidates.map(({ _id, name, email, username }) => {
-					const id = _id.toString()
-					const startedExam = candidatesStartedExams.get(id)
-					const hasAnswer = !!startedExam?.submit
-					const pendingCorrection = hasAnswer && startedExam.submit!.answers.some(answer => {
-						return !("isCorrect" in answer) || answer.isCorrect === undefined
-					})
+			<div className="flex flex-col gap-lg">
+				<CandidatesTable
+					examId={id}
+					data={exam.candidates.map(({ _id, name, email, username }) => {
+						const id = _id.toString()
+						const startedExam = candidatesStartedExams.get(id)
+						const hasAnswer = !!startedExam?.submit
+						const pendingCorrection = hasAnswer && startedExam.submit!.answers.some(answer => {
+							return !("isCorrect" in answer) || answer.isCorrect === undefined
+						})
 
-					return {
-						id,
-						name,
-						email,
-						username,
-						startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
-						hasAnswer,
-						isExpired: hasAnswer ? Date.now() > startedExam.submit!.createdAt.getTime() : false,
-						pendingCorrection
-					}
-				})}
-				key={`${exam.__v}.${exam.candidates.length}`}
-			/>
+						return {
+							id,
+							name,
+							email,
+							username,
+							startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
+							hasAnswer,
+							isExpired: hasAnswer ? Date.now() > startedExam.submit!.createdAt.getTime() : false,
+							pendingCorrection
+						}
+					})}
+					key={`${exam.__v}.${exam.candidates.length}`}
+				/>
+
+				<AddCandidate examId={id} />
+			</div>
 		</div>
 	)
 }

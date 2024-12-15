@@ -1,6 +1,6 @@
 import type { IStartedExam, IStartedExamMethods, StartedExamModel } from "./typings/StartedExam"
-import type Submit from "./Submit"
-import type Exam from "./Exam"
+import type { ISubmit } from "./typings/Submit"
+import type { IExam } from "./typings/Exam"
 import { model, models, Schema } from "mongoose"
 
 const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExamMethods>({
@@ -26,17 +26,28 @@ startedExamSchema.method("isExpired", async function isExpired({
 	exam,
 	submit
 }: {
-	exam?: InstanceType<typeof Exam>,
-	submit?: InstanceType<typeof Submit> | null
+	exam?: Document & IExam
+	submit?: (Document & ISubmit) | boolean | null
 } = {}){
-	if(!exam || !submit){
+	if(!(exam && exam.expiresAt && exam.duration) || !submit){
 		const [Exam, Submit] = await Promise.all([
 			import("@models/Exam").then(module => module.default),
 			import("@models/Submit").then(module => module.default)
 		])
 
-		if(!exam) exam = (await Exam.findById(this.exam))!
-		if(submit === undefined) submit = await Submit.findOne({ exam: exam._id })
+		if(!(exam && exam.expiresAt && exam.duration)){
+			if(!exam && !this.exam) throw new Error("Missing 'exam' property in StartedExam")
+
+			exam = (await Exam
+				.findById(exam || this.exam, {
+					duration: 1,
+					expiresAt: 1
+				})
+				.lean<Document & IExam>()
+			)!
+		}
+
+		if(submit === undefined) submit = !!(await Submit.exists({ exam }))
 	}
 
 	if(submit) return false

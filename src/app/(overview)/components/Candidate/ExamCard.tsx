@@ -35,7 +35,7 @@ export default async function ExamCard({
 	const isExamSubmitted = !!submit
 	const isExamExpired = isExamStarted && !isExamSubmitted && await startedExam.isExpired({
 		exam,
-		submit
+		submit: isExamSubmitted
 	})
 
 	const submitStatus = getSubmitStatus({

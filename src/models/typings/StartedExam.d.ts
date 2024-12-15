@@ -1,4 +1,4 @@
-import type { Document, Model, PopulatedDoc, Types } from "mongoose"
+import type { Document, Model, PopulatedDoc } from "mongoose"
 import type { ISubmit } from "./Submit"
 import type { IExam } from "./Exam"
 import type { IUser } from "./User"
@@ -11,8 +11,8 @@ export interface IStartedExam {
 
 export interface IStartedExamMethods {
 	isExpired({ exam, submit }?: {
-		exam?: (Document & IExam)
-		submit?: (Document & ISubmit) | null
+		exam?: Document & IExam
+		submit?: (Document & ISubmit) | boolean | null
 	}): Promise<boolean>
 }
 

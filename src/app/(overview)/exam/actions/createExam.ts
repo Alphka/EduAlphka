@@ -24,7 +24,6 @@ export default async function createExamAction(examData: z.infer<typeof examSche
 	}
 
 	revalidatePath(routes.homepage.pathname)
-	revalidatePath(routes.exam.children.template.pathname, "page")
 	redirect(routes.homepage.pathname)
 
 	// TODO: Add expiresAt input in front-end

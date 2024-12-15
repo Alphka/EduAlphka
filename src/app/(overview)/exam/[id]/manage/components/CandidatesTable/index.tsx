@@ -27,11 +27,6 @@ export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "userna
 	status: SubmitStatus
 }
 
-export interface CandidatesTableProps {
-	examId: string
-	data: CandidatesRowData[]
-}
-
 function parseDate(date: string){
 	const [day, month, year] = date.split("/").map(Number)
 	return Date.UTC(year, month - 1, day)
@@ -68,6 +63,11 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 			const keys = Object.keys(item).filter(key => filters.includes(key as FilterTypes)) as FilterTypes[]
 			return keys.some(key => (item[key] || "").toLocaleLowerCase().includes(query))
 		})
+}
+
+export interface CandidatesTableProps {
+	examId: string
+	data: CandidatesRowData[]
 }
 
 export default function CandidatesTable({ examId, data }: CandidatesTableProps){
@@ -116,10 +116,12 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 			</header>
 
 			<TextInput
+				size="sm"
 				value={search}
 				placeholder="Pesquisar..."
 				aria-label="Pesquisar"
 				leftSection={<MdSearch className="text-base" />}
+				enterKeyHint="search"
 				onChange={handleSearchChange}
 				disabled={!data.length}
 			/>
@@ -140,7 +142,7 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 							</Th>
 
 							<Th
-								className="w-16 xs:w-32"
+								className="w-16 xs:w-36"
 								sorted={sortBy === "startedAt"}
 								reversed={reverseSortDirection}
 								onSort={() => setSorting("startedAt")}
