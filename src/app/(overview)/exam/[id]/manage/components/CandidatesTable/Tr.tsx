@@ -1,7 +1,8 @@
 import type { CandidatesTableProps, RowData } from "."
 import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Table, Text } from "@mantine/core"
-import { MdMenu, MdEdit, MdChecklist, MdDeleteOutline } from "react-icons/md"
-import { removeExamCandidate } from "../../actions/tableActions"
+import { MdMenu, MdEdit, MdChecklist } from "react-icons/md"
+import { useMediaQuery } from "@mantine/hooks"
+import RemoveCandidateButton from "./components/RemoveCandidateButton"
 
 interface TrProps extends
 	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "hasAnswer" | "isExpired" | "pendingCorrection">,
@@ -20,6 +21,8 @@ export default function Tr({
 	name,
 	id
 }: TrProps){
+	const isMobile = useMediaQuery("(max-width: 400px)")
+
 	return (
 		<Table.Tr>
 			<Table.Td>
@@ -53,6 +56,7 @@ export default function Tr({
 				<Badge
 					color={statusColor}
 					variant="light"
+					size={isMobile ? "xs" : "sm"}
 					fullWidth
 				>
 					{status}
@@ -64,7 +68,7 @@ export default function Tr({
 					<Menu
 						position="bottom-end"
 						transitionProps={{ transition: "pop" }}
-						trigger="click-hover"
+						trigger="click"
 						openDelay={100}
 						closeDelay={400}
 						menuItemTabIndex={0}
@@ -99,16 +103,13 @@ export default function Tr({
 								</MenuItem>
 							)}
 
-							<MenuItem
+							<RemoveCandidateButton
+								examId={examId}
+								candidateId={id}
 								px="md"
 								py="sm"
-								color="red"
-								onClick={() => removeExamCandidate(examId, id)}
-								leftSection={<MdDeleteOutline className="text-base" />}
 								disabled={!!startedAt}
-							>
-								Remover acesso
-							</MenuItem>
+							/>
 						</MenuDropdown>
 					</Menu>
 				</div>

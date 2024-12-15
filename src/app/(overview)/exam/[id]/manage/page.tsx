@@ -31,7 +31,8 @@ export default async function ManageExamPage({ params }: PageProps){
 		Exam
 			.findById(id, {
 				title: 1,
-				candidates: 1
+				candidates: 1,
+				__v: 1
 			})
 			.populate<{
 				candidates: Types.DocumentArray<Pick<IUser, "_id" | "name" | "email" | "username">>
@@ -134,6 +135,7 @@ export default async function ManageExamPage({ params }: PageProps){
 						pendingCorrection
 					}
 				})}
+				key={`${exam.__v}.${exam.candidates.length}`}
 			/>
 		</div>
 	)

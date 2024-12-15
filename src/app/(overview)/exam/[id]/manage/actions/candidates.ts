@@ -1,13 +1,12 @@
 "use server"
 
+import { revalidatePath } from "next/cache"
 import { Types } from "mongoose"
 import { Exam } from "@models"
+import routes from "@app/routes"
 
-export async function removeExamCandidate(examId: string, userId: string){
-	const exam = await Exam
-		.findById(examId, {
-			candidates: 1
-		})
+export async function removeCandidate(examId: string, userId: string){
+	const exam = await Exam.findById(examId, { candidates: 1 })
 
 	if(!exam) return { errors: ["Teste não encontrado"] }
 
@@ -22,5 +21,10 @@ export async function removeExamCandidate(examId: string, userId: string){
 		exam.candidates.splice(index, 1)
 	}
 
+	exam.markModified("candidates")
+
 	await exam.save()
+
+	revalidatePath(routes.homepage.pathname)
+	revalidatePath(routes.exam.children.template.children.manage.pathname, "page")
 }

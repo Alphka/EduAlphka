@@ -38,7 +38,6 @@ export default async function editExamAction(id: string, examData: z.infer<typeo
 	}
 
 	revalidatePath(routes.homepage.pathname)
-	revalidatePath(routes.exam.pathname)
 	revalidatePath(routes.exam.children.template.pathname, "page")
 	redirect(routes.homepage.pathname)
 }

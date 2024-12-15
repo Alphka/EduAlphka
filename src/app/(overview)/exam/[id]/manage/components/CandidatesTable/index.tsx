@@ -124,9 +124,9 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 				disabled={!data.length}
 			/>
 
-			<Table.ScrollContainer minWidth={500}>
+			<Table.ScrollContainer minWidth={250}>
 				<Table
-					horizontalSpacing="sm"
+					horizontalSpacing="xs"
 					verticalSpacing="sm"
 				>
 					<Table.Thead>
@@ -140,21 +140,22 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 							</Th>
 
 							<Th
+								className="w-16 xs:w-32"
 								sorted={sortBy === "startedAt"}
 								reversed={reverseSortDirection}
 								onSort={() => setSorting("startedAt")}
 								ta="center"
-								w="12%"
 							>
-								Data de início
+								<Text component="span" visibleFrom="xs">Data de início</Text>
+								<Text component="span" hiddenFrom="xs" aria-hidden>Início</Text>
 							</Th>
 
 							<Th
+								className="w-1/12"
 								sorted={sortBy === "status"}
 								reversed={reverseSortDirection}
 								onSort={() => setSorting("status")}
 								ta="center"
-								w="10%"
 							>
 								Status
 							</Th>

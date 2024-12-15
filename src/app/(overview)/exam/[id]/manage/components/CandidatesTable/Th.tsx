@@ -24,10 +24,11 @@ export default function Th({
 	return (
 		<Table.Th {...props}>
 			<UnstyledButton onClick={onSort}>
-				<div className="flex items-center justify-between">
+				<div className="flex items-center justify-between gap-1">
 					<Text fw={500} fz="sm">
 						{children}
 					</Text>
+
 					<div className="flex items-center justify-center">
 						<Icon className="text-base" />
 					</div>
