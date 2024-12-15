@@ -13,10 +13,11 @@ export async function GET(request: NextRequest){
 
 	const token = cookiesStore.get(TOKEN_KEY)?.value
 
-	if(token && token.length >= TOKEN_LENGTH){
+	if(token && token.length === TOKEN_LENGTH){
 		await Session.deleteOne({ token })
-		cookiesStore.delete(TOKEN_KEY)
 	}
+
+	cookiesStore.delete(TOKEN_KEY)
 
 	return NextResponse.redirect(new URL(routes.login.pathname, request.url))
 }
