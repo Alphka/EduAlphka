@@ -7,14 +7,14 @@ export default function NotFoundPage(){
 	const router = useRouter()
 
 	return (
-		<div className="min-h-dvh flex flex-col items-center justify-center p-5xl gap-3xl">
+		<div className="main-height flex flex-col items-center justify-center p-5xl gap-3xl">
 			<Title
 				order={1}
 				fz="h2"
 				fw={600}
 				ta="center"
 			>
-				Página não encontrada
+				Esse teste não foi encontrado
 			</Title>
 
 			<Button

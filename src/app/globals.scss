@@ -48,3 +48,11 @@ button,
 ::-ms-reveal{
 	display: none;
 }
+
+.main-height{
+	min-height: calc(100dvh - var(--app-shell-header-height) - 2 * (var(--app-shell-footer-offset, 0rem) + var(--app-shell-padding)));
+
+	@supports not (height: 100dvh){
+		min-height: calc(100vh - var(--app-shell-header-height) - 2 * (var(--app-shell-footer-offset, 0rem) + var(--app-shell-padding)));
+	}
+}

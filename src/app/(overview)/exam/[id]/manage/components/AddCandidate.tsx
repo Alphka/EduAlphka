@@ -1,8 +1,8 @@
 "use client"
 
-import type { CandidatesTableProps } from ".."
+import type { CandidatesTableProps } from "./CandidatesTable"
 import { Button, TextInput, Title } from "@mantine/core"
-import { addCandidate } from "../../../actions/candidates"
+import { addCandidate } from "../actions/candidates"
 import { MdSearch } from "react-icons/md"
 import { useRef } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"

@@ -17,8 +17,8 @@ export default async function ExamList({ exams }: ExamListProps){
 					<GridCol
 						span={{
 							base: 12,
-							md: 6,
-							lg: 4
+							lg: 6,
+							xl: 4
 						}}
 						key={id}
 					>

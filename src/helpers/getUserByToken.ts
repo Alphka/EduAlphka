@@ -1,4 +1,3 @@
-import type { HydratedDocument } from "mongoose"
 import type { IUser } from "@models/typings/User"
 import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"
@@ -8,7 +7,7 @@ export default async function getUserByToken(token: string){
 
 	const session = await Session
 		.findOne({ token }, { user: 1 })
-		.populate<{ user: HydratedDocument<IUser> }>("user")
+		.populate<{ user: IUser }>("user")
 		.lean()
 
 	if(!session?.user){

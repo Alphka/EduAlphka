@@ -1,17 +1,18 @@
-import { HydratedDocument, Types } from "mongoose"
 import type { IStartedExam } from "@models/typings/StartedExam"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IAnswer } from "@models/typings/Answer"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
+import { HydratedDocument, Types } from "mongoose"
 import { Exam, StartedExam } from "@models"
 import { Divider, Title } from "@mantine/core"
 import { notFound } from "next/navigation"
 import verifyAuthorization from "@helpers/verifyAuthorization"
+import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
-import AddCandidate from "./components/CandidatesTable/components/AddCandidate"
+import AddCandidate from "./components/AddCandidate"
 import routes from "@app/routes"
 
 const title = routes.exam.children.template.children.manage.title
@@ -107,10 +108,15 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header>
+			<header className="flex justify-between gap-md">
 				<Title order={1} fz="4xl">
 					{exam.title || "Teste sem nome"}
 				</Title>
+
+				<RemoveExamButton
+					examId={id}
+					examName={exam.title}
+				/>
 			</header>
 
 			<Divider />
