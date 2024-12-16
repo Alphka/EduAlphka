@@ -39,7 +39,7 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 			trapFocus
 			centered
 			classNames={{
-				body: "flex flex-col px-3xl py-xl gap-4xl"
+				body: "flex flex-col justify-center px-3xl py-xl gap-4xl"
 			}}
 		>
 			<header className="flex flex-col gap-md">

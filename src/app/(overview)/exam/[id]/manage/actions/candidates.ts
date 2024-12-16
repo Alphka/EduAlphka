@@ -1,8 +1,8 @@
 "use server"
 
+import type { Types } from "mongoose"
 import { revalidatePath } from "next/cache"
 import { Exam, User } from "@models"
-import { Types } from "mongoose"
 import routes from "@app/routes"
 
 export async function addCandidate(examId: string, usernameOrEmail: string){
@@ -25,6 +25,8 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	if(!candidate) return { errors: ["Usuário não encontrado"] }
 	if(candidate.accountType !== "candidate") return { errors: ["Este usuário não é um candidato"] }
 
+	if(exam.candidates.some(id => (id as Types.ObjectId).equals(candidate._id))) return { errors: ["Candidato já adicionado ao teste"] }
+
 	exam.candidates.unshift(candidate._id)
 	exam.markModified("candidates")
 	await exam.save()
@@ -42,7 +44,7 @@ export async function removeCandidate(examId: string, userId: string){
 
 	exam.candidates.forEach((candidate, index) => {
 		if(!candidate) deleteIndexes.push(index)
-		else if((candidate instanceof Types.ObjectId ? candidate : candidate._id).equals(userId)) deleteIndexes.push(index)
+		else if((candidate as Types.ObjectId).equals(userId)) deleteIndexes.push(index)
 	})
 
 	for(const index of deleteIndexes.reverse()){
