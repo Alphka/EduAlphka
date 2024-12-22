@@ -32,13 +32,16 @@ export interface IExam {
 	subject?: string
 	duration: number
 	questions: Types.DocumentArray<ExamQuestion>
-	// TODO: Check if this can be undefined
 	candidates: NonNullable<PopulatedDoc<IUser>>[]
 	createdAt: Date
 	updatedAt?: Date
 	expiresAt?: Date
 }
 
+export interface IExamMethods {
+	isExpired(): boolean
+}
+
 export type QuestionModel = Model<ExamQuestion>
 export type OptionModel = Model<IQuestionOption>
-export type ExamModel = Model<IExam>
+export type ExamModel = Model<IExam, {}, IExamMethods>

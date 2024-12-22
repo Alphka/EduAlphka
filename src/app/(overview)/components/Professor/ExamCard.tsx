@@ -1,36 +1,29 @@
-import type { IExam } from "@models/typings/Exam"
-import type { Types } from "mongoose"
-import type formatTimeDuration from "@helpers/formatTimeDuration"
+import type { IExam, IExamMethods } from "@models/typings/Exam"
+import type { Document } from "mongoose"
 import { Badge, Box, Card, Text, Tooltip } from "@mantine/core"
 import { MdOutlineTimer, MdPerson } from "react-icons/md"
 import { twJoin } from "tailwind-merge"
-import getHistoryMessage, { type HistoryMessageProps } from "../ExamCard/helpers/getHistoryMessage"
+import formatTimeDuration from "@helpers/formatTimeDuration"
+import getHistoryMessage from "../ExamCard/helpers/getHistoryMessage"
 import getStringColor from "@helpers/getStringColor"
+import routes from "@app/routes"
 import Link from "next/link"
 
-interface ExamCardProps extends Pick<IExam, "title" | "subject" | "description">, HistoryMessageProps {
-	candidatesCount: number
-	duration: ReturnType<typeof formatTimeDuration>
-	active: boolean
-	examId: string | Types.ObjectId
+interface ExamCardProps {
+	exam: Document & IExam & IExamMethods
 }
 
-export default function ExamCard({
-	title,
-	active,
-	examId,
-	subject,
-	duration,
-	createdAt,
-	updatedAt,
-	description,
-	candidatesCount
-}: ExamCardProps){
-	const history = getHistoryMessage({ createdAt, updatedAt })
+export default async function ExamCard({ exam }: ExamCardProps){
+	const history = getHistoryMessage({
+		createdAt: exam.createdAt,
+		updatedAt: exam.updatedAt
+	})
+
+	const isExamExpired = exam.isExpired()
 
 	return (
 		<Link
-			href={`/exam/${examId}`}
+			href={`${routes.exam.pathname}/${exam.id}`}
 			className={twJoin(
 				"group relative h-full rounded-md overflow-hidden shadow-xs",
 				"focus:outline-none"
@@ -56,20 +49,20 @@ export default function ExamCard({
 						<Text
 							fz="2xl"
 							fw="bold"
-							title={title}
+							title={exam.title}
 							truncate="end"
 							component="h2"
 						>
-							{title}
+							{exam.title}
 						</Text>
 
 						<Badge
 							size="md"
 							variant="light"
 							className="shrink-0"
-							color={active ? "blue" : "yellow"}
+							color={isExamExpired ? "yellow" : "blue"}
 						>
-							{active ? "Ativo" : "Expirado"}
+							{isExamExpired ? "Expirado" : "Ativo"}
 						</Badge>
 					</div>
 
@@ -80,19 +73,19 @@ export default function ExamCard({
 						className="whitespace-pre-wrap"
 						lineClamp={5}
 					>
-						{description}
+						{exam.description}
 					</Text>
 
 					<div className="flex-grow flex items-end content-end flex-wrap gap-x-md gap-y-2">
-						{!!subject && (
+						{!!exam.subject && (
 							<div className="flex-shrink-0 flex items-center gap-xs">
 								<Box
-									bg={`${getStringColor(subject)}.5`}
+									bg={`${getStringColor(exam.subject)}.5`}
 									className="w-2.5 h-2.5 rounded-full"
 								/>
 
 								<p className="text-xs font-medium leading-none">
-									{subject}
+									{exam.subject}
 								</p>
 							</div>
 						)}
@@ -112,7 +105,7 @@ export default function ExamCard({
 										<MdOutlineTimer className="text-sm" />
 
 										<Text fz="xs" fw={500} lh={1}>
-											{duration}
+											{formatTimeDuration(exam.duration)}
 										</Text>
 									</div>
 								</Tooltip>
@@ -131,7 +124,7 @@ export default function ExamCard({
 									<MdPerson className="text-sm" />
 
 									<p className="text-xs font-medium leading-none">
-										{candidatesCount}
+										{exam.candidates.length}
 									</p>
 								</div>
 							</Tooltip>
@@ -140,7 +133,7 @@ export default function ExamCard({
 								fz="2xs"
 								fw={400}
 								lh={1}
-								title={new Date(updatedAt || createdAt).toLocaleString("pt-BR")}
+								title={new Date(exam.updatedAt || exam.createdAt).toLocaleString("pt-BR")}
 								className="text-nowrap"
 								truncate="end"
 							>

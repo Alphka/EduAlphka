@@ -1,5 +1,4 @@
 import type { ProfessorDashboardProps } from "."
-import type { IExam } from "@models/typings/Exam"
 import { Exam } from "@models"
 import ExamList from "../../../components/Professor/ExamList"
 
@@ -29,7 +28,6 @@ export default async function RecentExams({ user, limit }: RecentExamsProps){
 		})
 		.sort({ createdAt: -1 })
 		.limit(limit)
-		.lean<IExam[]>()
 
 	return exams.length ? (
 		<ExamList exams={exams} />

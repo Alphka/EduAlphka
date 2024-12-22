@@ -1,41 +1,27 @@
-import type { IExam } from "@models/typings/Exam"
+import type { IExam, IExamMethods } from "@models/typings/Exam"
+import type { Document } from "mongoose"
 import { Grid, GridCol } from "@mantine/core"
-import formatTimeDuration from "@helpers/formatTimeDuration"
 import ExamCard from "./ExamCard"
 
 interface ExamListProps {
-	exams: IExam[]
+	exams: (Document & IExam & IExamMethods)[]
 }
 
 export default async function ExamList({ exams }: ExamListProps){
 	return (
 		<Grid gutter="md">
-			{exams.map(exam => {
-				const id = exam._id.toString()
-
-				return (
-					<GridCol
-						span={{
-							base: 12,
-							lg: 6,
-							xl: 4
-						}}
-						key={id}
-					>
-						<ExamCard
-							title={exam.title}
-							active
-							examId={id}
-							subject={exam.subject}
-							duration={formatTimeDuration(exam.duration)}
-							createdAt={exam.createdAt}
-							updatedAt={exam.updatedAt}
-							description={exam.description}
-							candidatesCount={exam.candidates.length}
-						/>
-					</GridCol>
-				)
-			})}
+			{exams.map(exam => (
+				<GridCol
+					span={{
+						base: 12,
+						lg: 6,
+						xl: 4
+					}}
+					key={exam.id}
+				>
+					<ExamCard exam={exam} />
+				</GridCol>
+			))}
 		</Grid>
 	)
 }

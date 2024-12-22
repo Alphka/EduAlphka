@@ -1,53 +1,9 @@
-import type {
-	IExam,
-	ExamModel,
-	OptionModel,
-	QuestionModel,
-	IQuestionOption,
-	ExamQuestionBase,
-	ExamDissertativeQuestion,
-	ExamMultipleChoiceQuestion
-} from "./typings/Exam"
+import type { IExam, ExamModel, IExamMethods } from "../typings/Exam"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
+import { QuestionSchema, QuestionTypes } from "./Question"
 import { model, models, Schema } from "mongoose"
 
-export enum QuestionTypes {
-	multiple_choice = "Múltipla escolha",
-	dissertative = "Dissertativa"
-}
-
-const OptionSchema = new Schema<IQuestionOption, OptionModel>({
-	text: {
-		type: String,
-		required: true
-	}
-})
-
-const QuestionSchema = new Schema<
-	& ExamQuestionBase
-	& Omit<ExamMultipleChoiceQuestion, "type">
-	& Omit<ExamDissertativeQuestion, "type">
-, QuestionModel>({
-	type: {
-		type: String,
-		enum: Object.keys(QuestionTypes),
-		required: true
-	},
-	text: {
-		type: String,
-		required: true,
-		minlength: ExamFormValidation.questionTextMinLength,
-		maxlength: ExamFormValidation.questionTextMaxLength
-	},
-	isRequired: {
-		type: Boolean,
-		required: true
-	},
-	options: [OptionSchema],
-	correctAnswer: Schema.ObjectId
-})
-
-const examSchema = new Schema<IExam, ExamModel>({
+const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 	owner: {
 		type: Schema.ObjectId,
 		ref: "User",
@@ -88,6 +44,11 @@ const examSchema = new Schema<IExam, ExamModel>({
 	expiresAt: Date
 })
 
+examSchema.method("isExpired", function isExpired(){
+	return !!this.expiresAt && Date.now() > this.expiresAt.getTime()
+})
+
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)
 
 export default Exam
+export { QuestionTypes }

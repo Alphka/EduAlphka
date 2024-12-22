@@ -11,6 +11,7 @@ import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import getHistoryMessage from "../ExamCard/helpers/getHistoryMessage"
 import getStringColor from "@helpers/getStringColor"
+import routes from "@app/routes"
 import Link from "next/link"
 
 interface ExamCardProps {
@@ -47,7 +48,7 @@ export default async function ExamCard({
 
 	return (
 		<Link
-			href={`/exam/${exam.id}/submit`}
+			href={`${routes.exam.pathname}/${exam.id}/submit`}
 			className={twJoin(
 				"group relative h-full rounded-md overflow-hidden shadow-xs",
 				"focus:outline-none"
