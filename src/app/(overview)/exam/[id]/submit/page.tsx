@@ -138,17 +138,19 @@ export default async function SubmitExamPage({ params }: PageProps){
 					{exam.title}
 				</h1>
 
-				<Paper
-					className={twJoin(
-						"leading-none px-sm py-xs shadow-xs",
-						pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
-					)}
-					title={pendingCorrection ? "Nota final pendente de correção" : undefined}
-					aria-label={`${grade} ${grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
-					withBorder
-				>
-					Nota: {grade}
-				</Paper>
+				{!!startedExam?.submit && (
+					<Paper
+						className={twJoin(
+							"leading-none px-sm py-xs shadow-xs",
+							pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
+						)}
+						title={pendingCorrection ? "Nota final pendente de correção" : undefined}
+						aria-label={`${grade} ${grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
+						withBorder
+					>
+						Nota: {grade}
+					</Paper>
+				)}
 			</header>
 
 			<Divider />
@@ -201,11 +203,11 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 			<SubmitExamForm
 				exam={examClient}
-				submit={{
+				submit={startedExam?.submit ? {
 					incorrectAnswers,
 					correctAnswers,
 					pendingAnswers
-				}}
+				} : undefined}
 				defaultValues={startedExam?.submit ? {
 					question: startedExam.submit.answers.map(({ option, content }) => ({
 						option: option?.toString(),

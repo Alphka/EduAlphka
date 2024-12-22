@@ -85,10 +85,9 @@ export default function SubmitExamForm({
 				}, questionIndex) => {
 					return (
 						<Paper
-							p="md"
+							className="p-xl shadow-xs"
 							component="li"
 							withBorder
-							shadow="xs"
 							key={_id}
 						>
 							<Title
