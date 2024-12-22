@@ -57,7 +57,7 @@ export default function ExamForm({
 	const durationInputRef = useRef<HTMLInputElement>(null)
 	const isMobile = useMediaQuery("(max-width: 600px)")
 
-	const formDisabled = loading || !canEdit
+	const formDisabled = loading || canEdit === false
 
 	const {
 		watch,
@@ -74,7 +74,6 @@ export default function ExamForm({
 		defaultValues: defaultValues || {
 			question: [defaultExamData]
 		},
-		progressive: true,
 		disabled: formDisabled,
 		mode: "onSubmit"
 	})

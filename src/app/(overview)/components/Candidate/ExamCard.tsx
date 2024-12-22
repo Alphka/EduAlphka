@@ -40,7 +40,7 @@ export default async function ExamCard({
 
 	const submitStatus = getSubmitStatus({
 		hasStartedExam: isExamStarted,
-		hasAnswer: isExamSubmitted,
+		hasSubmit: isExamSubmitted,
 		isExpired: isExamExpired,
 		pendingCorrection
 	})
@@ -80,12 +80,8 @@ export default async function ExamCard({
 							/>
 
 							<div>
-								<Text fz="sm" fw={500}>
-									{exam.owner.name}
-								</Text>
-								<Text fz="xs" c="dimmed">
-									{exam.owner.username}
-								</Text>
+								<p className="text-sm font-medium">{exam.owner.name}</p>
+								<p className="text-xs text-dark-200">{exam.owner.username}</p>
 							</div>
 						</div>
 
@@ -153,9 +149,9 @@ export default async function ExamCard({
 									<div className="flex-shrink-0 flex items-center gap-xs">
 										<MdOutlineTimer className="text-sm" />
 
-										<Text fz="xs" fw={500} lh={1}>
+										<p className="text-xs font-medium leading-none">
 											{formatTimeDuration(exam.duration)}
-										</Text>
+										</p>
 									</div>
 								</Tooltip>
 							</div>
@@ -172,9 +168,9 @@ export default async function ExamCard({
 								<div className="flex-shrink-0 flex items-center gap-xs">
 									<MdOutlineQuiz className="text-sm" />
 
-									<Text fz="xs" fw={500} lh={1}>
+									<p className="text-xs font-medium leading-none">
 										{exam.questions.length}
-									</Text>
+									</p>
 								</div>
 							</Tooltip>
 
@@ -190,9 +186,9 @@ export default async function ExamCard({
 								<div className="flex-shrink-0 flex items-center gap-xs">
 									<FaAsterisk className="text-sm" />
 
-									<Text fz="xs" fw={500} lh={1}>
+									<p className="text-xs font-medium leading-none">
 										{exam.questions.length}
-									</Text>
+									</p>
 								</div>
 							</Tooltip>
 

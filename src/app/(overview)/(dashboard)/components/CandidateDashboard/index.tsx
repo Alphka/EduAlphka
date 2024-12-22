@@ -1,6 +1,5 @@
 import type getSessionUserData from "@helpers/getSessionUserData"
 import { Suspense } from "react"
-import { Title } from "@mantine/core"
 import ParticipatingExams from "./ParticipatingExams"
 import ExamListSkeleton from "../ExamListSkeleton"
 
@@ -12,12 +11,9 @@ export default async function CandidateDashboard({ user }: CandidateDashboardPro
 	return <>
 		<div className="flex flex-col gap-lg">
 			<header className="flex justify-between gap-md">
-				<Title
-					order={1}
-					fz="4xl"
-				>
+				<h1 className="flex-grow text-h4 font-bold">
 					Testes em que você está participando
-				</Title>
+				</h1>
 			</header>
 
 			<Suspense fallback={<ExamListSkeleton limit={3} />}>

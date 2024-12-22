@@ -1,14 +1,14 @@
 interface SubmitStatusProps {
 	pendingCorrection: boolean
 	hasStartedExam: boolean
-	hasAnswer: boolean
+	hasSubmit: boolean
 	isExpired: boolean
 }
 
 export function getSubmitStatus({
 	pendingCorrection,
 	hasStartedExam,
-	hasAnswer,
+	hasSubmit,
 	isExpired
 }: SubmitStatusProps){
 	return hasStartedExam
@@ -16,7 +16,7 @@ export function getSubmitStatus({
 			? "Pendente"
 			: isExpired
 				? "Expirado"
-				: hasAnswer
+				: hasSubmit
 					? "Finalizado"
 					: "Ativo"
 		: "Não iniciado"

@@ -1,7 +1,7 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { Table, Text, UnstyledButton, type TableThProps } from "@mantine/core"
+import { Table, UnstyledButton, type TableThProps } from "@mantine/core"
 import { MdArrowDropDown, MdArrowDropUp } from "react-icons/md"
 import { HiOutlineSelector } from "react-icons/hi"
 
@@ -25,9 +25,7 @@ export default function Th({
 		<Table.Th {...props}>
 			<UnstyledButton onClick={onSort}>
 				<div className="flex items-center justify-between gap-1">
-					<Text fw={500} fz="sm">
-						{children}
-					</Text>
+					<div className="text-sm font-medium">{children}</div>
 
 					<div className="flex items-center justify-center">
 						<Icon className="text-base" />

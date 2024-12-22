@@ -1,10 +1,10 @@
-import type { Document, HydratedDocument } from "mongoose"
 import type { ParticipatingExamsProps } from "../../(dashboard)/components/CandidateDashboard/ParticipatingExams"
 import type { IStartedExam } from "@models/typings/StartedExam"
 import type { IAnswer } from "@models/typings/Answer"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IExam } from "@models/typings/Exam"
 import type { IUser } from "@models/typings/User"
+import { Types, type Document, type HydratedDocument } from "mongoose"
 import { Grid, GridCol } from "@mantine/core"
 import { StartedExam } from "@models"
 import ExamCard from "./ExamCard"
@@ -24,8 +24,8 @@ export default async function ExamList({ user, exams }: ExamListProps){
 				}) | null>([
 					{
 						$match: {
-							exam,
-							user
+							exam: exam._id,
+							user: new Types.ObjectId(user.id)
 						}
 					},
 					{
@@ -71,10 +71,8 @@ export default async function ExamList({ user, exams }: ExamListProps){
 					}
 				]).then(result => result[0] || null)
 
-				const hasAnswer = !!startedExam?.submit
-				const pendingCorrection = hasAnswer && startedExam.submit!.answers.some(answer => {
-					return !("isCorrect" in answer) || answer.isCorrect === undefined
-				})
+				const hasSubmit = !!startedExam?.submit
+				const pendingCorrection = hasSubmit && startedExam.submit!.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
 
 				return (
 					<GridCol

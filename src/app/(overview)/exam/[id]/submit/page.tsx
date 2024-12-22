@@ -1,71 +1,192 @@
-import type { HydratedDocument } from "mongoose"
+import type { ComponentProps } from "react"
+import type { IStartedExam } from "@models/typings/StartedExam"
 import type { PageProps } from "@typings/index"
+import type { ISubmit } from "@models/typings/Submit"
+import type { IAnswer } from "@models/typings/Answer"
 import type { IUser } from "@models/typings/User"
-import { Divider, Grid, GridCol, Paper, Text, Title } from "@mantine/core"
+import { Divider, Grid, GridCol, Paper } from "@mantine/core"
+import { Types, type HydratedDocument } from "mongoose"
+import { Exam, StartedExam } from "@models"
 import { notFound } from "next/navigation"
-import { Exam } from "@models"
+import { twJoin } from "tailwind-merge"
+import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
+import SubmitExamForm from "./components/SubmitExamForm"
 
 export default async function SubmitExamPage({ params }: PageProps){
 	await connectDatabase()
 
 	const { id } = await params
 
-	const [exam] = await Promise.all([
-		Exam.findById(id)
-			.populate<{ owner: HydratedDocument<IUser> }>("owner"),
+	const [exam, user] = await Promise.all([
+		Exam.findById(id, {
+			title: 1,
+			owner: 1,
+			subject: 1,
+			description: 1,
+			questions: 1,
+			expiresAt: 1,
+			createdAt: 1
+		})
+			.populate<{ owner: HydratedDocument<Pick<IUser, "name">> }>("owner", "-_id name"),
 		verifyAuthorization({ accountType: "candidate" })
 	])
 
 	if(!exam) notFound()
 
+	const startedExam = await StartedExam.aggregate<(HydratedDocument<IStartedExam> & {
+		submit: (HydratedDocument<ISubmit> & {
+			answers: HydratedDocument<IAnswer>[]
+		}) | null
+	}) | null>([
+		{
+			$match: {
+				exam: exam._id,
+				user: new Types.ObjectId(user.id)
+			}
+		},
+		{
+			$lookup: {
+				as: "submit",
+				from: "submits",
+				let: {
+					userId: "$user",
+					examId: "$exam"
+				},
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$and: [
+									{ $eq: ["$user", "$$userId"] },
+									{ $eq: ["$exam", "$$examId"] }
+								]
+							}
+						}
+					},
+					{
+						$lookup: {
+							as: "answers",
+							from: "answers",
+							localField: "_id",
+							foreignField: "submit"
+						}
+					},
+					{
+						$limit: 1
+					}
+				]
+			}
+		},
+		{
+			$set: {
+				submit: { $arrayElemAt: ["$submit", 0] }
+			}
+		},
+		{
+			$limit: 1
+		}
+	]).then(result => result[0] || null)
+
+	const pendingCorrection = !!startedExam?.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+
+	const examClient = pick(exam.toJSON({
+		flattenObjectIds: true
+	}), ["_id", "questions"] as const) as unknown as ComponentProps<typeof SubmitExamForm>["exam"]
+
+	examClient.questions = examClient.questions.map(({ options, ...question }) => ({
+		...pick(question, [
+			"_id",
+			"type",
+			"text",
+			"isRequired"
+		] as const),
+		options: options.map(option => pick(option, ["_id", "text"] as const))
+	}))
+
+	const incorrectAnswers: string[] = []
+	const correctAnswers: string[] = []
+	const pendingAnswers: string[] = []
+
+	if(startedExam?.submit){
+		const questionsMap = new Map(exam.questions.map(question => [question.id, question]))
+
+		for(const answer of startedExam.submit.answers){
+			const questionId = answer.question.toString()
+			const question = questionsMap.get(questionId)
+
+			if(!question){
+				console.error("Answer's question was not found in exam. Answer ID: %s, Question ID: %s", answer.id, questionId)
+				continue
+			}
+
+			if(answer.isCorrect) correctAnswers.push(questionId)
+			else if(answer.isCorrect === false) incorrectAnswers.push(questionId)
+			else if(question.isRequired) pendingAnswers.push(questionId)
+		}
+	}
+
+	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
+	const maxGrade = requiredQuestions.length
+	const grade = correctAnswers.length
+
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header>
-				<Title order={1} fz="4xl">
-					{exam.title || "Teste sem nome"}
-				</Title>
+			<header className="flex items-center justify-end flex-wrap gap-md">
+				<h1 className="flex-grow text-h3 font-bold">
+					{exam.title}
+				</h1>
+
+				<Paper
+					className={twJoin(
+						"leading-none px-sm py-xs shadow-xs",
+						pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
+					)}
+					title={pendingCorrection ? "Nota final pendente de correção" : undefined}
+					aria-label={`${grade} ${grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
+					withBorder
+				>
+					Nota: {grade}
+				</Paper>
 			</header>
 
 			<Divider />
 
 			<Paper
-				className="flex flex-col gap-md"
-				p="xl"
+				className="flex flex-col p-xl gap-md shadow-xs"
 				withBorder
-				shadow="xs"
 			>
 				<Grid
 					gutter="sm"
 					grow
 				>
 					<GridCol className="flex items-baseline gap-1">
-						<Text fz="h5" fw={600}>Professor:</Text>
-						<Text component="span" c="gray.5">{exam.owner!.name}</Text>
+						<p className="text-5xl font-semibold">Professor:</p>
+						<span className="text-gray-500">{exam.owner!.name}</span>
 					</GridCol>
 
 					{exam.subject && (
 						<GridCol className="flex items-baseline gap-1">
-							<Text fz="h5" fw={600}>Disciplina:</Text>
-							<Text component="span" c="gray.5">{exam.subject}</Text>
+							<p className="text-5xl font-semibold">Disciplina:</p>
+							<span className="text-gray-500">{exam.subject}</span>
 						</GridCol>
 					)}
 
 					<GridCol className="flex items-baseline gap-1">
-						<Text fz="h5" fw={600}>Pontuação:</Text>
-						<Text component="span" c="gray.5">{exam.questions.filter(({ isRequired }) => isRequired).length}</Text>
+						<p className="text-5xl font-semibold">Pontuação máxima:</p>
+						<span className="text-gray-500">{maxGrade}</span>
 					</GridCol>
 
 					<GridCol className="flex items-baseline gap-1">
-						<Text fz="h5" fw={600}>Data de criação do teste:</Text>
-						<Text component="span" c="gray.5">{exam.createdAt.toLocaleDateString("pt-BR")}</Text>
+						<p className="text-5xl font-semibold">Data de criação do teste:</p>
+						<span className="text-gray-500">{exam.createdAt.toLocaleDateString("pt-BR")}</span>
 					</GridCol>
 
 					{exam.expiresAt && (
 						<GridCol className="flex items-baseline gap-1">
-							<Text fz="h5" fw={600}>Data final para a entrega do teste:</Text>
-							<Text component="span" c="gray.5">{exam.expiresAt.toLocaleString("pt-BR")}</Text>
+							<p className="text-5xl font-semibold">Data final para a entrega do teste:</p>
+							<span className="text-gray-500">{exam.expiresAt.toLocaleString("pt-BR")}</span>
 						</GridCol>
 					)}
 				</Grid>
@@ -73,66 +194,25 @@ export default async function SubmitExamPage({ params }: PageProps){
 				<Divider />
 
 				<div className="flex flex-col gap-1">
-					<Text fz="h5" fw={600}>Descrição:</Text>
-					<Text component="span" c="gray.5" className="whitespace-pre-wrap">{exam.description}</Text>
+					<p className="text-5xl font-semibold">Descrição:</p>
+					<span className="text-gray-500 whitespace-pre-wrap">{exam.description}</span>
 				</div>
 			</Paper>
 
-			<div className="flex flex-col gap-lg">
-				<Title
-					order={2}
-					fz="h3"
-				>
-					Questões
-				</Title>
-
-				<ul className="flex flex-col gap-md">
-					{exam.questions.map((question, index) => {
-						const {
-							_id,
-							text,
-							isRequired
-						} = question
-
-						return (
-							<Paper
-								p="md"
-								component="li"
-								withBorder
-								shadow="xs"
-								key={_id.toString()}
-							>
-								<Title
-									fz="h5"
-									fw="bold"
-									order={3}
-								>
-									{isRequired && (
-										<Text
-											c="red"
-											className="float-right select-none"
-											aria-label="Questão obrigatória"
-											component="span"
-										>
-											*
-										</Text>
-									)}
-
-									Questão {index + 1}
-								</Title>
-
-								<Text
-									fz="lg"
-									fw={500}
-									component="span"
-								>
-									{text}
-								</Text>
-							</Paper>
-						)
-					})}
-				</ul>
-			</div>
+			<SubmitExamForm
+				exam={examClient}
+				submit={{
+					incorrectAnswers,
+					correctAnswers,
+					pendingAnswers
+				}}
+				defaultValues={startedExam?.submit ? {
+					question: startedExam.submit.answers.map(({ option, content }) => ({
+						option: option?.toString(),
+						content
+					}))
+				} : undefined}
+			/>
 		</div>
 	)
 }

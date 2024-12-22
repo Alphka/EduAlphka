@@ -1,10 +1,12 @@
 import type { HydratedDocument, Model, PopulatedDoc, Types } from "mongoose"
 import type { IAnswer } from "./Answer"
+import type { IUser } from "./User"
+import type { IExam } from "./Exam"
 
 export interface ISubmit {
 	_id: Types.ObjectId
-	user: NonNullable<PopulatedDoc<Types.ObjectId>>
-	exam: NonNullable<PopulatedDoc<Types.ObjectId>>
+	user: NonNullable<PopulatedDoc<IUser>>
+	exam: NonNullable<PopulatedDoc<IExam>>
 	createdAt: Date
 }
 

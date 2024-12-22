@@ -52,7 +52,19 @@ const config: Config = {
 				"4xl": "2.5rem",
 				"5xl": "3rem",
 				"6xl": "4rem"
-			}
+			},
+		},
+		screens: {
+			xs: "36em",
+			"max-xs": { raw: "not all and (min-width: 36em)" },
+			sm: "48em",
+			"max-sm": { raw: "not all and (min-width: 48em)" },
+			md: "62em",
+			"max-md": { raw: "not all and (min-width: 62em)" },
+			lg: "75em",
+			"max-lg": { raw: "not all and (min-width: 75em)" },
+			xl: "88em",
+			"max-xl": { raw: "not all and (min-width: 88em)" }
 		}
 	},
 	presets: [

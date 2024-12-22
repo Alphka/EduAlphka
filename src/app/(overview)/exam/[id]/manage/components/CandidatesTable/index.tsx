@@ -18,12 +18,12 @@ export interface CandidatesRowData {
 	username: string
 	/** Started exam date */
 	startedAt?: string
-	hasAnswer: boolean
+	hasSubmit: boolean
 	isExpired: boolean
 	pendingCorrection: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "hasAnswer" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "hasSubmit" | "pendingCorrection"> {
 	status: SubmitStatus
 }
 
@@ -71,19 +71,19 @@ export interface CandidatesTableProps {
 }
 
 export default function CandidatesTable({ examId, data }: CandidatesTableProps){
-	const rowsData = useMemo(() => data.map(({ id, name, username, startedAt, pendingCorrection, hasAnswer, isExpired }) => ({
+	const rowsData = useMemo(() => data.map(({ id, name, username, startedAt, pendingCorrection, hasSubmit, isExpired }) => ({
 		id,
 		name,
 		status: getSubmitStatus({
 			pendingCorrection,
 			hasStartedExam: !!startedAt,
-			hasAnswer,
+			hasSubmit: hasSubmit,
 			isExpired
 		}),
 		username,
 		startedAt,
 		isExpired,
-		hasAnswer,
+		hasSubmit: hasSubmit,
 		pendingCorrection
 	} as RowData)), [data])
 
@@ -128,7 +128,8 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 
 			<Table.ScrollContainer minWidth={250}>
 				<Table
-					horizontalSpacing="xs"
+					className="bg-dark-600 rounded"
+					horizontalSpacing="sm"
 					verticalSpacing="sm"
 				>
 					<Table.Thead>
@@ -148,8 +149,8 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 								onSort={() => setSorting("startedAt")}
 								ta="center"
 							>
-								<Text component="span" visibleFrom="xs">Data de início</Text>
-								<Text component="span" hiddenFrom="xs" aria-hidden>Início</Text>
+								<span className="hidden xs:block">Data de início</span>
+								<span className="block xs:hidden" aria-hidden>Início</span>
 							</Th>
 
 							<Th
@@ -176,13 +177,13 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 							username,
 							startedAt,
 							isExpired,
-							hasAnswer,
+							hasSubmit,
 							pendingCorrection
 						}) => {
 							const status = getSubmitStatus({
 								pendingCorrection,
 								hasStartedExam: !!startedAt,
-								hasAnswer,
+								hasSubmit,
 								isExpired
 							})
 
@@ -196,7 +197,7 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 										username,
 										startedAt,
 										isExpired,
-										hasAnswer,
+										hasSubmit,
 										pendingCorrection
 									}}
 									statusColor={submitStatusColors[status]}

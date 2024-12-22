@@ -1,5 +1,5 @@
 import type { AccountType } from "@typings/api"
-import { redirect } from "next/navigation"
+import { redirect, RedirectType } from "next/navigation"
 import getUserByToken from "./getUserByToken"
 import getRequestURL from "./getRequestURL"
 import getToken from "./getToken"
@@ -19,7 +19,9 @@ export default async function verifyAuthorization(options: AuthorizationOptions 
 	if(!user) return await redirectToLogin()
 
 	if(options.accountType){
-		if(user.accountType !== options.accountType) redirect(routes.accessDenied.pathname)
+		if(user.accountType !== options.accountType){
+			redirect(routes.accessDenied.pathname, RedirectType.replace)
+		}
 	}
 
 	return user

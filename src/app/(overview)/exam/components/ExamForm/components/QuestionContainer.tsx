@@ -152,7 +152,7 @@ export default function QuestionContainer({
 						message: "O tipo da questão é obrigatório"
 					}
 				})}
-				defaultValue={watch(`question.${index}.question_type`)}
+				defaultValue={questionType}
 				onChange={value => {
 					setValue(`question.${index}.question_type`, (value || "") as keyof typeof QuestionTypes)
 				}}
@@ -162,13 +162,13 @@ export default function QuestionContainer({
 				withAsterisk
 			/>
 
-			{questionType && questionType === "multiple_choice" && <>
-				<div className="flex flex-col gap-md">
+			{questionType === "multiple_choice" && <>
+				<ul className="flex flex-col gap-md">
 					{optionFields.map(({ id }, optionIndex, { length }) => {
 						const path = `question.${index}.correct_answer` as const
 
 						return (
-							<div
+							<li
 								className="flex items-center justify-between gap-sm"
 								key={id}
 							>
@@ -188,8 +188,8 @@ export default function QuestionContainer({
 												message: "Nenhuma opção foi selecionada como a resposta correta"
 											}
 										})}
-										defaultValue={watch(path, undefined)}
 										name={undefined}
+										defaultValue={watch(path, undefined)}
 									/>
 								)}
 
@@ -209,10 +209,10 @@ export default function QuestionContainer({
 										watch
 									}}
 								/>
-							</div>
+							</li>
 						)
 					})}
-				</div>
+				</ul>
 
 				<div className="flex justify-center">
 					<Button

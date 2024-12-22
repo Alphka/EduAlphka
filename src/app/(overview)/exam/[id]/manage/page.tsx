@@ -6,7 +6,7 @@ import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
 import { HydratedDocument, Types } from "mongoose"
 import { Exam, StartedExam } from "@models"
-import { Divider, Title } from "@mantine/core"
+import { Divider, Paper } from "@mantine/core"
 import { notFound } from "next/navigation"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
@@ -56,8 +56,10 @@ export default async function ManageExamPage({ params }: PageProps){
 	}>([
 		{
 			$match: {
-				exam,
-				user: { $in: exam.candidates }
+				exam: exam._id,
+				user: {
+					$in: exam.candidates.map(candidate => candidate._id)
+				}
 			}
 		},
 		{
@@ -109,9 +111,9 @@ export default async function ManageExamPage({ params }: PageProps){
 	return (
 		<div className="flex flex-col gap-3xl">
 			<header className="flex justify-between gap-md">
-				<Title order={1} fz="4xl">
+				<h1 className="flex-grow text-h3 font-bold">
 					{exam.title || "Teste sem nome"}
-				</Title>
+				</h1>
 
 				<RemoveExamButton
 					examId={id}
@@ -121,16 +123,17 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<Divider />
 
-			<div className="flex flex-col gap-lg">
+			<Paper
+				className="flex flex-col p-xl gap-lg"
+				withBorder
+			>
 				<CandidatesTable
 					examId={id}
 					data={exam.candidates.map(({ _id, name, email, username }) => {
 						const id = _id.toString()
 						const startedExam = candidatesStartedExams.get(id)
-						const hasAnswer = !!startedExam?.submit
-						const pendingCorrection = hasAnswer && startedExam.submit!.answers.some(answer => {
-							return !("isCorrect" in answer) || answer.isCorrect === undefined
-						})
+						const hasSubmit = !!startedExam?.submit
+						const pendingCorrection = hasSubmit && startedExam.submit!.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
 
 						return {
 							id,
@@ -138,16 +141,18 @@ export default async function ManageExamPage({ params }: PageProps){
 							email,
 							username,
 							startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
-							hasAnswer,
-							isExpired: hasAnswer ? Date.now() > startedExam.submit!.createdAt.getTime() : false,
+							hasSubmit,
+							isExpired: hasSubmit ? Date.now() > startedExam.submit!.createdAt.getTime() : false,
 							pendingCorrection
 						}
 					})}
 					key={`${exam.__v}.${exam.candidates.length}`}
 				/>
 
+				<Divider />
+
 				<AddCandidate examId={id} />
-			</div>
+			</Paper>
 		</div>
 	)
 }

@@ -3,8 +3,8 @@ import type { QuestionContainerProps } from "./QuestionContainer"
 import type { ExamFormData } from ".."
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { ActionIcon, Radio, TextInput } from "@mantine/core"
-import { useCallback, useRef } from "react"
 import { MdDeleteOutline } from "react-icons/md"
+import { useCallback } from "react"
 
 interface OptionContainerProps extends Pick<QuestionContainerProps, "clearErrors" | "disabled" | "register" | "setValue" | "errors" | "watch"> {
 	defaultOption: NonNullable<ExamFormData["question"][number]["option"]>[number]
@@ -29,8 +29,6 @@ export default function OptionContainer({
 	errors,
 	watch
 }: OptionContainerProps){
-	const optionRef = useRef<HTMLInputElement>(null)
-
 	const contentError = errors.question?.[questionIndex]?.option?.[optionIndex]?.text?.message
 	const optionError = errors.question?.[questionIndex]?.correct_answer?.message
 	const optionPath = `question.${questionIndex}.correct_answer` as const
@@ -59,9 +57,8 @@ export default function OptionContainer({
 			defaultChecked={watch(`question.${questionIndex}.correct_answer`) === optionIndex}
 			aria-label="Definir como a resposta correta"
 			title={optionError || "Definir como a resposta correta"}
-			disabled={disabled || watch("exam.duration", undefined) === undefined}
+			disabled={disabled || watch(optionPath, undefined) === undefined}
 			error={!!optionError}
-			ref={optionRef}
 		/>
 
 		<TextInput

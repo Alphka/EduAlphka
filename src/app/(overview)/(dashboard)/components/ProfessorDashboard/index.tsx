@@ -1,7 +1,7 @@
 import type getSessionUserData from "@helpers/getSessionUserData"
 import { MdAddCircleOutline } from "react-icons/md"
-import { Button, Title } from "@mantine/core"
 import { Suspense } from "react"
+import { Button } from "@mantine/core"
 import ExamListSkeleton from "../ExamListSkeleton"
 import RecentExams from "./RecentExams"
 import routes from "@app/routes"
@@ -16,12 +16,9 @@ export default function ProfessorDashboard({ user, recentExamsLimit }: Professor
 	return <>
 		<div className="flex flex-col gap-lg">
 			<header className="flex justify-between gap-md">
-				<Title
-					order={1}
-					fz="4xl"
-				>
+				<h1 className="flex-grow text-h3 font-bold">
 					Testes criados recentemente
-				</Title>
+				</h1>
 
 				<Button
 					className="flex-shrink-0"

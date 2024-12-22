@@ -1,11 +1,11 @@
 import type { CandidatesTableProps, RowData } from "."
-import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Table, Text } from "@mantine/core"
+import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Table } from "@mantine/core"
 import { MdMenu, MdEdit, MdChecklist } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
 import RemoveCandidateButton from "./components/RemoveCandidateButton"
 
 interface TrProps extends
-	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "hasAnswer" | "isExpired" | "pendingCorrection">,
+	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "hasSubmit" | "isExpired" | "pendingCorrection">,
 	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
@@ -14,7 +14,7 @@ export default function Tr({
 	pendingCorrection,
 	statusColor,
 	startedAt,
-	hasAnswer,
+	hasSubmit,
 	username,
 	examId,
 	status,
@@ -36,12 +36,8 @@ export default function Tr({
 					/>
 
 					<div>
-						<Text fz="sm" fw={500}>
-							{name}
-						</Text>
-						<Text fz="xs" c="dimmed">
-							{username}
-						</Text>
+						<p className="text-sm font-medium">{name}</p>
+						<p className="text-xs text-gray-200">{username}</p>
 					</div>
 				</div>
 			</Table.Td>
@@ -93,7 +89,7 @@ export default function Tr({
 								>
 									Corrigir respostas
 								</MenuItem>
-							) : hasAnswer && (
+							) : hasSubmit && (
 								<MenuItem
 									px="md"
 									py="sm"

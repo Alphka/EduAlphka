@@ -1,6 +1,5 @@
 import type { ProfessorDashboardProps } from "."
 import type { IExam } from "@models/typings/Exam"
-import { Text } from "@mantine/core"
 import { Exam } from "@models"
 import ExamList from "../../../components/Professor/ExamList"
 
@@ -35,8 +34,8 @@ export default async function RecentExams({ user, limit }: RecentExamsProps){
 	return exams.length ? (
 		<ExamList exams={exams} />
 	) : (
-		<Text size="md" c="dimmed">
+		<p className="text-md text-dark-200">
 			Não há testes recentemente criados.
-		</Text>
+		</p>
 	)
 }

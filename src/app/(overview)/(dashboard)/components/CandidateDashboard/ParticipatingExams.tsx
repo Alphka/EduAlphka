@@ -1,7 +1,6 @@
 import type { CandidateDashboardProps } from "."
 import type { HydratedDocument } from "mongoose"
 import type { IUser } from "@models/typings/User"
-import { Text } from "@mantine/core"
 import { Exam } from "@models"
 import ExamList from "../../../components/Candidate/ExamList"
 
@@ -31,8 +30,8 @@ export default async function ParticipatingExams({ user }: ParticipatingExamsPro
 			exams={exams}
 		/>
 	) : (
-		<Text size="md" c="dimmed">
+		<p className="text-md text-dark-200">
 			Você não está participando de nenhum teste.
-		</Text>
+		</p>
 	)
 }

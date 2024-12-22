@@ -91,13 +91,9 @@ export default function ExamCard({
 									className="w-2.5 h-2.5 rounded-full"
 								/>
 
-								<Text
-									fz="xs"
-									fw={500}
-									lh={1}
-								>
+								<p className="text-xs font-medium leading-none">
 									{subject}
-								</Text>
+								</p>
 							</div>
 						)}
 
@@ -134,9 +130,9 @@ export default function ExamCard({
 								<div className="flex-shrink-0 flex items-center gap-xs">
 									<MdPerson className="text-sm" />
 
-									<Text fz="xs" fw={500} lh={1}>
+									<p className="text-xs font-medium leading-none">
 										{candidatesCount}
-									</Text>
+									</p>
 								</div>
 							</Tooltip>
 

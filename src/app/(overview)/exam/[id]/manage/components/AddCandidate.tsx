@@ -1,7 +1,7 @@
 "use client"
 
 import type { CandidatesTableProps } from "./CandidatesTable"
-import { Button, TextInput, Title } from "@mantine/core"
+import { Button, TextInput } from "@mantine/core"
 import { addCandidate } from "../actions/candidates"
 import { MdSearch } from "react-icons/md"
 import { useRef } from "react"
@@ -16,9 +16,9 @@ export default function AddCandidate({ examId }: AddCandidateProps){
 	return (
 		<section className="flex flex-col gap-md">
 			<header>
-				<Title order={3} fz="1xl" fw={500}>
+				<h3 className="text-h6 font-semibold">
 					Adicionar candidato ao teste
-				</Title>
+				</h3>
 			</header>
 
 			<form className="flex items-center gap-xs">
