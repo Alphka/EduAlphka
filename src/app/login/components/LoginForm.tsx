@@ -24,7 +24,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 			redirectURL &&
 			redirectURL !== "/" &&
 			redirectURL !== "/login" &&
-			/^\/(?!.*\/\/)([a-zA-Z-\/]+)$/.test(redirectURL)
+			/^\/(?!.*\/\/)([\w-\/]+)$/.test(redirectURL)
 		){
 			searchParams.set("redirect", redirectURL)
 		}

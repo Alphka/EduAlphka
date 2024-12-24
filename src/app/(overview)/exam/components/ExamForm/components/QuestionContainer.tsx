@@ -1,7 +1,6 @@
 import type { ExamFormData } from ".."
 import {
 	useFieldArray,
-	useWatch,
 	type Control,
 	type FieldErrors,
 	type UseFieldArrayRemove,
@@ -56,12 +55,6 @@ export default function QuestionContainer({
 		control,
 		name: `question.${index}.option`
 	})
-
-	const questionType = (useWatch({
-		name: `question.${index}.question_type`,
-		defaultValue: "" as keyof typeof QuestionTypes,
-		control
-	}) || null) as keyof typeof QuestionTypes | null
 
 	return <>
 		<div className="flex items-start gap-xs">
@@ -152,7 +145,7 @@ export default function QuestionContainer({
 						message: "O tipo da questão é obrigatório"
 					}
 				})}
-				defaultValue={questionType}
+				defaultValue={watch(`question.${index}.question_type`) || null}
 				onChange={value => {
 					setValue(`question.${index}.question_type`, (value || "") as keyof typeof QuestionTypes)
 				}}
@@ -162,7 +155,7 @@ export default function QuestionContainer({
 				withAsterisk
 			/>
 
-			{questionType === "multiple_choice" && <>
+			{watch(`question.${index}.question_type`) === "multiple_choice" && <>
 				<ul className="flex flex-col gap-md">
 					{optionFields.map(({ id }, optionIndex, { length }) => {
 						const path = `question.${index}.correct_answer` as const

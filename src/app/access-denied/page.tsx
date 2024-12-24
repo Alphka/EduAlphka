@@ -12,7 +12,7 @@ export default async function AccessDeniedPage(){
 					{error}
 				</div>
 
-				<div className="relative z-[1] pt-16 xs:pt-28 sm:pt-56 text-center">
+				<div className="relative z-1 pt-16 xs:pt-28 sm:pt-56 text-center">
 					<h1 className="font-black text-2xl sm:text-1xl">
 						Acesso negado
 					</h1>

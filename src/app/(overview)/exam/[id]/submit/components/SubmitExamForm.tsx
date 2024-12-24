@@ -1,7 +1,7 @@
 "use client"
 
 import type { ExamMultipleChoiceQuestion, ExamQuestion } from "@models/typings/Exam"
-import { Button, Divider, Paper, Radio, TextInput, Title } from "@mantine/core"
+import { Button, Divider, Paper, Radio, Textarea, Title } from "@mantine/core"
 import { useForm, type DefaultValues } from "react-hook-form"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import submitExam from "../actions/submitExam"
@@ -115,9 +115,12 @@ export default function SubmitExamForm({
 								<Divider />
 
 								{type === "dissertative" ? (
-									<TextInput
+									<Textarea
+										size="md"
 										label="Resposta"
 										placeholder="Digite sua resposta"
+										aria-label="Resposta"
+										maxRows={12}
 										{...register(`question.${questionIndex}.content`, {
 											required: {
 												value: isRequired,
@@ -126,6 +129,8 @@ export default function SubmitExamForm({
 										})}
 										withAsterisk={false}
 										error={errors.question?.[questionIndex]?.content?.message}
+										spellCheck
+										autosize
 									/>
 								) : (
 									<ul className="flex flex-col gap-md">

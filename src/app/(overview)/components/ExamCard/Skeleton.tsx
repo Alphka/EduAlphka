@@ -19,7 +19,7 @@ export default function ExamCardSkeleton(){
 			>
 				<div
 					className={twJoin(
-						"absolute inset-0 pointer-events-none z-[1]",
+						"absolute inset-0 pointer-events-none z-1",
 						"group-hover:bg-blue-500/5",
 						"group-focus-visible:bg-blue-500/10"
 					)}

@@ -49,5 +49,5 @@ export async function loginAction({
 		return { errors: ["Falha ao autenticar o usuário"] }
 	}
 
-	redirect(redirectTo && /^\/(?!.*\/\/)([a-zA-Z-\/]+)$/.test(redirectTo) && redirectTo || routes.homepage.pathname)
+	redirect(redirectTo && /^\/(?!.*\/\/)([\w-\/]+)$/.test(redirectTo) && redirectTo || routes.homepage.pathname)
 }

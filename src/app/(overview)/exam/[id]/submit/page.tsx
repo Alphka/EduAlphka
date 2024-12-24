@@ -1,4 +1,4 @@
-import type { ComponentProps } from "react"
+import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
 import type { IStartedExam } from "@models/typings/StartedExam"
 import type { PageProps } from "@typings/index"
 import type { ISubmit } from "@models/typings/Submit"
@@ -13,6 +13,7 @@ import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import SubmitExamForm from "./components/SubmitExamForm"
+import StartExamModal from "./components/StartExamModal"
 
 export default async function SubmitExamPage({ params }: PageProps){
 	await connectDatabase()
@@ -24,6 +25,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 			title: 1,
 			owner: 1,
 			subject: 1,
+			duration: 1,
 			description: 1,
 			questions: 1,
 			expiresAt: 1,
@@ -89,11 +91,35 @@ export default async function SubmitExamPage({ params }: PageProps){
 		}
 	]).then(result => result[0] || null)
 
-	const pendingCorrection = !!startedExam?.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
-
 	const examClient = pick(exam.toJSON({
 		flattenObjectIds: true
-	}), ["_id", "questions"] as const) as unknown as ComponentProps<typeof SubmitExamForm>["exam"]
+	}), [
+		"_id",
+		"title",
+		"owner",
+		"subject",
+		"duration",
+		"description",
+		"expiresAt",
+		"createdAt",
+		"questions"
+	] as const) as unknown as Pick<IExam,
+		| "title"
+		| "subject"
+		| "duration"
+		| "description"
+		| "expiresAt"
+		| "createdAt"
+	> & {
+		_id: string
+		owner: Pick<IUser, "name">
+		questions: (Pick<ExamQuestion, "type" | "text" | "isRequired"> & {
+			_id: string
+			options: (Pick<ExamMultipleChoiceQuestion["options"][number], "text"> & {
+				_id: string
+			})[]
+		})[]
+	}
 
 	examClient.questions = examClient.questions.map(({ options, ...question }) => ({
 		...pick(question, [
@@ -105,11 +131,21 @@ export default async function SubmitExamPage({ params }: PageProps){
 		options: options.map(option => pick(option, ["_id", "text"] as const))
 	}))
 
+	if(!startedExam){
+		return (
+			<StartExamModal
+				exam={examClient}
+			/>
+		)
+	}
+
+	const pendingCorrection = !!startedExam.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+
 	const incorrectAnswers: string[] = []
 	const correctAnswers: string[] = []
 	const pendingAnswers: string[] = []
 
-	if(startedExam?.submit){
+	if(startedExam.submit){
 		const questionsMap = new Map(exam.questions.map(question => [question.id, question]))
 
 		for(const answer of startedExam.submit.answers){
@@ -138,7 +174,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 					{exam.title}
 				</h1>
 
-				{!!startedExam?.submit && (
+				{!!startedExam.submit && (
 					<Paper
 						className={twJoin(
 							"leading-none px-sm py-xs shadow-xs",
@@ -165,7 +201,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 				>
 					<GridCol className="flex items-baseline gap-1">
 						<p className="text-5xl font-semibold">Professor:</p>
-						<span className="text-gray-500">{exam.owner!.name}</span>
+						<span className="text-gray-500">{exam.owner.name}</span>
 					</GridCol>
 
 					{exam.subject && (
@@ -180,35 +216,28 @@ export default async function SubmitExamPage({ params }: PageProps){
 						<span className="text-gray-500">{maxGrade}</span>
 					</GridCol>
 
-					<GridCol className="flex items-baseline gap-1">
-						<p className="text-5xl font-semibold">Data de criação do teste:</p>
-						<span className="text-gray-500">{exam.createdAt.toLocaleDateString("pt-BR")}</span>
-					</GridCol>
-
 					{exam.expiresAt && (
 						<GridCol className="flex items-baseline gap-1">
 							<p className="text-5xl font-semibold">Data final para a entrega do teste:</p>
 							<span className="text-gray-500">{exam.expiresAt.toLocaleString("pt-BR")}</span>
 						</GridCol>
 					)}
+
+					<GridCol className="flex items-baseline gap-1">
+						<p className="text-5xl font-semibold">Descrição:</p>
+						<p className="text-gray-500 whitespace-pre-wrap">{exam.description}</p>
+					</GridCol>
 				</Grid>
-
-				<Divider />
-
-				<div className="flex flex-col gap-1">
-					<p className="text-5xl font-semibold">Descrição:</p>
-					<span className="text-gray-500 whitespace-pre-wrap">{exam.description}</span>
-				</div>
 			</Paper>
 
 			<SubmitExamForm
-				exam={examClient}
-				submit={startedExam?.submit ? {
+				exam={pick(examClient, ["_id", "questions"] as const)}
+				submit={startedExam.submit ? {
 					incorrectAnswers,
 					correctAnswers,
 					pendingAnswers
 				} : undefined}
-				defaultValues={startedExam?.submit ? {
+				defaultValues={startedExam.submit ? {
 					question: startedExam.submit.answers.map(({ option, content }) => ({
 						option: option?.toString(),
 						content
