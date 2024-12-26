@@ -12,7 +12,7 @@
 		"esModuleInterop": true,
 		"isolatedModules": true,
 		"noUnusedLocals": true,
-		"skipLibCheck": true,
+		"skipLibCheck": false,
 		"incremental": true,
 		"sourceMap": true,
 		"jsx": "preserve",
