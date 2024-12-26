@@ -18,7 +18,7 @@ const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExa
 		required: true
 	}
 }, {
-	_id: false,
+	id: false,
 	versionKey: false
 })
 

@@ -7,7 +7,9 @@ import * as Dialog from "@radix-ui/react-dialog"
 import { Button, Fieldset, Grid, Paper } from "@mantine/core"
 import { isFinite } from "lodash"
 import { twJoin } from "tailwind-merge"
+import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
+import startExam from "../actions/startExam"
 
 interface StartExamModalProps {
 	exam: Pick<IExam, "createdAt" | "title" | "description" | "subject" | "duration" | "expiresAt"> & {
@@ -39,6 +41,8 @@ function getDurationString(duration: number | ReturnType<typeof formatTimeDurati
 }
 
 export default function StartExamModal({ exam }: StartExamModalProps){
+	const { handleServerAction, isPending } = useServerActionHandler()
+
 	const totalQuestions = exam.questions.length
 	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
 	const maxGrade = requiredQuestions.length
@@ -51,19 +55,21 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 				>
 					<Dialog.Content
 						className={twJoin(
-							"h-full",
-							"flex flex-col items-center justify-center px-4 xs:px-8 sm:px-12",
+							"relative z-10 h-full",
+							"flex flex-col items-center justify-center px-4 xs:px-8 sm:px-12 py-10",
 							"outline-none"
 						)}
 					>
 						<VisuallyHidden.Root asChild>
-							<Dialog.Title className="DialogTitle">Iniciar teste</Dialog.Title>
+							<Dialog.Title>Iniciar teste</Dialog.Title>
 						</VisuallyHidden.Root>
 
 						<Paper
 							className={twJoin(
-								"w-10/12 max-w-screen-lg",
-								"flex flex-col px-lg py-2xl gap-lg shadow-xs"
+								"max-h-full w-10/12 max-w-screen-lg overflow-auto",
+								"flex flex-col px-lg py-2xl gap-lg shadow-xs",
+								"*:flex-shrink-0",
+								"[scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,.3)_transparent]"
 							)}
 							withBorder
 						>
@@ -134,6 +140,10 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 								variant="filled"
 								className="self-center"
 								aria-label="Iniciar teste"
+								onClick={() => {
+									handleServerAction(startExam(exam._id.toString()))
+								}}
+								loading={isPending}
 							>
 								Iniciar
 							</Button>

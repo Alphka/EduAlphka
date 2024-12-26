@@ -49,12 +49,6 @@ button,
 	display: none;
 }
 
-main{
-	@apply mx-auto;
-
-	max-width: calc(1280px + (var(--app-shell-navbar-offset, 0rem) + var(--app-shell-padding)) + (var(--app-shell-aside-offset, 0rem) + var(--app-shell-padding)));
-}
-
 .main-height{
 	min-height: calc(100dvh - var(--app-shell-header-height) - 2 * (var(--app-shell-footer-offset, 0rem) + var(--app-shell-padding)));
 

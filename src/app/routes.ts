@@ -34,6 +34,10 @@ const routes = {
 					manage: {
 						title: "Gerenciar teste",
 						pathname: "/exam/[id]/manage"
+					},
+					submit: {
+						title: "Realizar teste",
+						pathname: "/exam/[id]/submit"
 					}
 				}
 			},
