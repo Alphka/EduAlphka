@@ -1,13 +1,12 @@
-import type getSessionUserData from "@helpers/getSessionUserData"
 import { Suspense } from "react"
 import ParticipatingExams from "./ParticipatingExams"
 import ExamListSkeleton from "../ExamListSkeleton"
 
 export interface CandidateDashboardProps {
-	user: NonNullable<Awaited<ReturnType<typeof getSessionUserData>>>
+	userId: string
 }
 
-export default async function CandidateDashboard({ user }: CandidateDashboardProps){
+export default async function CandidateDashboard({ userId }: CandidateDashboardProps){
 	return <>
 		<div className="flex flex-col gap-lg">
 			<header className="flex justify-between gap-md">
@@ -17,7 +16,7 @@ export default async function CandidateDashboard({ user }: CandidateDashboardPro
 			</header>
 
 			<Suspense fallback={<ExamListSkeleton limit={3} />}>
-				<ParticipatingExams user={user} />
+				<ParticipatingExams userId={userId} />
 			</Suspense>
 		</div>
 	</>

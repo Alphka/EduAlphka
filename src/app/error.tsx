@@ -26,9 +26,10 @@ export default function ServerErrorPage({ error, reset }: ServerErrorPageProps){
 
 				<Text size="lg" ta="center" className="max-w-lg text-blue-100 mx-auto mt-xl mb-2xl">
 					Nossos servidores não conseguiram lidar com sua solicitação.
-					{/* Não se preocupe, nossa equipe de desenvolvimento já foi notificada. */}
 					Tente atualizar a página.
 				</Text>
+
+				{/* Não se preocupe, nossa equipe de desenvolvimento já foi notificada. */}
 
 				<div className="flex items-center justify-center">
 					<Button

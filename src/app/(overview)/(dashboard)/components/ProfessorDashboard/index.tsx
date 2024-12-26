@@ -1,4 +1,3 @@
-import type getSessionUserData from "@helpers/getSessionUserData"
 import { MdAddCircleOutline } from "react-icons/md"
 import { Suspense } from "react"
 import { Button } from "@mantine/core"
@@ -9,10 +8,10 @@ import Link from "next/link"
 
 export interface ProfessorDashboardProps {
 	recentExamsLimit: number
-	user: NonNullable<Awaited<ReturnType<typeof getSessionUserData>>>
+	userId: string
 }
 
-export default function ProfessorDashboard({ user, recentExamsLimit }: ProfessorDashboardProps){
+export default function ProfessorDashboard({ userId, recentExamsLimit }: ProfessorDashboardProps){
 	return <>
 		<div className="flex flex-col gap-lg">
 			<header className="flex justify-between gap-md">
@@ -33,7 +32,7 @@ export default function ProfessorDashboard({ user, recentExamsLimit }: Professor
 
 			<Suspense fallback={<ExamListSkeleton limit={recentExamsLimit / 2} />}>
 				<RecentExams
-					user={user}
+					userId={userId}
 					limit={recentExamsLimit}
 				/>
 			</Suspense>

@@ -3,6 +3,7 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion } from "@models/typings/Exam"
 import { Button, Divider, Paper, Radio, Textarea, Title } from "@mantine/core"
 import { useForm, type DefaultValues } from "react-hook-form"
+import { useId } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import submitExam from "../actions/submitExam"
 
@@ -39,6 +40,7 @@ export default function SubmitExamForm({
 	exam
 }: SubmitExamFormProps){
 	const { handleServerAction, isPending } = useServerActionHandler()
+	const titleId = useId()
 
 	const formDisabled = loading || !!submit
 
@@ -69,13 +71,17 @@ export default function SubmitExamForm({
 			})}
 		>
 			<Title
+				id={titleId}
 				order={2}
 				fz="h3"
 			>
 				Questões
 			</Title>
 
-			<ul className="flex flex-col gap-md">
+			<ul
+				className="flex flex-col gap-md"
+				aria-labelledby={titleId}
+			>
 				{exam.questions.map(({
 					_id,
 					type,

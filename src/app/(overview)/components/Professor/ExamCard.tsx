@@ -52,6 +52,7 @@ export default async function ExamCard({ exam }: ExamCardProps){
 							title={exam.title}
 							truncate="end"
 							component="h2"
+							className="self-start"
 						>
 							{exam.title}
 						</Text>
@@ -134,8 +135,8 @@ export default async function ExamCard({ exam }: ExamCardProps){
 								fw={400}
 								lh={1}
 								title={new Date(exam.updatedAt || exam.createdAt).toLocaleString("pt-BR")}
-								className="text-nowrap"
 								truncate="end"
+								className="text-nowrap"
 							>
 								{history}
 							</Text>

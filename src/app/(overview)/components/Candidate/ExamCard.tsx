@@ -1,8 +1,7 @@
-import type { Document, HydratedDocument } from "mongoose"
+import type { HTMLAttributes } from "react"
+import type { ExamListProps } from "./ExamList"
 import type { StartedExam } from "@models"
 import type { ISubmit } from "@models/typings/Submit"
-import type { IExam } from "@models/typings/Exam"
-import type { IUser } from "@models/typings/User"
 import { Avatar, Badge, Box, Card, Divider, Text, Tooltip } from "@mantine/core"
 import { getSubmitStatus, submitStatusColors } from "@helpers/getSubmitStatus"
 import { MdOutlineQuiz, MdOutlineTimer } from "react-icons/md"
@@ -18,7 +17,7 @@ interface ExamCardProps {
 	pendingCorrection: boolean
 	startedExam: InstanceType<typeof StartedExam> | null
 	submit: ISubmit | null
-	exam: Document & Omit<IExam, "owner"> & { owner: HydratedDocument<IUser> }
+	exam: ExamListProps["exams"][number]
 }
 
 export default async function ExamCard({
@@ -34,7 +33,7 @@ export default async function ExamCard({
 
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!submit
-	const isExamExpired = isExamStarted && !isExamSubmitted && await startedExam.isExpired({
+	const isExamExpired = isExamStarted && await startedExam.isExpired({
 		exam,
 		submit: isExamSubmitted
 	})
@@ -46,14 +45,24 @@ export default async function ExamCard({
 		pendingCorrection
 	})
 
+	const Container = (props: HTMLAttributes<HTMLElement>) => {
+		return isExamExpired ? (
+			<div {...props} />
+		) : (
+			<Link
+				href={`${routes.exam.pathname}/${exam.id}/submit`}
+				prefetch={false}
+				{...props}
+			/>
+		)
+	}
+
 	return (
-		<Link
-			href={`${routes.exam.pathname}/${exam.id}/submit`}
+		<Container
 			className={twJoin(
 				"group relative h-full rounded-md overflow-hidden shadow-xs",
 				"focus:outline-none"
 			)}
-			prefetch={false}
 		>
 			<Card
 				className={twJoin(
@@ -104,6 +113,7 @@ export default async function ExamCard({
 						title={exam.title}
 						truncate="end"
 						component="h2"
+						className="self-start"
 					>
 						{exam.title}
 					</Text>
@@ -198,8 +208,8 @@ export default async function ExamCard({
 								fw={400}
 								lh={1}
 								title={new Date(exam.updatedAt || exam.createdAt).toLocaleString("pt-BR")}
-								className="text-nowrap"
 								truncate="end"
+								className="text-nowrap"
 							>
 								{history}
 							</Text>
@@ -207,7 +217,7 @@ export default async function ExamCard({
 					</div>
 				</div>
 			</Card>
-		</Link>
+		</Container>
 	)
 }
 

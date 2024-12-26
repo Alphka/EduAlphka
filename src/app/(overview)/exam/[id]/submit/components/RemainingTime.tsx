@@ -1,0 +1,78 @@
+"use client"
+
+import { useCallback, useState } from "react"
+import { useInterval } from "@mantine/hooks"
+import { useRouter } from "next/navigation"
+import { twJoin } from "tailwind-merge"
+import { toast } from "react-toastify"
+import { Paper } from "@mantine/core"
+import formatTimeDuration from "@helpers/formatTimeDuration"
+import routes from "@app/routes"
+
+const criticalMinutesRemaining = 5
+
+interface RemainingTimeProps {
+	examDuration: number
+	startedAt: Date
+}
+
+export default function RemainingTime({
+	examDuration,
+	startedAt
+}: RemainingTimeProps){
+	const router = useRouter()
+
+	const getRemainingMinutes = useCallback(() => {
+		const remainingMinutes = examDuration - (Date.now() - startedAt.getTime()) / 1000 / 60
+		return remainingMinutes < 0 ? 0 : remainingMinutes
+	}, [examDuration, startedAt.getTime()])
+
+	const getRemainingTime = useCallback((remainingMinutes: number) => ({
+		hours: Math.floor(remainingMinutes / 60),
+		minutes: Math.floor(remainingMinutes % 60),
+		seconds: Math.floor(remainingMinutes % 1 * 60),
+		string: formatTimeDuration(remainingMinutes, true)
+	}), [])
+
+	const [remainingTime, setRemainingTime] = useState(() => {
+		const remainingMinutes = getRemainingMinutes()
+		return getRemainingTime(remainingMinutes)
+	})
+
+	useInterval(() => {
+		const remainingMinutes = getRemainingMinutes()
+		const remainingTime = getRemainingTime(remainingMinutes)
+
+		setRemainingTime(remainingTime)
+
+		if(remainingTime.minutes === 0 && remainingTime.seconds === 0){
+			toast.warn("O seu teste expirou!")
+			router.push(routes.homepage.pathname)
+		}
+	}, 1000, { autoInvoke: true })
+
+	return (
+		<Paper
+			className={twJoin(
+				"leading-none px-sm py-xs shadow-xs",
+				(
+					remainingTime.minutes === criticalMinutesRemaining && remainingTime.seconds === 0 ||
+					remainingTime.minutes <= criticalMinutesRemaining - 1
+				) && "bg-red-light text-red-light-color border-red-light-hover"
+			)}
+			withBorder
+		>
+			<span>
+				Tempo restante:
+			</span>
+			{" "}
+			<span
+				aria-live="off"
+				role="timer"
+				suppressHydrationWarning
+			>
+				{remainingTime.string}
+			</span>
+		</Paper>
+	)
+}

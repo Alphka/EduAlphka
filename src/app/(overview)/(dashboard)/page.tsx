@@ -20,12 +20,12 @@ export default async function Homepage(){
 		<div className="flex flex-col gap-2xl">
 			{user.accountType === "professor" ? (
 				<ProfessorDashboard
-					user={user}
+					userId={user.id}
 					recentExamsLimit={6}
 				/>
 			) : (
 				<CandidateDashboard
-					user={user}
+					userId={user.id}
 				/>
 			)}
 		</div>

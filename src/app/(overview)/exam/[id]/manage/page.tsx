@@ -50,9 +50,9 @@ export default async function ManageExamPage({ params }: PageProps){
 	if(!exam) notFound()
 
 	const startedExams = await StartedExam.aggregate<HydratedDocument<IStartedExam> & {
-		submit: (HydratedDocument<ISubmit> & {
+		submit?: (HydratedDocument<ISubmit> & {
 			answers: HydratedDocument<IAnswer>[]
-		}) | null
+		})
 	}>([
 		{
 			$match: {

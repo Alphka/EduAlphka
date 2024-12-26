@@ -22,7 +22,9 @@ export interface ExamDissertativeQuestion extends ExamQuestionBase {
 	type: "dissertative"
 }
 
-export type ExamQuestion = ExamMultipleChoiceQuestion | ExamDissertativeQuestion
+export type ExamQuestion = (ExamMultipleChoiceQuestion | ExamDissertativeQuestion) & {
+	_id: Types.ObjectId
+}
 
 export interface IExam {
 	_id: Types.ObjectId

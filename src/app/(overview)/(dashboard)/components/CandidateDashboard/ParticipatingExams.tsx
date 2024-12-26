@@ -4,12 +4,12 @@ import type { IUser } from "@models/typings/User"
 import { Exam } from "@models"
 import ExamList from "../../../components/Candidate/ExamList"
 
-export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "user"> {}
+export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "userId"> {}
 
-export default async function ParticipatingExams({ user }: ParticipatingExamsProps){
+export default async function ParticipatingExams({ userId }: ParticipatingExamsProps){
 	const exams = await Exam
 		.find({
-			candidates: user.id
+			candidates: userId
 		}, {
 			id: 1,
 			owner: 1,
@@ -22,11 +22,11 @@ export default async function ParticipatingExams({ user }: ParticipatingExamsPro
 			updatedAt: 1
 		})
 		.sort({ createdAt: -1, updatedAt: -1 })
-		.populate<{ owner: HydratedDocument<IUser> }>("owner")
+		.populate<{ owner: HydratedDocument<Pick<IUser, "name" | "username">> }>("owner", "-_id name username")
 
 	return exams.length ? (
 		<ExamList
-			user={user}
+			userId={userId}
 			exams={exams}
 		/>
 	) : (

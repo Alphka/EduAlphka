@@ -4,16 +4,18 @@ import type { PageProps } from "@typings/index"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IAnswer } from "@models/typings/Answer"
 import type { IUser } from "@models/typings/User"
+import { notFound, redirect, RedirectType } from "next/navigation"
 import { Divider, Grid, GridCol, Paper } from "@mantine/core"
 import { Types, type HydratedDocument } from "mongoose"
 import { Exam, StartedExam } from "@models"
-import { notFound } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import SubmitExamForm from "./components/SubmitExamForm"
 import StartExamModal from "./components/StartExamModal"
+import RemainingTime from "./components/RemainingTime"
+import routes from "@app/routes"
 
 export default async function SubmitExamPage({ params }: PageProps){
 	await connectDatabase()
@@ -38,9 +40,9 @@ export default async function SubmitExamPage({ params }: PageProps){
 	if(!exam) notFound()
 
 	const startedExam = await StartedExam.aggregate<(HydratedDocument<IStartedExam> & {
-		submit: (HydratedDocument<ISubmit> & {
+		submit?: (HydratedDocument<ISubmit> & {
 			answers: HydratedDocument<IAnswer>[]
-		}) | null
+		})
 	}) | null>([
 		{
 			$match: {
@@ -167,6 +169,14 @@ export default async function SubmitExamPage({ params }: PageProps){
 	const maxGrade = requiredQuestions.length
 	const grade = correctAnswers.length
 
+	const isExamExpired = !startedExam.submit && await StartedExam
+		.hydrate(startedExam)
+		.isExpired({ exam, submit: false })
+
+	if(isExamExpired){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
+
 	return (
 		<div className="flex flex-col gap-3xl">
 			<header className="flex items-center justify-end flex-wrap gap-md">
@@ -174,7 +184,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 					{exam.title}
 				</h1>
 
-				{!!startedExam.submit && (
+				{!!startedExam && !!startedExam.submit ? (
 					<Paper
 						className={twJoin(
 							"leading-none px-sm py-xs shadow-xs",
@@ -186,6 +196,11 @@ export default async function SubmitExamPage({ params }: PageProps){
 					>
 						Nota: {grade}
 					</Paper>
+				) : (
+					<RemainingTime
+						examDuration={exam.duration}
+						startedAt={startedExam.startedAt}
+					/>
 				)}
 			</header>
 

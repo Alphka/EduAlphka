@@ -138,7 +138,7 @@ export default function ExamForm({
 					{type === "edit" ? defaultValues?.exam?.title || "Teste sem nome" : "Criar teste"}
 				</Title>
 
-				{type === "edit" && (
+				{!loading && type === "edit" && (
 					<Button
 						className="flex-shrink-0"
 						href={routes.exam.children.template.children.manage.pathname.replace("[id]", id as string)}

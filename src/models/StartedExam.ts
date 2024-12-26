@@ -26,10 +26,10 @@ startedExamSchema.method("isExpired", async function isExpired({
 	exam,
 	submit
 }: {
-	exam?: Document & IExam & IExamMethods
+	exam?: Document & Pick<IExam, "expiresAt" | "duration"> & IExamMethods
 	submit?: (Document & ISubmit) | boolean | null
 } = {}){
-	if(!(exam && exam.expiresAt && exam.duration) || !submit){
+	if(!(exam && exam.expiresAt && exam.duration) || submit === undefined){
 		const [Exam, Submit] = await Promise.all([
 			import("@models/Exam").then(module => module.default),
 			import("@models/Submit").then(module => module.default)
@@ -49,10 +49,9 @@ startedExamSchema.method("isExpired", async function isExpired({
 
 	if(submit) return false
 
-	const currentDate = Date.now()
 	const submitExpirationDate = this.startedAt.getTime() + exam.duration * 60 * 1000
 
-	return currentDate > submitExpirationDate || exam.isExpired()
+	return Date.now() > submitExpirationDate || exam.isExpired()
 })
 
 const StartedExam = models?.StartedExam as StartedExamModel || model<IStartedExam, StartedExamModel>("StartedExam", startedExamSchema)
