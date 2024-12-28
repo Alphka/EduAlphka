@@ -2,8 +2,8 @@ import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IExam } from "@models/typings/Exam"
 import type { Types } from "mongoose"
+import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, StartedExam, Submit } from "@models"
-import { notFound } from "next/navigation"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
@@ -24,20 +24,30 @@ export default async function EditExamPage({ params }: PageProps){
 
 	const { id } = await params
 
-	const [exam] = await Promise.all([
+	const [exam, user] = await Promise.all([
 		Exam.findById(id)
 			.select({
+				owner: 1,
 				title: 1,
 				subject: 1,
 				duration: 1,
 				questions: 1,
 				description: 1
 			})
-			.lean<IExam>(),
-		verifyAuthorization({ accountType: "professor" })
+			.lean<Pick<IExam,
+				| "owner"
+				| "title"
+				| "subject"
+				| "duration"
+				| "questions"
+				| "description"
+			>>(),
+		verifyAuthorization()
 	])
 
 	if(!exam) notFound()
+	if(user.accountType !== "professor") redirect(routes.exam.children.template.children.submit.pathname.replace("[id]", id), RedirectType.replace)
+	if(!(exam.owner as Types.ObjectId).equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const {
 		subject,

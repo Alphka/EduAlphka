@@ -11,12 +11,11 @@ interface AuthorizationOptions {
 
 export default async function verifyAuthorization(options: AuthorizationOptions = {}){
 	const token = await getToken()
+	const user = token && await getUserByToken(token)
 
-	if(!token) return await redirectToLogin()
-
-	const user = await getUserByToken(token)
-
-	if(!user) return await redirectToLogin()
+	if(!token || !user){
+		return await redirectToLogin()
+	}
 
 	if(options.accountType){
 		if(user.accountType !== options.accountType){
