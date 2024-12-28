@@ -28,16 +28,26 @@ export default async function SubmitExamPage({ params }: PageProps){
 			owner: 1,
 			subject: 1,
 			duration: 1,
-			description: 1,
 			questions: 1,
-			expiresAt: 1,
-			createdAt: 1
+			candidates: 1,
+			description: 1,
+			createdAt: 1,
+			expiresAt: 1
 		})
-			.populate<{ owner: HydratedDocument<Pick<IUser, "name">> }>("owner", "-_id name"),
+			.populate<{
+				owner: HydratedDocument<Pick<IUser, "name">>
+			}>("owner", {
+				_id: 0,
+				name: 1
+			}),
 		verifyAuthorization({ accountType: "candidate" })
 	])
 
 	if(!exam) notFound()
+
+	const candidates = exam.candidates.map(({ _id }) => _id.toString())
+
+	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const startedExam = await StartedExam.aggregate<(HydratedDocument<IStartedExam> & {
 		submit?: (HydratedDocument<ISubmit> & {
@@ -180,7 +190,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 	return (
 		<div className="flex flex-col gap-3xl">
 			<header className="flex items-center justify-end flex-wrap gap-md">
-				<h1 className="flex-grow text-h3 font-bold">
+				<h1 className="flex-grow text-h4 xs:text-h3">
 					{exam.title}
 				</h1>
 

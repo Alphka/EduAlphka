@@ -139,10 +139,10 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 								size="sm"
 								variant="filled"
 								className="self-center"
-								aria-label="Iniciar teste"
 								onClick={() => {
 									handleServerAction(startExam(exam._id.toString()))
 								}}
+								aria-label="Iniciar teste"
 								loading={isPending}
 							>
 								Iniciar

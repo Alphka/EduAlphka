@@ -5,7 +5,7 @@ import type { z } from "zod"
 import type questionSchema from "@schemas/question"
 import type optionSchema from "@schemas/option"
 import type examSchema from "@schemas/exam"
-import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput, Title } from "@mantine/core"
+import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
 import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useCallback, useRef, type ChangeEvent } from "react"
@@ -130,13 +130,10 @@ export default function ExamForm({
 
 	return (
 		<div className="flex flex-col gap-2xl">
-			<header className="flex justify-between gap-md">
-				<Title
-					order={1}
-					fz="4xl"
-				>
-					{type === "edit" ? defaultValues?.exam?.title || "Teste sem nome" : "Criar teste"}
-				</Title>
+			<header className="flex justify-end flex-wrap gap-md">
+				<h1 className="flex-grow text-4xl font-bold">
+					{type === "edit" ? defaultValues?.exam?.title : "Criar teste"}
+				</h1>
 
 				{!loading && type === "edit" && (
 					<Button
@@ -307,12 +304,12 @@ export default function ExamForm({
 									<ActionIcon
 										color={errors.exam?.duration ? "currentColor" : "gray"}
 										variant="subtle"
-										aria-label="Escolha o horário"
 										onClick={event => {
 											if(!event.currentTarget.disabled){
 												durationInputRef.current?.showPicker?.()
 											}
 										}}
+										aria-label="Escolha o horário"
 										disabled={formDisabled || getValues("exam.duration") === undefined}
 									>
 										<MdAccessTime className="text-[1.25rem]" />

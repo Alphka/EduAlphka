@@ -1,8 +1,8 @@
 "use client"
 
-import type { CandidatesTableProps } from "./CandidatesTable"
+import type { CandidatesTableProps } from ".."
 import { Button, TextInput } from "@mantine/core"
-import { addCandidate } from "../actions/candidates"
+import { addCandidate } from "../../../actions/candidates"
 import { MdSearch } from "react-icons/md"
 import { useRef } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"
@@ -21,10 +21,10 @@ export default function AddCandidate({ examId }: AddCandidateProps){
 				</h3>
 			</header>
 
-			<form className="flex items-center gap-xs">
+			<form className="flex items-center justify-center flex-wrap gap-x-xs gap-y-sm">
 				<TextInput
 					size="sm"
-					className="flex-grow"
+					className="flex-grow basis-60"
 					placeholder="Nome de usuário ou e-mail"
 					aria-label="Digite o nome de usuário ou email do candidato a ser adicionado"
 					leftSection={<MdSearch className="text-base" />}
@@ -49,6 +49,7 @@ export default function AddCandidate({ examId }: AddCandidateProps){
 					size="sm"
 					color="blue"
 					variant="light"
+					className="flex-shrink-0"
 					aria-label="Adicionar candidato ao teste"
 					onClick={event => {
 						event.preventDefault()

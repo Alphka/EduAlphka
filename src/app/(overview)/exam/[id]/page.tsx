@@ -32,6 +32,7 @@ export default async function EditExamPage({ params }: PageProps){
 				subject: 1,
 				duration: 1,
 				questions: 1,
+				candidates: 1,
 				description: 1
 			})
 			.lean<Pick<IExam,
@@ -40,21 +41,22 @@ export default async function EditExamPage({ params }: PageProps){
 				| "subject"
 				| "duration"
 				| "questions"
+				| "candidates"
 				| "description"
 			>>(),
 		verifyAuthorization()
 	])
 
 	if(!exam) notFound()
-	if(user.accountType !== "professor") redirect(routes.exam.children.template.children.submit.pathname.replace("[id]", id), RedirectType.replace)
-	if(!(exam.owner as Types.ObjectId).equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const {
-		subject,
-		duration,
-		questions,
-		description
-	} = exam
+	const candidates = exam.candidates.map(({ _id }) => _id.toString())
+
+	if(user.accountType === "candidate"){
+		if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+		redirect(routes.exam.children.template.children.submit.pathname.replace("[id]", id), RedirectType.replace)
+	}
+
+	if(user.accountType !== "professor" || !(exam.owner as Types.ObjectId).equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const hasSubmit = await Submit.exists({ exam: id })
 	const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
@@ -66,11 +68,11 @@ export default async function EditExamPage({ params }: PageProps){
 			defaultValues={{
 				exam: {
 					title: exam.title,
-					subject,
-					duration: formatTimeDuration(duration),
-					description
+					subject: exam.subject,
+					duration: formatTimeDuration(exam.duration),
+					description: exam.description
 				},
-				question: questions.map(question => ({
+				question: exam.questions.map(question => ({
 					text: question.text,
 					required: question.isRequired,
 					question_type: question.type,

@@ -125,11 +125,11 @@ export default function OptionContainer({
 			color="red"
 			variant="light"
 			className="shrink-0"
-			aria-label={`Remover ${optionIndex + 1}ª opção`}
-			title="Remover opção"
 			onClick={() => {
 				removeOption(optionIndex)
 			}}
+			title="Remover opção"
+			aria-label={`Remover ${optionIndex + 1}ª opção`}
 			disabled={disabled || !canDelete}
 		>
 			<MdDeleteOutline className="text-[1.5rem]" />

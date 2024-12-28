@@ -1,31 +1,15 @@
-"use client"
-
-import { Button, Title } from "@mantine/core"
-import { useRouter } from "next/navigation"
+import BackButton from "@components/BackButton"
 
 export default function NotFoundPage(){
-	const router = useRouter()
-
 	return (
 		<div className="main-height flex flex-col items-center justify-center p-5xl gap-3xl">
-			<Title
-				order={1}
-				fz="h2"
-				fw={600}
-				ta="center"
-			>
+			<h1 className="text-h2 font-semibold text-center">
 				Esse teste não foi encontrado
-			</Title>
+			</h1>
 
-			<Button
-				aria-label="Voltar para a página anterior"
-				onClick={() => {
-					if(window.history.length > 1) router.back()
-					else router.push("/")
-				}}
-			>
+			<BackButton>
 				Voltar
-			</Button>
+			</BackButton>
 		</div>
 	)
 }

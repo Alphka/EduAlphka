@@ -2,7 +2,7 @@ import type { HTMLAttributes } from "react"
 import type { ExamListProps } from "./ExamList"
 import type { StartedExam } from "@models"
 import type { ISubmit } from "@models/typings/Submit"
-import { Avatar, Badge, Box, Card, Divider, Text, Tooltip } from "@mantine/core"
+import { Avatar, Badge, Box, Card, Divider, Text, Title, Tooltip } from "@mantine/core"
 import { getSubmitStatus, submitStatusColors } from "@helpers/getSubmitStatus"
 import { MdOutlineQuiz, MdOutlineTimer } from "react-icons/md"
 import { FaAsterisk } from "react-icons/fa"
@@ -107,19 +107,18 @@ export default async function ExamCard({
 
 					<Divider />
 
-					<Text
+					<Title
 						fz="2xl"
-						fw="bold"
+						order={2}
 						title={exam.title}
-						truncate="end"
-						component="h2"
+						lineClamp={3}
 						className="self-start"
 					>
 						{exam.title}
-					</Text>
+					</Title>
 
 					<Text
-						size="xs"
+						fz="xs"
 						c="dimmed"
 						ta="justify"
 						className="whitespace-pre-wrap"

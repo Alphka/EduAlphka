@@ -13,6 +13,8 @@ export default function BackButton(props: ComponentPropsWithoutRef<typeof Button
 				if(window.history.length > 1) router.back()
 				else router.push("/")
 			}}
+			aria-label="Voltar para a página anterior"
+			children="Voltar"
 			{...props}
 		/>
 	)

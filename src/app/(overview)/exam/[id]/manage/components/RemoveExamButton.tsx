@@ -2,9 +2,9 @@
 
 import { MdDeleteForever, MdWarningAmber } from "react-icons/md"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
-import { Modal, Button, Title, Badge } from "@mantine/core"
+import { Modal, Button, Badge } from "@mantine/core"
 import useServerActionHandler from "@hooks/useServerActionHandler"
-import deleteExamAction from "@app/(overview)/exam/actions/deleteExam"
+import deleteExamAction from "../../../actions/deleteExam"
 
 interface RemoveExamButtonProps {
 	examName: string
@@ -19,7 +19,7 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 	return <>
 		<Button
 			className="flex-shrink-0"
-			color="red"
+			color="red.9"
 			variant="filled"
 			leftSection={<MdDeleteForever className="text-lg" />}
 			onClick={open}
@@ -53,23 +53,14 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 						<MdWarningAmber />
 					</Badge>
 
-					<Title
-						order={1}
-						fz="h4"
-						fw={500}
-					>
+					<h1 className="text-h4 font-medium">
 						Deseja realmente excluir este teste?
-					</Title>
+					</h1>
 				</div>
 
-				<Title
-					order={2}
-					c="dimmed"
-					fz="h6"
-					fw={400}
-				>
+				<h2 className="text-dark-200 text-h6 font-normal">
 					Você está excluindo o teste "{examName}", deseja continuar?
-				</Title>
+				</h2>
 			</header>
 
 			<div className="flex items-center justify-end gap-lg">
@@ -79,7 +70,7 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 					color="gray"
 					variant="light"
 					onClick={close}
-					aria-label="Cancelar"
+					aria-label="Cancelar exclusão"
 				>
 					Cancelar
 				</Button>
@@ -89,8 +80,8 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 					size="sm"
 					color="red"
 					variant="filled"
-					aria-label="Excluir teste"
 					onClick={() => handleServerAction(deleteExamAction(examId))}
+					aria-label="Excluir teste"
 					loading={isPending}
 				>
 					Excluir

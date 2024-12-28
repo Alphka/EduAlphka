@@ -1,6 +1,6 @@
 import type { IExam, IExamMethods } from "@models/typings/Exam"
 import type { Document } from "mongoose"
-import { Badge, Box, Card, Text, Tooltip } from "@mantine/core"
+import { Badge, Box, Card, Text, Title, Tooltip } from "@mantine/core"
 import { MdOutlineTimer, MdPerson } from "react-icons/md"
 import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
@@ -46,16 +46,15 @@ export default async function ExamCard({ exam }: ExamCardProps){
 
 				<div className="h-full flex flex-col gap-md">
 					<div className="flex items-start justify-between gap-md">
-						<Text
+						<Title
 							fz="2xl"
-							fw="bold"
+							order={2}
 							title={exam.title}
-							truncate="end"
-							component="h2"
+							lineClamp={3}
 							className="self-start"
 						>
 							{exam.title}
-						</Text>
+						</Title>
 
 						<Badge
 							size="md"

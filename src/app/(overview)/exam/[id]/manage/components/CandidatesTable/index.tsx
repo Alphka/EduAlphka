@@ -2,8 +2,9 @@
 
 import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
-import { Table, Text, TextInput, Title } from "@mantine/core"
+import { Paper, Table, Text, TextInput } from "@mantine/core"
 import { MdSearch } from "react-icons/md"
+import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
 import Tr from "./Tr"
 
@@ -108,114 +109,121 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 	}
 
 	return (
-		<section className="flex flex-col gap-md">
-			<header>
-				<Title order={2} fz="2xl">
-					Candidatos participando do teste
-				</Title>
-			</header>
+		<Paper
+			className="flex flex-col p-xl gap-lg"
+			withBorder
+		>
+			<section className="flex flex-col gap-md">
+				<header>
+					<h2 className="text-h5">
+						Candidatos participando do teste
+					</h2>
+				</header>
 
-			<TextInput
-				size="sm"
-				value={search}
-				placeholder="Pesquisar..."
-				aria-label="Pesquisar"
-				leftSection={<MdSearch className="text-base" />}
-				enterKeyHint="search"
-				onChange={handleSearchChange}
-				disabled={!data.length}
-			/>
+				<TextInput
+					size="sm"
+					value={search}
+					placeholder="Pesquisar..."
+					aria-label="Pesquisar"
+					leftSection={<MdSearch className="text-base" />}
+					enterKeyHint="search"
+					onChange={handleSearchChange}
+					disabled={!data.length}
+				/>
 
-			<Table.ScrollContainer minWidth={250}>
-				<Table
-					className="bg-dark-600 rounded"
-					horizontalSpacing="sm"
-					verticalSpacing="sm"
-				>
-					<Table.Thead>
-						<Table.Tr>
-							<Th
-								sorted={sortBy === "name"}
-								reversed={reverseSortDirection}
-								onSort={() => setSorting("name")}
-							>
-								Candidato
-							</Th>
-
-							<Th
-								className="w-16 xs:w-36"
-								sorted={sortBy === "startedAt"}
-								reversed={reverseSortDirection}
-								onSort={() => setSorting("startedAt")}
-								ta="center"
-							>
-								<span className="hidden xs:block">Data de início</span>
-								<span className="block xs:hidden" aria-hidden>Início</span>
-							</Th>
-
-							<Th
-								className="w-1/12"
-								sorted={sortBy === "status"}
-								reversed={reverseSortDirection}
-								onSort={() => setSorting("status")}
-								ta="center"
-							>
-								Status
-							</Th>
-
-							<Table.Th
-								ta="center"
-								w="4%"
-							/>
-						</Table.Tr>
-					</Table.Thead>
-
-					<Table.Tbody>
-						{sortedData.length > 0 ? sortedData.map(({
-							id,
-							name,
-							username,
-							startedAt,
-							isExpired,
-							hasSubmit,
-							pendingCorrection
-						}) => {
-							const status = getSubmitStatus({
-								pendingCorrection,
-								hasStartedExam: !!startedAt,
-								hasSubmit,
-								isExpired
-							})
-
-							return (
-								<Tr
-									examId={examId}
-									{...{
-										id,
-										name,
-										status,
-										username,
-										startedAt,
-										isExpired,
-										hasSubmit,
-										pendingCorrection
-									}}
-									statusColor={submitStatusColors[status]}
-									key={id}
-								/>
-							)
-						}) : (
+				<Table.ScrollContainer minWidth={250}>
+					<Table
+						className="bg-dark-600 rounded"
+						horizontalSpacing="sm"
+						verticalSpacing="sm"
+					>
+						<Table.Thead>
 							<Table.Tr>
-								<Table.Td colSpan={4}>
-									<Text fw={500} ta="center">
-										Nenhum usuário encontrado
-									</Text>
-								</Table.Td>
+								<Th
+									sorted={sortBy === "name"}
+									reversed={reverseSortDirection}
+									onSort={() => setSorting("name")}
+								>
+									Candidato
+								</Th>
+
+								<Th
+									className="w-16 xs:w-36"
+									sorted={sortBy === "startedAt"}
+									reversed={reverseSortDirection}
+									onSort={() => setSorting("startedAt")}
+									ta="center"
+								>
+									<span className="hidden xs:block">Data de início</span>
+									<span className="block xs:hidden" aria-hidden>Início</span>
+								</Th>
+
+								<Th
+									className="w-1/12"
+									sorted={sortBy === "status"}
+									reversed={reverseSortDirection}
+									onSort={() => setSorting("status")}
+									ta="center"
+								>
+									Status
+								</Th>
+
+								<Table.Th
+									ta="center"
+									w="4%"
+								/>
 							</Table.Tr>
-						)}
-					</Table.Tbody>
-				</Table>
-			</Table.ScrollContainer>
-		</section>
+						</Table.Thead>
+
+						<Table.Tbody>
+							{sortedData.length > 0 ? sortedData.map(({
+								id,
+								name,
+								username,
+								startedAt,
+								isExpired,
+								hasSubmit,
+								pendingCorrection
+							}) => {
+								const status = getSubmitStatus({
+									pendingCorrection,
+									hasStartedExam: !!startedAt,
+									hasSubmit,
+									isExpired
+								})
+
+								return (
+									<Tr
+										examId={examId}
+										{...{
+											id,
+											name,
+											status,
+											username,
+											startedAt,
+											isExpired,
+											hasSubmit,
+											pendingCorrection
+										}}
+										statusColor={submitStatusColors[status]}
+										key={id}
+									/>
+								)
+							}) : (
+								<Table.Tr>
+									<Table.Td colSpan={4}>
+										<Text fw={500} ta="center">
+											Nenhum usuário encontrado
+										</Text>
+									</Table.Td>
+								</Table.Tr>
+							)}
+						</Table.Tbody>
+					</Table>
+				</Table.ScrollContainer>
+			</section>
+
+			<AddCandidate examId={examId} />
+		</Paper>
 	)
 }

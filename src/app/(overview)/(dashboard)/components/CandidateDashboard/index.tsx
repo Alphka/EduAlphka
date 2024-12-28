@@ -9,7 +9,7 @@ export interface CandidateDashboardProps {
 export default async function CandidateDashboard({ userId }: CandidateDashboardProps){
 	return <>
 		<div className="flex flex-col gap-lg">
-			<header className="flex justify-between gap-md">
+			<header className="flex justify-end flex-wrap gap-md">
 				<h1 className="flex-grow text-h4 font-bold">
 					Testes em que você está participando
 				</h1>

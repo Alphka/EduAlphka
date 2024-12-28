@@ -22,7 +22,13 @@ export default async function ParticipatingExams({ userId }: ParticipatingExamsP
 			updatedAt: 1
 		})
 		.sort({ createdAt: -1, updatedAt: -1 })
-		.populate<{ owner: HydratedDocument<Pick<IUser, "name" | "username">> }>("owner", "-_id name username")
+		.populate<{
+			owner: HydratedDocument<Pick<IUser, "name" | "username">>
+		}>("owner", {
+			_id: 0,
+			name: 1,
+			username: 1
+		})
 
 	return exams.length ? (
 		<ExamList

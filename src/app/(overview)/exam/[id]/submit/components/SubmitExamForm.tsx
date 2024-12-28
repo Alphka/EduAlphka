@@ -1,7 +1,7 @@
 "use client"
 
 import type { ExamMultipleChoiceQuestion, ExamQuestion } from "@models/typings/Exam"
-import { Button, Divider, Paper, Radio, Textarea, Title } from "@mantine/core"
+import { Button, Divider, Paper, Radio, Textarea } from "@mantine/core"
 import { useForm, type DefaultValues } from "react-hook-form"
 import { useId } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"
@@ -70,13 +70,9 @@ export default function SubmitExamForm({
 				} as Parameters<typeof submitExam>[1]))
 			})}
 		>
-			<Title
-				id={titleId}
-				order={2}
-				fz="h3"
-			>
+			<h2 id={titleId} className="text-h3">
 				Questões
-			</Title>
+			</h2>
 
 			<ul
 				className="flex flex-col gap-md"
@@ -96,12 +92,7 @@ export default function SubmitExamForm({
 							withBorder
 							key={_id}
 						>
-							<Title
-								c="dimmed"
-								fz="h6"
-								fw="bold"
-								order={3}
-							>
+							<h3 className="text-dark-200 text-h6">
 								{isRequired && (
 									<span
 										className="text-red-500 float-right select-none"
@@ -113,7 +104,7 @@ export default function SubmitExamForm({
 								)}
 
 								Questão {questionIndex + 1}
-							</Title>
+							</h3>
 
 							<div className="flex flex-col mt-xs gap-md">
 								<p className="text-md font-medium">{text}</p>

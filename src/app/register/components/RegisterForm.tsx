@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Button, Checkbox, Text, TextInput, Title } from "@mantine/core"
+import { ActionIcon, Button, Checkbox, Text, TextInput } from "@mantine/core"
 import { signInAction, type UserSignInData } from "../actions/signIn"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { GenericFormValidation } from "@constants/forms"
@@ -40,23 +40,12 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 			})}
 		>
 			<header className="flex flex-col gap-xs">
-				<Title
-					order={1}
-					fz="6xl"
-					fw={800}
-				>
+				<h1 className="text-6xl font-extrabold">
 					Crie uma conta
-				</Title>
-
-				<Title
-					order={2}
-					lts="-0.025em"
-					fz="4xl"
-					fw={500}
-					c="gray"
-				>
+				</h1>
+				<h2 className="text-gray-500 text-4xl font-medium tracking-tight">
 					Junte-se à nossa plataforma de testes online e comece sua jornada de aprendizado!
-				</Title>
+				</h2>
 			</header>
 
 			<div className="flex flex-col gap-2xl">

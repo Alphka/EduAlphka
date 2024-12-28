@@ -69,7 +69,7 @@ export default function QuestionContainer({
 				</Title>
 
 				<Switch
-					size="xs"
+					size="md"
 					radius="xl"
 					color="blue"
 					label={isMobile ? "Obrigatória" : "Questão obrigatória"}
@@ -211,10 +211,10 @@ export default function QuestionContainer({
 					<Button
 						size="sm"
 						variant="subtle"
-						aria-label={`Adicionar opção de múltipla escolha à ${index}ª questão`}
 						onClick={() => {
 							appendOption(defaultQuestionOption)
 						}}
+						aria-label={`Adicionar opção de múltipla escolha à ${index}ª questão`}
 						disabled={disabled || optionFields.length === ExamFormValidation.maxOptionsNumber}
 					>
 						Adicionar opção

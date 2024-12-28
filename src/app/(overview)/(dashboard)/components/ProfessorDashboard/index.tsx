@@ -14,8 +14,8 @@ export interface ProfessorDashboardProps {
 export default function ProfessorDashboard({ userId, recentExamsLimit }: ProfessorDashboardProps){
 	return <>
 		<div className="flex flex-col gap-lg">
-			<header className="flex justify-between gap-md">
-				<h1 className="flex-grow text-h3 font-bold">
+			<header className="flex justify-end flex-wrap gap-md">
+				<h1 className="flex-grow text-h4 xs:text-h3 font-bold">
 					Testes criados recentemente
 				</h1>
 

@@ -47,6 +47,16 @@ const routes = {
 			}
 		}
 	},
+	invite: {
+		pathname: "/invite",
+		redirect: "/",
+		access: "candidate",
+		children: {
+			template: {
+				pathname: "/invite/[token]"
+			}
+		}
+	},
 	logout: {
 		title: "Sair da conta",
 		pathname: "/logout",

@@ -9,6 +9,12 @@ const config: Config = {
 	theme: {
 		extend: {
 			fontSize: {
+				"3xs": ["var(--mantine-font-size-3xs)", {
+					lineHeight: "1.55"
+				}],
+				"2xs": ["var(--mantine-font-size-2xs)", {
+					lineHeight: "1.55"
+				}],
 				xs: ["var(--mantine-font-size-xs)", {
 					lineHeight: "1.55"
 				}],
@@ -24,23 +30,47 @@ const config: Config = {
 				xl: ["var(--mantine-font-size-xl)", {
 					lineHeight: "1.55"
 				}],
-				"1xl": ["var(--mantine-font-size-6xl)", {
+				"6xl": ["var(--mantine-font-size-6xl)", {
 					lineHeight: "1.5"
 				}],
-				"2xl": ["var(--mantine-font-size-5xl)", {
+				"5xl": ["var(--mantine-font-size-5xl)", {
 					lineHeight: "1.5"
 				}],
-				"3xl": ["var(--mantine-font-size-4xl)", {
+				"4xl": ["var(--mantine-font-size-4xl)", {
 					lineHeight: "1.45"
 				}],
-				"4xl": ["var(--mantine-font-size-3xl)", {
+				"3xl": ["var(--mantine-font-size-3xl)", {
 					lineHeight: "1.4"
 				}],
-				"5xl": ["var(--mantine-font-size-2xl)", {
+				"2xl": ["var(--mantine-font-size-2xl)", {
 					lineHeight: "1.35"
 				}],
-				"6xl": ["var(--mantine-font-size-1xl)", {
+				"1xl": ["var(--mantine-font-size-1xl)", {
 					lineHeight: "1.3"
+				}],
+				"h1": ["var(--mantine-font-size-6xl)", {
+					fontWeight: "bold",
+					lineHeight: "1.3"
+				}],
+				"h2": ["var(--mantine-font-size-5xl)", {
+					fontWeight: "bold",
+					lineHeight: "1.35"
+				}],
+				"h3": ["var(--mantine-font-size-4xl)", {
+					fontWeight: "bold",
+					lineHeight: "1.4"
+				}],
+				"h4": ["var(--mantine-font-size-3xl)", {
+					fontWeight: "bold",
+					lineHeight: "1.45"
+				}],
+				"h5": ["var(--mantine-font-size-2xl)", {
+					fontWeight: "bold",
+					lineHeight: "1.5"
+				}],
+				"h6": ["var(--mantine-font-size-1xl)", {
+					fontWeight: "bold",
+					lineHeight: "1.55"
 				}],
 				DEFAULT: ["var(--mantine-font-size-md)", {
 					lineHeight: "1.55"

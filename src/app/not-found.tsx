@@ -1,40 +1,26 @@
-"use client"
-
-import { useRouter } from "next/navigation"
-import { Button } from "@mantine/core"
+import BackButton from "@components/BackButton"
 
 export default function NotFoundPage(){
-	const router = useRouter()
-
 	return (
-		<div className="min-h-dvh flex flex-col items-center justify-center px-xs py-20 gap-3xl">
+		<div className="min-h-dvh flex flex-col items-center justify-center px-xs py-20 pt-20 pb-32 gap-3xl">
 			<div className="relative">
 				<div className="block w-full h-min absolute top-0 left-0 right-0 text-gray-700/75 text-center text-[60px] xs:text-[120px] sm:text-[250px] font-[900] leading-[.8] overflow-hidden select-none">
 					404
 				</div>
 
 				<div className="relative z-1 pt-16 xs:pt-28 sm:pt-56 text-center">
-					<h1 className="font-black text-2xl sm:text-1xl">
+					<h1 className="text-white text-center text-h2 sm:text-h1 !font-[900]">
 						Página não encontrada
 					</h1>
 
-					<p className="text-lg text-gray-500 max-w-lg mx-auto mt-6 mb-12">
+					<p className="max-w-lg text-dark-200 text-lg text-center mx-auto mt-xl mb-2xl">
 						A página que você está tentando abrir não existe.
 						Você pode ter digitado o endereço errado ou a página foi movida para outra URL.
 						Se você acha que isso é um erro, entre em contato com o suporte.
 					</p>
 
-					<div className="flex justify-center">
-						<Button
-							size="md"
-							aria-label="Voltar para a página anterior"
-							onClick={() => {
-								if(window.history.length > 1) router.back()
-								else router.push("/")
-							}}
-						>
-							Voltar
-						</Button>
+					<div className="flex items-center justify-center">
+						<BackButton />
 					</div>
 				</div>
 			</div>

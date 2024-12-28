@@ -1,6 +1,6 @@
 "use client"
 
-import { ActionIcon, Anchor, Button, Checkbox, TextInput, Title } from "@mantine/core"
+import { ActionIcon, Anchor, Button, Checkbox, TextInput } from "@mantine/core"
 import { loginAction, type UserLoginData } from "../actions/login"
 import { MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { GenericFormValidation } from "@constants/forms"
@@ -52,23 +52,12 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 			})}
 		>
 			<header className="flex flex-col gap-xs">
-				<Title
-					order={1}
-					fz="6xl"
-					fw={800}
-				>
+				<h1 className="text-6xl font-extrabold">
 					Acesse sua conta
-				</Title>
-
-				<Title
-					order={2}
-					lts="-0.025em"
-					fz="4xl"
-					fw={500}
-					c="gray"
-				>
+				</h1>
+				<h2 className="text-gray-500 text-4xl font-medium tracking-tight">
 					Entre com seu endereço de email ou nome usuário.
-				</Title>
+				</h2>
 			</header>
 
 			<div className="flex flex-col gap-2xl">

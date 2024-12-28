@@ -1,4 +1,4 @@
-import type { Model, PopulatedDoc, Types } from "mongoose"
+import type { Model, PopulatedDoc } from "mongoose"
 import type { IUser } from "./User"
 
 export interface ISession {
