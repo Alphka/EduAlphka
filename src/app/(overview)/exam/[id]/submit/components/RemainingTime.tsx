@@ -39,13 +39,14 @@ export default function RemainingTime({
 		return getRemainingTime(remainingMinutes)
 	})
 
-	useInterval(() => {
+	const { stop: stopTimer } = useInterval(() => {
 		const remainingMinutes = getRemainingMinutes()
 		const remainingTime = getRemainingTime(remainingMinutes)
 
 		setRemainingTime(remainingTime)
 
-		if(remainingTime.minutes === 0 && remainingTime.seconds === 0){
+		if(remainingTime.hours === 0 && remainingTime.minutes === 0 && remainingTime.seconds === 0){
+			stopTimer()
 			toast.warn("O seu teste expirou!")
 			router.push(routes.homepage.pathname)
 		}
@@ -55,7 +56,7 @@ export default function RemainingTime({
 		<Paper
 			className={twJoin(
 				"leading-none px-sm py-xs shadow-xs",
-				(
+				remainingTime.hours === 0 && (
 					remainingTime.minutes === criticalMinutesRemaining && remainingTime.seconds === 0 ||
 					remainingTime.minutes <= criticalMinutesRemaining - 1
 				) && "bg-red-light text-red-light-color border-red-light-hover"
@@ -67,8 +68,8 @@ export default function RemainingTime({
 			</span>
 			{" "}
 			<span
-				aria-live="off"
 				role="timer"
+				aria-live="off"
 				suppressHydrationWarning
 			>
 				{remainingTime.string}
