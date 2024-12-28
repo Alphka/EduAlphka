@@ -4,10 +4,10 @@ import type { Metadata } from "next"
 import type { IAnswer } from "@models/typings/Answer"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
+import { notFound, redirect, RedirectType } from "next/navigation"
 import { HydratedDocument, Types } from "mongoose"
 import { Exam, StartedExam } from "@models"
 import { Divider, Paper } from "@mantine/core"
-import { notFound } from "next/navigation"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
@@ -29,7 +29,7 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const { id } = await params
 
-	const [exam] = await Promise.all([
+	const [exam, user] = await Promise.all([
 		Exam
 			.findById(id, {
 				title: 1,
@@ -48,6 +48,7 @@ export default async function ManageExamPage({ params }: PageProps){
 	])
 
 	if(!exam) notFound()
+	if(!(exam.owner as Types.ObjectId).equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const startedExams = await StartedExam.aggregate<HydratedDocument<IStartedExam> & {
 		submit?: (HydratedDocument<ISubmit> & {
