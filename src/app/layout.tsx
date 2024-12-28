@@ -84,7 +84,7 @@ export default function RootLayout({ children }: RootLayoutProps){
 				className={twJoin(
 					inter.variable,
 					inter.className,
-					"bg-dark antialiased min-h-dvh"
+					"bg-dark text-md antialiased min-h-dvh"
 				)}
 			>
 				<Providers fontFamily={inter.style.fontFamily}>

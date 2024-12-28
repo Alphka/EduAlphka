@@ -1,11 +1,14 @@
 "use server"
 
 import type { ExamMultipleChoiceQuestion } from "@models/typings/Exam"
-import { startSession, type Types } from "mongoose"
+import type { Types } from "mongoose"
+import { Answer, Exam, Session, StartedExam, Submit } from "@models"
 import { ExamFormValidation } from "@constants/forms"
-import { Answer, Exam, StartedExam, Submit } from "@models"
+import { revalidatePath } from "next/cache"
+import { redirect } from "next/navigation"
 import getSessionUserData from "@helpers/getSessionUserData"
 import connectDatabase from "@lib/connectDatabase"
+import routes from "@app/routes"
 
 interface DissertativeAnswer {
 	content: string
@@ -39,8 +42,6 @@ export default async function submitExam(id: string, data: SubmitExamData){
 
 		if(!exam) return { errors: ["Teste não encontrado"] }
 		if(exam.questions.length !== questions.length) return { errors: ["Quantidade de respostas inválida"] }
-
-		const session = await startSession()
 
 		const submit = new Submit({
 			exam: id,
@@ -114,12 +115,17 @@ export default async function submitExam(id: string, data: SubmitExamData){
 		}
 
 		try{
-			await session.withTransaction(() => Promise.all([
-				Answer.bulkSave(answers, { session }),
-				submit.save({ session })
-			]))
-		}finally{
-			session.endSession()
+			await Promise.all([
+				Answer.bulkSave(answers),
+				submit.save()
+			])
+		}catch(error){
+			await Promise.allSettled([
+				Answer.deleteMany({ submit: submit.id }),
+				Session.deleteMany({ exam: id, user: user.id})
+			])
+
+			throw error
 		}
 	}catch(error){
 		if(typeof error === "string") return { errors: [error] }
@@ -129,4 +135,9 @@ export default async function submitExam(id: string, data: SubmitExamData){
 
 		return { errors: ["Falha ao enviar o teste"] }
 	}
+
+	revalidatePath(routes.homepage.pathname)
+	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", id))
+	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", id))
+	redirect(routes.homepage.pathname)
 }

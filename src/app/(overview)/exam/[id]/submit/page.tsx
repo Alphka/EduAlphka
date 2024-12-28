@@ -5,9 +5,9 @@ import type { ISubmit } from "@models/typings/Submit"
 import type { IAnswer } from "@models/typings/Answer"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Divider, Grid, GridCol, Paper } from "@mantine/core"
 import { Types, type HydratedDocument } from "mongoose"
 import { Exam, StartedExam } from "@models"
+import { Divider, Paper } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
@@ -217,42 +217,38 @@ export default async function SubmitExamPage({ params }: PageProps){
 			<Divider />
 
 			<Paper
-				className="flex flex-col p-xl gap-md shadow-xs"
+				className="flex flex-col p-xl gap-xs shadow-xs"
+				component="ul"
 				withBorder
 			>
-				<Grid
-					gutter="sm"
-					grow
-				>
-					<GridCol className="flex items-baseline gap-1">
-						<p className="text-5xl font-semibold">Professor:</p>
-						<span className="text-gray-500">{exam.owner.name}</span>
-					</GridCol>
+				<li>
+					<span className="font-semibold">Professor: </span>
+					{exam.owner.name}
+				</li>
 
-					{exam.subject && (
-						<GridCol className="flex items-baseline gap-1">
-							<p className="text-5xl font-semibold">Disciplina:</p>
-							<span className="text-gray-500">{exam.subject}</span>
-						</GridCol>
-					)}
+				{exam.subject && (
+					<li>
+						<span className="font-semibold">Disciplina: </span>
+						{exam.subject}
+					</li>
+				)}
 
-					<GridCol className="flex items-baseline gap-1">
-						<p className="text-5xl font-semibold">Pontuação máxima:</p>
-						<span className="text-gray-500">{maxGrade}</span>
-					</GridCol>
+				<li>
+					<span className="font-semibold">Nota máxima: </span>
+					{maxGrade}
+				</li>
 
-					{exam.expiresAt && (
-						<GridCol className="flex items-baseline gap-1">
-							<p className="text-5xl font-semibold">Data final para a entrega do teste:</p>
-							<span className="text-gray-500">{exam.expiresAt.toLocaleString("pt-BR")}</span>
-						</GridCol>
-					)}
+				{exam.expiresAt && (
+					<li>Data final para
+						<span className="font-semibold">entrega: </span>
+						{exam.expiresAt.toLocaleString("pt-BR")}
+					</li>
+				)}
 
-					<GridCol className="flex items-baseline gap-1">
-						<p className="text-5xl font-semibold">Descrição:</p>
-						<p className="text-gray-500 whitespace-pre-wrap">{exam.description}</p>
-					</GridCol>
-				</Grid>
+				<li>
+					<span className="font-semibold">Descrição: </span>
+					{exam.description}
+				</li>
 			</Paper>
 
 			<SubmitExamForm

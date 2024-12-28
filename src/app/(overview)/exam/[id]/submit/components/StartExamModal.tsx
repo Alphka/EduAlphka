@@ -4,9 +4,10 @@ import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/ty
 import type { IUser } from "@models/typings/User"
 import * as VisuallyHidden from "@radix-ui/react-visually-hidden"
 import * as Dialog from "@radix-ui/react-dialog"
-import { Button, Fieldset, Grid, Paper } from "@mantine/core"
+import { Button, Paper } from "@mantine/core"
 import { isFinite } from "lodash"
 import { twJoin } from "tailwind-merge"
+import { useId } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import startExam from "../actions/startExam"
@@ -41,6 +42,7 @@ function getDurationString(duration: number | ReturnType<typeof formatTimeDurati
 }
 
 export default function StartExamModal({ exam }: StartExamModalProps){
+	const durationId = useId()
 	const { handleServerAction, isPending } = useServerActionHandler()
 
 	const totalQuestions = exam.questions.length
@@ -66,8 +68,8 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 
 						<Paper
 							className={twJoin(
-								"max-h-full w-10/12 max-w-screen-lg overflow-auto",
-								"flex flex-col px-lg py-2xl gap-lg shadow-xs",
+								"max-h-full sm:w-10/12 max-w-screen-md overflow-auto",
+								"flex flex-col px-lg py-xl gap-lg shadow-xs",
 								"*:flex-shrink-0",
 								"[scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,.3)_transparent]"
 							)}
@@ -77,61 +79,61 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 								Você deseja iniciar o teste?
 							</h1>
 
-							<Paper
-								bg="dark.6"
-								className="p-lg"
-								component={Fieldset}
-								legend="Informações do teste"
-								shadow="none"
-							>
-								<Grid
-									gutter="sm"
-									grow
+							<div className="flex flex-col gap-sm">
+								<h2 className="text-h5 font-semibold">
+									Informações do teste
+								</h2>
+
+								<Paper
+									bg="dark.6"
+									className="px-md py-sm shadow-xs *:font-semibold"
+									component="ul"
+									withBorder
 								>
-									<Grid.Col className="flex items-baseline gap-1">
-										<p className="text-5xl font-semibold">Professor:</p>
-										<span className="text-gray-500">{exam.owner.name}</span>
-									</Grid.Col>
+									<li>
+										<span className="text-blue-300">Professor: </span>
+										<span className="font-normal">{exam.owner.name}</span>
+									</li>
 
 									{exam.subject && (
-										<Grid.Col className="flex items-baseline gap-1">
-											<p className="text-5xl font-semibold">Disciplina:</p>
-											<span className="text-gray-500">{exam.subject}</span>
-										</Grid.Col>
+										<li>
+											<span className="text-blue-300">Disciplina: </span>
+											<span className="font-normal">{exam.subject}</span>
+										</li>
 									)}
 
-									<Grid.Col className="flex items-baseline gap-1">
-										<p className="text-5xl font-semibold">Total de questões:</p>
-										<span className="text-gray-500">{totalQuestions}</span>
-									</Grid.Col>
+									<li>
+										<span className="text-blue-300">Nota máxima: </span>
+										<span className="font-normal">{maxGrade}</span>
+									</li>
 
-									<Grid.Col className="flex items-baseline gap-1">
-										<p className="text-5xl font-semibold">Questões obrigatórias:</p>
-										<span className="text-gray-500">{maxGrade}</span>
-									</Grid.Col>
+									<li>
+										<span className="text-blue-300">Total de questões: </span>
+										<span className="font-normal">{totalQuestions}</span>
+									</li>
 
-									<Grid.Col className="flex items-baseline gap-1">
-										<p className="text-5xl font-semibold">Tempo de duração:</p>
-										<span className="text-gray-500">{formatTimeDuration(exam.duration)}</span>
-									</Grid.Col>
+									<li>
+										<span className="text-blue-300">Tempo de duração: </span>
+										<span className="font-normal" aria-labelledby={durationId}>{formatTimeDuration(exam.duration)}</span>
+									</li>
 
 									{exam.expiresAt && (
-										<Grid.Col className="flex items-baseline gap-1">
-											<p className="text-5xl font-semibold">Data final para entrega:</p>
-											<span className="text-gray-500">{exam.expiresAt.toLocaleString("pt-BR")}</span>
-										</Grid.Col>
+										<li>
+											<span className="text-blue-300">Data final para entrega: </span>
+											<span className="font-normal">{exam.expiresAt.toLocaleString("pt-BR")}</span>
+										</li>
 									)}
 
-									<Grid.Col className="flex items-baseline gap-1">
-										<p className="text-5xl font-semibold">Descrição:</p>
-										<p className="text-gray-500 whitespace-pre-wrap">{exam.description}</p>
-									</Grid.Col>
-								</Grid>
-							</Paper>
+									<li>
+										<span className="text-blue-300">Descrição: </span>
+										<span className="font-normal whitespace-pre-wrap">{exam.description}</span>
+									</li>
+								</Paper>
+							</div>
 
-							<p className="text-h6">
+							<p className="text-justify text-h6 font-normal">
 								Após iniciar o teste,
-								você terá {getDurationString(exam.duration)} para completá-lo.<br />
+								você terá <span id={durationId} className="text-blue-500">{getDurationString(exam.duration)}</span> para completá-lo.<br />
 								Certifique-se de estar preparado antes de começar.
 							</p>
 

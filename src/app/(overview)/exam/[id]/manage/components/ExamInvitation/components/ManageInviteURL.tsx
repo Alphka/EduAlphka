@@ -50,8 +50,7 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 									color={copied ? "teal" : "gray"}
 									variant="default"
 									onClick={copy}
-									aria-label="Clique para copiar o link"
-									aria-live="off"
+									aria-label={copied ? "Link copiado" : "Clique para copiar o link"}
 								>
 									{copied ? <MdCheck className="text-base" /> : <MdCopyAll className="text-base" />}
 								</ActionIcon>
