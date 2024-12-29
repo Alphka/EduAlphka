@@ -1,4 +1,4 @@
-import type { Document, Model, PopulatedDoc, Types } from "mongoose"
+import type { HydratedDocument, Model, PopulatedDoc, Types } from "mongoose"
 import type { IExam, IExamMethods } from "./Exam"
 import type { ISubmit } from "./Submit"
 import type { IUser } from "./User"
@@ -12,8 +12,8 @@ export interface IStartedExam {
 
 export interface IStartedExamMethods {
 	isExpired({ exam, submit }?: {
-		exam?: Document & Pick<IExam, "expiresAt" | "duration"> & IExamMethods
-		submit?: (Document & ISubmit) | boolean | null
+		exam?: HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
+		submit?: HydratedDocument<ISubmit> | boolean | null
 	}): Promise<boolean>
 }
 

@@ -1,5 +1,5 @@
 import type { IExam, IExamMethods } from "@models/typings/Exam"
-import type { Document } from "mongoose"
+import type { HydratedDocument } from "mongoose"
 import { Badge, Box, Card, Text, Title, Tooltip } from "@mantine/core"
 import { MdOutlineTimer, MdPerson } from "react-icons/md"
 import { twJoin } from "tailwind-merge"
@@ -10,7 +10,7 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface ExamCardProps {
-	exam: Document & IExam & IExamMethods
+	exam: HydratedDocument<IExam> & IExamMethods
 }
 
 export default async function ExamCard({ exam }: ExamCardProps){

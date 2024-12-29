@@ -1,7 +1,7 @@
 import type { IStartedExam, IStartedExamMethods, StartedExamModel } from "./typings/StartedExam"
 import type { IExam, IExamMethods } from "./typings/Exam"
 import type { ISubmit } from "./typings/Submit"
-import { model, models, Schema } from "mongoose"
+import { model, models, Schema, type HydratedDocument } from "mongoose"
 
 const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExamMethods>({
 	user: {
@@ -26,8 +26,8 @@ startedExamSchema.method("isExpired", async function isExpired({
 	exam,
 	submit
 }: {
-	exam?: Document & Pick<IExam, "expiresAt" | "duration"> & IExamMethods
-	submit?: (Document & ISubmit) | boolean | null
+	exam?: HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
+	submit?: HydratedDocument<ISubmit> | boolean | null
 } = {}){
 	if(!(exam && exam.expiresAt && exam.duration) || submit === undefined){
 		const [Exam, Submit] = await Promise.all([

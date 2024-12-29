@@ -3,14 +3,14 @@ import type { IStartedExam } from "@models/typings/StartedExam"
 import type { IAnswer } from "@models/typings/Answer"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
-import { Types, type Document, type HydratedDocument } from "mongoose"
+import { Types, type HydratedDocument } from "mongoose"
 import { Grid, GridCol } from "@mantine/core"
 import { StartedExam } from "@models"
 import ExamCard from "./ExamCard"
 
 export interface ExamListProps {
 	userId: string
-	exams: (Document & Omit<IExam, "owner"> & { owner: HydratedDocument<Pick<IUser, "name" | "username">> } & IExamMethods)[]
+	exams: (HydratedDocument<Omit<IExam, "owner">> & { owner: HydratedDocument<Pick<IUser, "name" | "username">> } & IExamMethods)[]
 }
 
 export default async function ExamList({ userId, exams }: ExamListProps){
@@ -71,8 +71,20 @@ export default async function ExamList({ userId, exams }: ExamListProps){
 					}
 				]).then(result => result[0] || null)
 
-				const hasSubmit = !!startedExam?.submit
-				const pendingCorrection = hasSubmit && startedExam.submit!.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+				const submit = startedExam?.submit || null
+
+				let grade: number | null = 0
+				let pendingCorrection = false
+
+				if(submit){
+					for(const answer of submit.answers){
+						if(!("isCorrect" in answer) || answer.isCorrect === undefined) pendingCorrection = true
+						else if(answer.isCorrect) grade++
+					}
+				}else{
+					grade = null
+				}
+
 
 				return (
 					<GridCol
@@ -84,10 +96,8 @@ export default async function ExamList({ userId, exams }: ExamListProps){
 						key={exam.id}
 					>
 						<ExamCard
-							pendingCorrection={pendingCorrection}
 							startedExam={startedExam && StartedExam.hydrate(startedExam)}
-							submit={startedExam?.submit || null}
-							exam={exam}
+							{...{ exam, submit, grade, pendingCorrection }}
 						/>
 					</GridCol>
 				)

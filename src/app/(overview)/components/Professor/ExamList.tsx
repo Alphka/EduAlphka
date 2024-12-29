@@ -1,10 +1,10 @@
 import type { IExam, IExamMethods } from "@models/typings/Exam"
-import type { Document } from "mongoose"
+import type { HydratedDocument } from "mongoose"
 import { Grid, GridCol } from "@mantine/core"
 import ExamCard from "./ExamCard"
 
 interface ExamListProps {
-	exams: (Document & IExam & IExamMethods)[]
+	exams: (HydratedDocument<IExam> & IExamMethods)[]
 }
 
 export default async function ExamList({ exams }: ExamListProps){

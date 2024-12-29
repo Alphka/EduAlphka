@@ -1,10 +1,12 @@
+import type { HydratedDocument } from "mongoose"
 import type { HTMLAttributes } from "react"
 import type { ExamListProps } from "./ExamList"
-import type { StartedExam } from "@models"
+import type { IStartedExam } from "@models/typings/StartedExam"
 import type { ISubmit } from "@models/typings/Submit"
 import { Avatar, Badge, Box, Card, Divider, Text, Title, Tooltip } from "@mantine/core"
 import { getSubmitStatus, submitStatusColors } from "@helpers/getSubmitStatus"
 import { MdOutlineQuiz, MdOutlineTimer } from "react-icons/md"
+import { StartedExam } from "@models"
 import { FaAsterisk } from "react-icons/fa"
 import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
@@ -15,8 +17,9 @@ import Link from "next/link"
 
 interface ExamCardProps {
 	pendingCorrection: boolean
-	startedExam: InstanceType<typeof StartedExam> | null
+	startedExam: IStartedExam | HydratedDocument<IStartedExam> | null
 	submit: ISubmit | null
+	grade: number | null
 	exam: ExamListProps["exams"][number]
 }
 
@@ -24,6 +27,7 @@ export default async function ExamCard({
 	pendingCorrection,
 	startedExam,
 	submit,
+	grade,
 	exam
 }: ExamCardProps){
 	const history = getHistoryMessage({
@@ -33,7 +37,7 @@ export default async function ExamCard({
 
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!submit
-	const isExamExpired = isExamStarted && await startedExam.isExpired({
+	const isExamExpired = isExamStarted && await StartedExam.hydrate(startedExam).isExpired({
 		exam,
 		submit: isExamSubmitted
 	})
@@ -56,6 +60,9 @@ export default async function ExamCard({
 			/>
 		)
 	}
+
+	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
+	const maxGrade = requiredQuestions.length
 
 	return (
 		<Container
@@ -95,14 +102,23 @@ export default async function ExamCard({
 							</div>
 						</div>
 
-						<Badge
-							size="md"
-							variant="light"
-							className="shrink-0"
-							color={submitStatusColors[submitStatus]}
-						>
-							{submitStatus}
-						</Badge>
+						<div className="flex flex-col items-end gap-md">
+							<Badge
+								size="md"
+								variant="light"
+								className="shrink-0"
+								color={submitStatusColors[submitStatus]}
+							>
+								{submitStatus}
+							</Badge>
+
+							{pendingCorrection && (
+								<p className="text-dark-100 text-sm">
+									Nota parcial: <b className="font-medium">{grade} de {maxGrade}</b>
+								</p>
+							)}
+						</div>
+
 					</div>
 
 					<Divider />
