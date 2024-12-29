@@ -21,7 +21,6 @@ export default function middleware(request: NextRequest){
 		}
 	})
 
-	response.headers.set("Accept-CH", "Viewport-Width")
 	response.headers.set("Referrer-Policy", "origin-when-cross-origin")
 	response.headers.set("X-Frame-Options", "DENY")
 	response.headers.set("X-XSS-Protection", "1; mode=block")
@@ -31,6 +30,6 @@ export default function middleware(request: NextRequest){
 
 export const config = {
 	matcher: [
-		"/((?!api|_logs|_src|_next/(?:static|image)|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout).*)"
+		"/((?!_logs|_src|_next/(?:static|image)|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout|invite).*)"
 	]
 }

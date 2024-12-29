@@ -1,8 +1,7 @@
 import type { AccountType } from "@typings/api"
 import { redirect, RedirectType } from "next/navigation"
-import getUserByToken from "./getUserByToken"
+import getSessionUserData from "./getSessionUserData"
 import getRequestURL from "./getRequestURL"
-import getToken from "./getToken"
 import routes from "@app/routes"
 
 interface AuthorizationOptions {
@@ -10,10 +9,9 @@ interface AuthorizationOptions {
 }
 
 export default async function verifyAuthorization(options: AuthorizationOptions = {}){
-	const token = await getToken()
-	const user = token && await getUserByToken(token)
+	const user = await getSessionUserData()
 
-	if(!token || !user){
+	if(!user){
 		return await redirectToLogin()
 	}
 

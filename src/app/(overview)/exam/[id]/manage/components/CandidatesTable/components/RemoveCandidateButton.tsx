@@ -11,7 +11,7 @@ interface RemoveCandidateButtonProps extends Omit<ComponentProps<typeof MenuItem
 	examId: string
 }
 
-export default function RemoveCandidateButton({ candidateId, examId, ...props }: RemoveCandidateButtonProps){
+export default function RemoveCandidateButton({ candidateId, examId, disabled, ...props }: RemoveCandidateButtonProps){
 	const { handleServerAction, isPending } = useServerActionHandler()
 
 	return (
@@ -19,7 +19,7 @@ export default function RemoveCandidateButton({ candidateId, examId, ...props }:
 			{...props}
 			color="red"
 			onClick={() => handleServerAction(removeCandidate(examId, candidateId))}
-			disabled={isPending}
+			disabled={disabled || isPending}
 			leftSection={<MdDeleteOutline className="text-base" />}
 		>
 			Remover acesso

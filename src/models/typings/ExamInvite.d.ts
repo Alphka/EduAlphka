@@ -1,7 +1,8 @@
-import type { Model, PopulatedDoc } from "mongoose"
+import type { Model, PopulatedDoc, Types } from "mongoose"
 import type { IExam } from "./Exam"
 
 export interface IExamInvite {
+	_id: Types.ObjectId
 	token: string
 	exam: NonNullable<PopulatedDoc<IExam>>
 	createdAt: Date

@@ -63,10 +63,7 @@ export default function RemainingTime({
 			)}
 			withBorder
 		>
-			<span>
-				Tempo restante:
-			</span>
-			{" "}
+			<span>Tempo restante: </span>
 			<span
 				role="timer"
 				aria-live="off"
