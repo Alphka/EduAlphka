@@ -1,7 +1,7 @@
 "use server"
 
 import type { Types } from "mongoose"
-import { Exam, StartedExam, Submit } from "@models"
+import { Exam, ExamInvite, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import getSessionUserData from "@helpers/getSessionUserData"
@@ -28,7 +28,12 @@ export default async function deleteExamAction(id: string){
 		if(hasSubmit) return { errors: ["Não é possível excluir um teste que possui respostas"] }
 		if(hasStartedBySomeone) return { errors: ["Não é possível excluir um teste que já foi iniciado"] }
 
-		await exam.deleteOne()
+		await Promise.allSettled([
+			exam.deleteOne(),
+			ExamInvite.deleteMany({ exam: id }),
+			StartedExam.deleteMany({ exam: id }),
+			Submit.deleteMany({ exam: id })
+		])
 	}catch(error){
 		if(typeof error === "string") return { errors: [error] }
 		if(Array.isArray(error)) return { errors: error as string[] }
@@ -40,5 +45,7 @@ export default async function deleteExamAction(id: string){
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.template.pathname.replace("[id]", id))
+	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", id))
+	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", id))
 	redirect(routes.homepage.pathname)
 }

@@ -39,5 +39,7 @@ export default async function editExamAction(id: string, examData: z.infer<typeo
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.template.pathname.replace("[id]", id))
+	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", id))
+	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", id))
 	redirect(routes.homepage.pathname)
 }

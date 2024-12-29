@@ -46,7 +46,9 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 		: routes.exam.children.template.pathname
 	).replace("[id]", examInvite.exam.toString())
 
-	if(isCandidate){
+	const candidates = exam.candidates.map(candidate => candidate.toString())
+
+	if(isCandidate && !candidates.includes(user.id)){
 		exam.candidates.unshift(new Types.ObjectId(user.id))
 		exam.markModified("candidates")
 		await exam.save()

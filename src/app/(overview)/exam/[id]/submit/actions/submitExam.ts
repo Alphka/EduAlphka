@@ -122,7 +122,7 @@ export default async function submitExam(id: string, data: SubmitExamData){
 		}catch(error){
 			await Promise.allSettled([
 				Answer.deleteMany({ submit: submit.id }),
-				Session.deleteMany({ exam: id, user: user.id})
+				Session.deleteMany({ exam: id, user: user.id })
 			])
 
 			throw error
