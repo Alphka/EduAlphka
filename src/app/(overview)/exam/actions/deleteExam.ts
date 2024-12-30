@@ -1,7 +1,7 @@
 "use server"
 
 import type { Types } from "mongoose"
-import { Exam, ExamInvite, StartedExam, Submit } from "@models"
+import { Answer, Exam, ExamInvite, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import getSessionUserData from "@helpers/getSessionUserData"
@@ -22,17 +22,27 @@ export default async function deleteExamAction(id: string){
 		if(!exam) return { errors: ["Teste não encontrado"] }
 		if(!(exam.owner as Types.ObjectId).equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
 
-		const hasSubmit = await Submit.exists({ exam: id })
-		const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
+		if(!exam.isExpired()){
+			const hasSubmit = await Submit.exists({ exam: id })
+			const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
 
-		if(hasSubmit) return { errors: ["Não é possível excluir um teste que possui respostas"] }
-		if(hasStartedBySomeone) return { errors: ["Não é possível excluir um teste que já foi iniciado"] }
+			if(hasStartedBySomeone && !hasSubmit){
+				return { errors: ["Não é possível excluir esse teste pois há candidatos que iniciaram o teste mas ainda não o responderam"] }
+			}
+		}
 
 		await Promise.allSettled([
 			exam.deleteOne(),
 			ExamInvite.deleteMany({ exam: id }),
 			StartedExam.deleteMany({ exam: id }),
-			Submit.deleteMany({ exam: id })
+			Submit.find({ exam: id }, { _id: 1 }).lean().then(submits => {
+				const submitIds = submits.map(submit => submit._id)
+
+				return Promise.all([
+					Answer.deleteMany({ submit: { $in: submitIds } }),
+					Submit.deleteMany({ _id: { $in: submitIds } })
+				])
+			})
 		])
 	}catch(error){
 		if(typeof error === "string") return { errors: [error] }

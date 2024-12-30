@@ -50,7 +50,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 	if(isCandidate && !candidates.includes(user.id)){
 		exam.candidates.unshift(new Types.ObjectId(user.id))
-		exam.markModified("candidates")
 		await exam.save()
 	}
 

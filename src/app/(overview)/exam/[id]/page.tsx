@@ -20,9 +20,10 @@ export const metadata: Metadata = {
 }
 
 export default async function EditExamPage({ params }: PageProps){
-	await connectDatabase()
-
-	const { id } = await params
+	const [{ id }] = await Promise.all([
+		params,
+		await connectDatabase()
+	])
 
 	const [exam, user] = await Promise.all([
 		Exam.findById(id)

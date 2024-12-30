@@ -12,7 +12,7 @@ interface RemoveExamButtonProps {
 }
 
 export default function RemoveExamButton({ examId, examName }: RemoveExamButtonProps){
-	const { handleServerAction, isPending } = useServerActionHandler()
+	const { handleServerAction, isPending } = useServerActionHandler({ autoClose: 10e3 })
 	const [opened, { open, close }] = useDisclosure(false)
 	const isMobile = useMediaQuery("(max-width: 50em)")
 

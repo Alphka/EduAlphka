@@ -34,7 +34,7 @@ export interface IExam {
 	subject?: string
 	duration: number
 	questions: Types.DocumentArray<ExamQuestion>
-	candidates: NonNullable<PopulatedDoc<IUser>>[]
+	candidates: Types.Array<NonNullable<PopulatedDoc<IUser>>>
 	createdAt: Date
 	updatedAt?: Date
 	expiresAt?: Date

@@ -13,7 +13,9 @@ interface InviteURLProps extends Pick<ExamInvitationProps, "examId"> {
 
 export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 	const { handleServerAction, isPending } = useServerActionHandler({
-		successMessage: `Link de convite ${inviteURL ? "atualizado" : "gerado"} com sucesso`
+		successOptions: {
+			message: `Link de convite ${inviteURL ? "atualizado" : "gerado"} com sucesso`
+		}
 	})
 
 	if(typeof inviteURL === "string"){

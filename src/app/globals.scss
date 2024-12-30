@@ -36,6 +36,10 @@
 	}
 }
 
+:root{
+	--toastify-toast-width: theme(screens.xs);
+}
+
 button,
 [role=button]{
 	@apply select-none;

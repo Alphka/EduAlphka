@@ -1,16 +1,31 @@
 "use client"
 
-import { useState, type ReactNode } from "react"
+import { useState } from "react"
 import { toast } from "react-toastify"
 
 type ServerActionPromise = Promise<{ errors: string[] } | undefined>
 
-interface ServerActionHandlerProps {
-	successMessage?: ReactNode
+type ToastOptions = Pick<import("react-toastify").ToastOptions, "autoClose">
+
+type Options =  & ToastOptions
+
+interface ServerActionHandlerProps extends ToastOptions {
+	successOptions?: Partial<{
+		message: string
+	}> & Options
+	errorOptions?: Options
 }
 
-export default function useServerActionHandler({ successMessage }: ServerActionHandlerProps = {}){
+export default function useServerActionHandler({ successOptions = {}, errorOptions = {} }: ServerActionHandlerProps = {}){
 	const [isPending, setIsPending] = useState(false)
+
+	const options = (isError: boolean): ToastOptions => {
+		const options = isError ? errorOptions : successOptions
+
+		return {
+			autoClose: options.autoClose
+		}
+	}
 
 	return {
 		async handleServerAction(promise: ServerActionPromise){
@@ -21,15 +36,15 @@ export default function useServerActionHandler({ successMessage }: ServerActionH
 			if(result){
 				if("errors" in result && result.errors.length){
 					for(const error of result.errors){
-						toast.error(error)
+						toast.error(error, options(true))
 					}
 				}else{
 					console.error("Server action failed:", result)
-					toast.error("Algo deu errado")
+					toast.error("Algo deu errado", options(true))
 				}
 			}else{
-				if(successMessage){
-					toast.success(successMessage)
+				if(successOptions.message){
+					toast.success(successOptions.message, options(false))
 				}
 			}
 

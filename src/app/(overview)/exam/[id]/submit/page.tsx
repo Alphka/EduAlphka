@@ -18,22 +18,24 @@ import RemainingTime from "./components/RemainingTime"
 import routes from "@app/routes"
 
 export default async function SubmitExamPage({ params }: PageProps){
-	await connectDatabase()
-
-	const { id } = await params
+	const [{ id }] = await Promise.all([
+		params,
+		await connectDatabase()
+	])
 
 	const [exam, user] = await Promise.all([
-		Exam.findById(id, {
-			title: 1,
-			owner: 1,
-			subject: 1,
-			duration: 1,
-			questions: 1,
-			candidates: 1,
-			description: 1,
-			createdAt: 1,
-			expiresAt: 1
-		})
+		Exam
+			.findById(id, {
+				title: 1,
+				owner: 1,
+				subject: 1,
+				duration: 1,
+				questions: 1,
+				candidates: 1,
+				description: 1,
+				createdAt: 1,
+				expiresAt: 1
+			})
 			.populate<{
 				owner: HydratedDocument<Pick<IUser, "name">>
 			}>("owner", {
@@ -45,7 +47,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!exam) notFound()
 
-	const candidates = exam.candidates.map(({ _id }) => _id.toString())
+	const candidates = exam.candidates.map(candidate => candidate.toString())
 
 	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
