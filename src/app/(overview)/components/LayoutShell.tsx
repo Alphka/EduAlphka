@@ -94,10 +94,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 									active={active}
 									opened={opened || undefined}
 									component={Link}
-									className={twJoin(
-										"rounded",
-										active && hasChildren && "data-[expanded=true]:rounded-none data-[expanded=true]:rounded-l data-[expanded=true]:rounded-t"
-									)}
+									className="rounded"
 									leftSection={<route.Icon className="text-base" />}
 									prefetch={false}
 								>
@@ -109,7 +106,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 												href={childRoute.pathname}
 												label={childRoute.title}
 												component={Link}
-												className="rounded-b"
+												className="rounded"
 												active={active}
 												prefetch={false}
 												key={childKey}

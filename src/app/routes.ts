@@ -44,6 +44,10 @@ const routes = {
 			create: {
 				title: "Criar teste",
 				pathname: "/exam/create"
+			},
+			list: {
+				title: "Testes criados",
+				pathname: "/exam/list"
 			}
 		}
 	},

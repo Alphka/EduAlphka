@@ -36,6 +36,15 @@ export default function ProfessorDashboard({ userId, recentExamsLimit }: Profess
 					limit={recentExamsLimit}
 				/>
 			</Suspense>
+
+			<Button
+				className="self-center"
+				variant="light"
+				component={Link}
+				href={routes.exam.children.list.pathname}
+			>
+				Ver mais
+			</Button>
 		</div>
 	</>
 }

@@ -1,9 +1,9 @@
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IExam } from "@models/typings/Exam"
-import type { Types } from "mongoose"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, StartedExam, Submit } from "@models"
+import { Types } from "mongoose"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
@@ -24,6 +24,8 @@ export default async function EditExamPage({ params }: PageProps){
 		params,
 		await connectDatabase()
 	])
+
+	if(!Types.ObjectId.isValid(id)) notFound()
 
 	const [exam, user] = await Promise.all([
 		Exam.findById(id)

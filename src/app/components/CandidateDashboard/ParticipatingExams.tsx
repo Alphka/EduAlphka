@@ -2,7 +2,7 @@ import type { CandidateDashboardProps } from "."
 import type { HydratedDocument } from "mongoose"
 import type { IUser } from "@models/typings/User"
 import { Exam } from "@models"
-import ExamList from "../../../components/Candidate/ExamList"
+import ExamList from "../../(overview)/components/Candidate/ExamList"
 
 export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "userId"> {}
 
@@ -21,7 +21,10 @@ export default async function ParticipatingExams({ userId }: ParticipatingExamsP
 			createdAt: 1,
 			updatedAt: 1
 		})
-		.sort({ createdAt: -1, updatedAt: -1 })
+		.sort({
+			createdAt: -1,
+			updatedAt: -1
+		})
 		.populate<{
 			owner: HydratedDocument<Pick<IUser, "name" | "username">>
 		}>("owner", {
