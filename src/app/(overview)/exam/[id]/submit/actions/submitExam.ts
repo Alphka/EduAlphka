@@ -6,7 +6,6 @@ import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import getSessionUserData from "@helpers/getSessionUserData"
-import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
 
 interface DissertativeAnswer {
@@ -27,8 +26,6 @@ export default async function submitExam(id: string, data: SubmitExamData){
 	const { questions } = data
 
 	try{
-		await connectDatabase()
-
 		const user = await getSessionUserData()
 
 		if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }

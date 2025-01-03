@@ -1,10 +1,10 @@
-import { Types } from "mongoose"
 import getRequestURL from "@helpers/getRequestURL"
 import BackButton from "@components/BackButton"
 
 export default async function NotFoundPage(){
 	const url = await getRequestURL()
-	const isExamPage = url && Types.ObjectId.isValid(new URL(url).pathname.substring(1).split("/")[1])
+	const examId = url && new URL(url).pathname.substring(1).split("/")[1]
+	const isExamPage = !!examId && examId.length === 24 && /^[0-9a-fA-F]+$/.test(examId)
 
 	return (
 		<div className="main-height flex flex-col items-center justify-center p-5xl gap-3xl">

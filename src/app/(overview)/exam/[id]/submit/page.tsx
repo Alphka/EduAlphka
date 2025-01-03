@@ -1,8 +1,8 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
-import type { HydratedDocument } from "mongoose"
 import type { PageProps } from "@typings/index"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
+import { Types, type HydratedDocument } from "mongoose"
 import { Exam, StartedExam } from "@models"
 import { Divider, Paper } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
@@ -21,39 +21,40 @@ export default async function SubmitExamPage({ params }: PageProps){
 		connectDatabase()
 	])
 
-	const [exam, user] = await Promise.all([
-		Exam
-			.findById<HydratedDocument<Pick<IExam,
-				| "_id"
-				| "owner"
-				| "title"
-				| "subject"
-				| "duration"
-				| "questions"
-				| "candidates"
-				| "description"
-				| "expiresAt"
-			>> & IExamMethods>(id, {
-				title: 1,
-				owner: 1,
-				subject: 1,
-				duration: 1,
-				questions: 1,
-				candidates: 1,
-				description: 1,
-				createdAt: 1,
-				expiresAt: 1
-			})
-			.populate<{
-				owner: HydratedDocument<Pick<IUser, "name">>
-			}>("owner", {
-				_id: 0,
-				name: 1
-			}),
-		verifyAuthorization({ accountType: "candidate" })
-	])
+	const user = await verifyAuthorization({ accountType: "candidate" })
 
-	if(!exam) notFound()
+	if(!Types.ObjectId.isValid(id)) notFound()
+
+	const exam = await Exam
+		.findById<HydratedDocument<Pick<IExam,
+			| "_id"
+			| "owner"
+			| "title"
+			| "subject"
+			| "duration"
+			| "questions"
+			| "candidates"
+			| "description"
+			| "expiresAt"
+		>> & IExamMethods>(id, {
+			title: 1,
+			owner: 1,
+			subject: 1,
+			duration: 1,
+			questions: 1,
+			candidates: 1,
+			description: 1,
+			createdAt: 1,
+			expiresAt: 1
+		})
+		.populate<{
+			owner: HydratedDocument<Pick<IUser, "name">>
+		}>("owner", {
+			_id: 0,
+			name: 1
+		})
+		.orFail()
+		.catch(notFound)
 
 	const candidates = exam.candidates.map(candidate => candidate.toString())
 

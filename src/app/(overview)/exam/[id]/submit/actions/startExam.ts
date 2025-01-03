@@ -3,12 +3,9 @@
 import { Exam, StartedExam } from "@models"
 import { revalidatePath } from "next/cache"
 import getSessionUserData from "@helpers/getSessionUserData"
-import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
 
 export default async function startExam(id: string){
-	await connectDatabase()
-
 	const user = await getSessionUserData()
 
 	if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }

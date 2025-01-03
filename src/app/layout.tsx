@@ -86,6 +86,7 @@ export default function RootLayout({ children }: RootLayoutProps){
 					inter.className,
 					"bg-dark text-md antialiased min-h-dvh"
 				)}
+				suppressHydrationWarning
 			>
 				<Providers fontFamily={inter.style.fontFamily}>
 					{children}

@@ -5,14 +5,11 @@ import { revalidatePath } from "next/cache"
 import { createExam } from "@lib/editExam"
 import { redirect } from "next/navigation"
 import getSessionUserData from "@helpers/getSessionUserData"
-import connectDatabase from "@lib/connectDatabase"
 import examSchema from "@schemas/exam"
 import routes from "@app/routes"
 
 export default async function createExamAction(examData: z.infer<typeof examSchema>){
 	try{
-		await connectDatabase()
-
 		const user = await getSessionUserData()
 		const exam = createExam(user, examData)
 

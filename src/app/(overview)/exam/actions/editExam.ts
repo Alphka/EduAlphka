@@ -5,15 +5,12 @@ import { Exam, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import getSessionUserData from "@helpers/getSessionUserData"
-import connectDatabase from "@lib/connectDatabase"
 import examSchema from "@schemas/exam"
 import editExam from "@lib/editExam"
 import routes from "@app/routes"
 
 export default async function editExamAction(id: string, examData: z.infer<typeof examSchema>){
 	try{
-		await connectDatabase()
-
 		const [user, exam] = await Promise.all([
 			getSessionUserData(),
 			Exam.findById(id)

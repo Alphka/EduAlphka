@@ -1,26 +1,42 @@
+import type { ISession } from "@models/typings/Session"
 import type { IUser } from "@models/typings/User"
+import type { Types } from "mongoose"
+import { TOKEN_KEY } from "@constants/index"
+import { cookies } from "next/headers"
 import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"
 
 export default async function getUserByToken(token: string){
-	await connectDatabase()
+	const [cookiesStore] = await Promise.all([
+		cookies(),
+		connectDatabase()
+	])
 
 	const session = await Session
 		.findOne({ token }, { user: 1 })
-		.populate<{ user: IUser }>("user")
-		.lean()
+		.populate("user")
+		.lean<Pick<ISession, "_id"> & { user: IUser | null }>()
 
 	if(!session?.user){
 		if(session && !session.user){
-			const { id, user } = (await Session.findById(session._id, { user: 1 }))!
+			const { user } = await Session
+				.findById<{ user: Types.ObjectId }>(session, { _id: 0, user: 1 })
+				.orFail()
 
 			console.error(
 				"Session user not found, deleting user sessions." +
-				`\n\tSession ID: ${id}` +
+				`\n\tSession ID: ${session._id}` +
 				`\n\tUser ID: ${user}`
 			)
 
-			await Session.deleteMany({ $or: [{ _id: id }, { user }] })
+			cookiesStore.delete(TOKEN_KEY)
+
+			await Session.deleteMany({
+				$or: [
+					{ _id: session._id },
+					{ user: { _id: user } }
+				]
+			})
 		}
 
 		return null

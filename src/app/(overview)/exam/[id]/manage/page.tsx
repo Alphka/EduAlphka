@@ -1,10 +1,11 @@
+import type { IExam, IExamMethods } from "@models/typings/Exam"
+import type { HydratedDocument } from "mongoose"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, ExamInvite } from "@models"
 import { Divider } from "@mantine/core"
-import { Types, type HydratedDocument } from "mongoose"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import getExamSubmitData from "../../helpers/getSubmitData"
 import RemoveExamButton from "./components/RemoveExamButton"
@@ -12,7 +13,6 @@ import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import ExamInvitation from "./components/ExamInvitation"
 import routes from "@app/routes"
-import type { IExam, IExamMethods } from "@models/typings/Exam"
 
 const title = routes.exam.children.template.children.manage.title
 
@@ -43,17 +43,18 @@ export default async function ManageExamPage({ params }: PageProps){
 				__v: 1
 			})
 			.populate<{
-				candidates: Types.DocumentArray<Pick<IUser, "_id" | "name" | "email" | "username">>
+				candidates: Pick<IUser, "_id" | "name" | "email" | "username">[]
 			}>("candidates", {
 				name: 1,
 				email: 1,
 				username: 1
 			})
-			.lean(),
+			.lean()
+			.orFail()
+			.catch(notFound),
 		verifyAuthorization({ accountType: "professor" })
 	])
 
-	if(!exam) notFound()
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const [examInvite, startedExams] = await Promise.all([

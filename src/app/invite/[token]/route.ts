@@ -13,14 +13,15 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 		connectDatabase()
 	])
 
+	const user = await verifyAuthorization()
+
 	if(!Types.ObjectId.isValid(token)) notFound()
 
-	const [user, examInvite] = await Promise.all([
-		verifyAuthorization(),
-		ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & { exam: Types.ObjectId }>>({ token }, {
-			exam: 1
-		})
-	])
+	const examInvite = await ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & {
+		exam: Types.ObjectId
+	}>>({ token }, {
+		exam: 1
+	})
 
 	if(!examInvite) notFound()
 
