@@ -29,24 +29,24 @@ export default async function EditExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam.findById(id, {
-				owner: 1,
-				title: 1,
-				subject: 1,
-				duration: 1,
-				questions: 1,
-				candidates: 1,
-				description: 1
-			})
-			.lean<Pick<IExam,
-				| "_id"
-				| "owner"
-				| "title"
-				| "subject"
-				| "duration"
-				| "questions"
-				| "candidates"
-				| "description"
-			>>(),
+			owner: 1,
+			title: 1,
+			subject: 1,
+			duration: 1,
+			questions: 1,
+			candidates: 1,
+			description: 1
+		})
+		.lean<Pick<IExam,
+			| "_id"
+			| "owner"
+			| "title"
+			| "subject"
+			| "duration"
+			| "questions"
+			| "candidates"
+			| "description"
+		>>(),
 		verifyAuthorization()
 	])
 
