@@ -14,10 +14,10 @@ export function getSubmitStatus({
 	return hasStartedExam
 		? pendingCorrection
 			? "Pendente"
-			: isExpired
-				? "Expirado"
-				: hasSubmit
-					? "Finalizado"
+			: hasSubmit
+				? "Finalizado"
+				: isExpired
+					? "Expirado"
 					: "Ativo"
 		: "Não iniciado"
 }

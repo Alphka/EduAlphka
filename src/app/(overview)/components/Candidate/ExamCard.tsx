@@ -37,10 +37,7 @@ export default async function ExamCard({
 
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!submit
-	const isExamExpired = isExamStarted && await StartedExam.hydrate(startedExam).isExpired({
-		exam,
-		submit: isExamSubmitted
-	})
+	const isExamExpired = await StartedExam.hydrate(startedExam).isExpired({ exam })
 
 	const submitStatus = getSubmitStatus({
 		hasStartedExam: isExamStarted,
@@ -50,7 +47,7 @@ export default async function ExamCard({
 	})
 
 	const Container = (props: HTMLAttributes<HTMLElement>) => {
-		return isExamExpired ? (
+		return !isExamSubmitted && isExamExpired ? (
 			<div {...props} />
 		) : (
 			<Link

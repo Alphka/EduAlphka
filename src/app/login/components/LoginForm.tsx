@@ -15,7 +15,7 @@ interface LoginFormProps {
 
 export default function LoginForm({ redirectURL }: LoginFormProps){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-	const { isPending, handleServerAction } = useServerActionHandler()
+	const { handleServerAction, isPending } = useServerActionHandler()
 
 	const registerURL = useMemo(() => {
 		const searchParams = new URLSearchParams()

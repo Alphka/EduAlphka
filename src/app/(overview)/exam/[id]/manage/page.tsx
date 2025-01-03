@@ -1,19 +1,18 @@
-import type { IStartedExam } from "@models/typings/StartedExam"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
-import type { IAnswer } from "@models/typings/Answer"
-import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Exam, ExamInvite, StartedExam } from "@models"
-import { Types, type HydratedDocument } from "mongoose"
+import { Exam, ExamInvite } from "@models"
 import { Divider } from "@mantine/core"
+import { Types, type HydratedDocument } from "mongoose"
 import verifyAuthorization from "@helpers/verifyAuthorization"
+import getExamSubmitData from "../../helpers/getSubmitData"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import ExamInvitation from "./components/ExamInvitation"
 import routes from "@app/routes"
+import type { IExam, IExamMethods } from "@models/typings/Exam"
 
 const title = routes.exam.children.template.children.manage.title
 
@@ -27,12 +26,17 @@ export const metadata: Metadata = {
 export default async function ManageExamPage({ params }: PageProps){
 	const [{ id }] = await Promise.all([
 		params,
-		await connectDatabase()
+		connectDatabase()
 	])
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById(id, {
+			.findById<HydratedDocument<Pick<IExam,
+				| "_id"
+				| "owner"
+				| "title"
+				| "candidates"
+			>> & IExamMethods>(id, {
 				owner: 1,
 				title: 1,
 				candidates: 1,
@@ -50,68 +54,17 @@ export default async function ManageExamPage({ params }: PageProps){
 	])
 
 	if(!exam) notFound()
-	if(!(exam.owner as Types.ObjectId).equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const [examInvite, startedExams] = await Promise.all([
 		ExamInvite.findOne({ exam }),
-		StartedExam.aggregate<HydratedDocument<IStartedExam> & {
-			submit?: (HydratedDocument<ISubmit> & {
-				answers: HydratedDocument<IAnswer>[]
-			})
-		}>([
-			{
-				$match: {
-					exam: exam._id,
-					user: {
-						$in: exam.candidates.map(candidate => candidate._id)
-					}
-				}
-			},
-			{
-				$lookup: {
-					as: "submit",
-					from: "submits",
-					let: {
-						userId: "$user",
-						examId: "$exam"
-					},
-					pipeline: [
-						{
-							$match: {
-								$expr: {
-									$and: [
-										{ $eq: ["$user", "$$userId"] },
-										{ $eq: ["$exam", "$$examId"] }
-									]
-								}
-							}
-						},
-						{
-							$lookup: {
-								as: "answers",
-								from: "answers",
-								localField: "_id",
-								foreignField: "submit"
-							}
-						},
-						{
-							$limit: 1
-						}
-					]
-				}
-			},
-			{
-				$set: {
-					submit: { $arrayElemAt: ["$submit", 0] }
-				}
-			}
-		])
+		getExamSubmitData(exam._id, exam.candidates.map(({ _id }) => _id))
 	])
 
 	const candidatesStartedExams = new Map<string, typeof startedExams[number]>
 
 	for(const startedExam of startedExams){
-		candidatesStartedExams.set((startedExam.user as Types.ObjectId).toString(), startedExam)
+		candidatesStartedExams.set(startedExam.user.toString(), startedExam)
 	}
 
 	return (
@@ -140,17 +93,17 @@ export default async function ManageExamPage({ params }: PageProps){
 				data={exam.candidates.map(({ _id, name, email, username }) => {
 					const id = _id.toString()
 					const startedExam = candidatesStartedExams.get(id)
-					const hasSubmit = !!startedExam?.submit
-					const pendingCorrection = hasSubmit && startedExam.submit!.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+					const submitId = startedExam?.submit?._id.toString() as string | undefined
+					const pendingCorrection = !!startedExam?.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
 
 					return {
 						id,
 						name,
 						email,
+						submitId,
 						username,
 						startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
-						hasSubmit,
-						isExpired: hasSubmit ? Date.now() > startedExam.submit!.createdAt.getTime() : false,
+						isExpired: submitId ? Date.now() > startedExam!.submit!.createdAt.getTime() : false,
 						pendingCorrection
 					}
 				})}

@@ -1,6 +1,5 @@
 import type { IStartedExam, IStartedExamMethods, StartedExamModel } from "./typings/StartedExam"
 import type { IExam, IExamMethods } from "./typings/Exam"
-import type { ISubmit } from "./typings/Submit"
 import { model, models, Schema, type HydratedDocument } from "mongoose"
 
 const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExamMethods>({
@@ -23,17 +22,12 @@ const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExa
 })
 
 startedExamSchema.method("isExpired", async function isExpired({
-	exam,
-	submit
+	exam
 }: {
 	exam?: HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
-	submit?: HydratedDocument<ISubmit> | boolean | null
 } = {}){
-	if(!(exam && exam.expiresAt && exam.duration) || submit === undefined){
-		const [Exam, Submit] = await Promise.all([
-			import("@models/Exam").then(module => module.default),
-			import("@models/Submit").then(module => module.default)
-		])
+	if(!(exam && exam.expiresAt && exam.duration)){
+		const { default: Exam } = await import("@models/Exam")
 
 		if(!(exam && exam.expiresAt && exam.duration)){
 			if(!exam && !this.exam) throw new Error("Missing 'exam' property in StartedExam")
@@ -43,11 +37,7 @@ startedExamSchema.method("isExpired", async function isExpired({
 				expiresAt: 1
 			}))!
 		}
-
-		if(submit === undefined) submit = !!(await Submit.exists({ exam }))
 	}
-
-	if(submit) return false
 
 	const submitExpirationDate = this.startedAt.getTime() + exam.duration * 60 * 1000
 

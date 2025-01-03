@@ -16,15 +16,15 @@ export interface CandidatesRowData {
 	id: string
 	name: string
 	email: string
+	submitId?: string
 	username: string
 	/** Started exam date */
 	startedAt?: string
-	hasSubmit: boolean
 	isExpired: boolean
 	pendingCorrection: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "hasSubmit" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "submitId" | "pendingCorrection"> {
 	status: SubmitStatus
 }
 
@@ -72,20 +72,14 @@ export interface CandidatesTableProps {
 }
 
 export default function CandidatesTable({ examId, data }: CandidatesTableProps){
-	const rowsData = useMemo(() => data.map(({ id, name, username, startedAt, pendingCorrection, hasSubmit, isExpired }) => ({
-		id,
-		name,
+	const rowsData = useMemo(() => data.map(data => ({
 		status: getSubmitStatus({
-			pendingCorrection,
-			hasStartedExam: !!startedAt,
-			hasSubmit: hasSubmit,
-			isExpired
+			pendingCorrection: data.pendingCorrection,
+			hasStartedExam: !!data.startedAt,
+			hasSubmit: !!data.submitId,
+			isExpired: data.isExpired
 		}),
-		username,
-		startedAt,
-		isExpired,
-		hasSubmit: hasSubmit,
-		pendingCorrection
+		...data
 	} as RowData)), [data])
 
 	const [reverseSortDirection, setReverseSortDirection] = useState(false)
@@ -179,38 +173,30 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 							{sortedData.length > 0 ? sortedData.map(({
 								id,
 								name,
+								status,
 								username,
 								startedAt,
 								isExpired,
-								hasSubmit,
+								submitId,
 								pendingCorrection
-							}) => {
-								const status = getSubmitStatus({
-									pendingCorrection,
-									hasStartedExam: !!startedAt,
-									hasSubmit,
-									isExpired
-								})
-
-								return (
-									<Tr
-										examId={examId}
-										{...{
-											id,
-											name,
-											status,
-											username,
-											startedAt,
-											isExpired,
-											hasSubmit,
-											pendingCorrection
-										}}
-										statusColor={submitStatusColors[status]}
-										key={id}
-									/>
-								)
-							}) : (
-								<Table.Tr>
+							}) => (
+								<Tr
+									{...{
+										id,
+										name,
+										examId,
+										status,
+										submitId,
+										username,
+										startedAt,
+										isExpired,
+										pendingCorrection
+									}}
+									statusColor={submitStatusColors[status]}
+									key={id}
+								/>
+							)) : (
+								<Table.Tr key="not-found">
 									<Table.Td colSpan={4}>
 										<Text fw={500} ta="center">
 											Nenhum usuário encontrado

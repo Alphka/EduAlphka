@@ -15,7 +15,7 @@ interface RegisterFormProps {
 export default function RegisterForm({ redirectURL }: RegisterFormProps){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 	const [isProfessor, setIsMasterSelected] = useState(true)
-	const { isPending, handleServerAction } = useServerActionHandler()
+	const { handleServerAction, isPending } = useServerActionHandler()
 
 	const {
 		register,

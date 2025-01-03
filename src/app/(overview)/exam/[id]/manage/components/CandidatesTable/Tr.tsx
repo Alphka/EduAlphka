@@ -3,9 +3,11 @@ import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Ta
 import { MdMenu, MdEdit, MdChecklist } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
 import RemoveCandidateButton from "./components/RemoveCandidateButton"
+import routes from "@app/routes"
+import Link from "next/link"
 
 interface TrProps extends
-	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "hasSubmit" | "isExpired" | "pendingCorrection">,
+	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "submitId" | "isExpired" | "pendingCorrection">,
 	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
@@ -14,7 +16,7 @@ export default function Tr({
 	pendingCorrection,
 	statusColor,
 	startedAt,
-	hasSubmit,
+	submitId,
 	username,
 	examId,
 	status,
@@ -81,27 +83,29 @@ export default function Tr({
 						</MenuTarget>
 
 						<MenuDropdown>
-							{pendingCorrection ? (
+							{!!submitId && (pendingCorrection ? (
 								<MenuItem
+									href={routes.submit.children.template.pathname.replace("[id]", submitId)}
+									component={Link}
+									leftSection={<MdEdit className="text-base" />}
 									px="md"
 									py="sm"
-									leftSection={<MdEdit className="text-base" />}
 								>
 									Corrigir respostas
 								</MenuItem>
-							) : hasSubmit && (
+							) : (
 								<MenuItem
+									leftSection={<MdChecklist className="text-base" />}
 									px="md"
 									py="sm"
-									leftSection={<MdChecklist className="text-base" />}
 								>
 									Visualizar respostas
 								</MenuItem>
-							)}
+							))}
 
 							<RemoveCandidateButton
-								examId={examId}
 								candidateId={id}
+								examId={examId}
 								px="md"
 								py="sm"
 								disabled={!!startedAt}

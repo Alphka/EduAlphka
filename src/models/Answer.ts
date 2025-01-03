@@ -25,6 +25,11 @@ const answerSchema = new Schema<IAnswer>({
 		maxlength: ExamFormValidation.answerContentMaxLength
 	},
 	isCorrect: Boolean,
+	feedback: {
+		type: String,
+		minlength: ExamFormValidation.submitFeedbackMinLength,
+		maxlength: ExamFormValidation.submitFeedbackMaxLength
+	},
 	createdAt: {
 		type: Date,
 		default: Date.now,

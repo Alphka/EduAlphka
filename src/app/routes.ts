@@ -54,10 +54,19 @@ const routes = {
 	invite: {
 		pathname: "/invite",
 		redirect: "/",
-		access: "candidate",
 		children: {
 			template: {
 				pathname: "/invite/[token]"
+			}
+		}
+	},
+	submit: {
+		pathname: "/submit",
+		redirect: "/",
+		children: {
+			template: {
+				title: "Correção de teste",
+				pathname: "/submit/[id]"
 			}
 		}
 	},

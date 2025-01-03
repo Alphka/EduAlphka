@@ -1,16 +1,14 @@
-import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
-import type { IStartedExam } from "@models/typings/StartedExam"
+import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
+import type { HydratedDocument } from "mongoose"
 import type { PageProps } from "@typings/index"
-import type { ISubmit } from "@models/typings/Submit"
-import type { IAnswer } from "@models/typings/Answer"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Types, type HydratedDocument } from "mongoose"
 import { Exam, StartedExam } from "@models"
 import { Divider, Paper } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
+import getExamSubmitData from "../../helpers/getSubmitData"
 import connectDatabase from "@lib/connectDatabase"
 import SubmitExamForm from "./components/SubmitExamForm"
 import StartExamModal from "./components/StartExamModal"
@@ -20,12 +18,22 @@ import routes from "@app/routes"
 export default async function SubmitExamPage({ params }: PageProps){
 	const [{ id }] = await Promise.all([
 		params,
-		await connectDatabase()
+		connectDatabase()
 	])
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById(id, {
+			.findById<HydratedDocument<Pick<IExam,
+				| "_id"
+				| "owner"
+				| "title"
+				| "subject"
+				| "duration"
+				| "questions"
+				| "candidates"
+				| "description"
+				| "expiresAt"
+			>> & IExamMethods>(id, {
 				title: 1,
 				owner: 1,
 				subject: 1,
@@ -51,59 +59,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const startedExam = await StartedExam.aggregate<(HydratedDocument<IStartedExam> & {
-		submit?: (HydratedDocument<ISubmit> & {
-			answers: HydratedDocument<IAnswer>[]
-		})
-	}) | null>([
-		{
-			$match: {
-				exam: exam._id,
-				user: new Types.ObjectId(user.id)
-			}
-		},
-		{
-			$lookup: {
-				as: "submit",
-				from: "submits",
-				let: {
-					userId: "$user",
-					examId: "$exam"
-				},
-				pipeline: [
-					{
-						$match: {
-							$expr: {
-								$and: [
-									{ $eq: ["$user", "$$userId"] },
-									{ $eq: ["$exam", "$$examId"] }
-								]
-							}
-						}
-					},
-					{
-						$lookup: {
-							as: "answers",
-							from: "answers",
-							localField: "_id",
-							foreignField: "submit"
-						}
-					},
-					{
-						$limit: 1
-					}
-				]
-			}
-		},
-		{
-			$set: {
-				submit: { $arrayElemAt: ["$submit", 0] }
-			}
-		},
-		{
-			$limit: 1
-		}
-	]).then(result => result[0] || null)
+	const startedExam = await getExamSubmitData(exam._id, user.id)
 
 	const examClient = pick(exam.toJSON({
 		flattenObjectIds: true
@@ -147,14 +103,22 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!startedExam){
 		return (
-			<StartExamModal
-				exam={examClient}
-			/>
+			<StartExamModal exam={examClient} />
 		)
+	}
+
+	const isExamExpired = await StartedExam
+		.hydrate(startedExam)
+		.isExpired({ exam })
+
+	if(!startedExam.submit && isExamExpired){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
 	const pendingCorrection = !!startedExam.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
 
+	// TODO: Replace this with the 'answers' prop, like in the CorrectExamForm component
+	// TODO: Display correct and wrong answers to the candidate
 	const incorrectAnswers: string[] = []
 	const correctAnswers: string[] = []
 	const pendingAnswers: string[] = []
@@ -167,7 +131,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 			const question = questionsMap.get(questionId)
 
 			if(!question){
-				console.error("Answer's question was not found in exam. Answer ID: %s, Question ID: %s", answer.id, questionId)
+				console.error("Answer's question was not found in exam. Answer ID: %s, Question ID: %s", answer._id.toString(), questionId)
 				continue
 			}
 
@@ -180,14 +144,6 @@ export default async function SubmitExamPage({ params }: PageProps){
 	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
 	const maxGrade = requiredQuestions.length
 	const grade = correctAnswers.length
-
-	const isExamExpired = !startedExam.submit && await StartedExam
-		.hydrate(startedExam)
-		.isExpired({ exam, submit: false })
-
-	if(isExamExpired){
-		redirect(routes.accessDenied.pathname, RedirectType.replace)
-	}
 
 	return (
 		<div className="flex flex-col gap-3xl">
@@ -241,8 +197,8 @@ export default async function SubmitExamPage({ params }: PageProps){
 				</li>
 
 				{exam.expiresAt && (
-					<li>Data final para
-						<span className="font-semibold">entrega: </span>
+					<li>
+						<span className="font-semibold">Data final para entrega: </span>
 						{exam.expiresAt.toLocaleString("pt-BR")}
 					</li>
 				)}

@@ -1,6 +1,5 @@
 "use server"
 
-import type { Types } from "mongoose"
 import { Answer, Exam, ExamInvite, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
@@ -20,7 +19,7 @@ export default async function deleteExamAction(id: string){
 		const exam = await Exam.findById(id, { owner: 1 })
 
 		if(!exam) return { errors: ["Teste não encontrado"] }
-		if(!(exam.owner as Types.ObjectId).equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
+		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
 
 		if(!exam.isExpired()){
 			const hasSubmit = await Submit.exists({ exam: id })

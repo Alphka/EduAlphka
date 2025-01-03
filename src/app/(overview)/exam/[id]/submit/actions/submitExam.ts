@@ -1,7 +1,6 @@
 "use server"
 
 import type { ExamMultipleChoiceQuestion } from "@models/typings/Exam"
-import type { Types } from "mongoose"
 import { Answer, Exam, Session, StartedExam, Submit } from "@models"
 import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
@@ -65,7 +64,7 @@ export default async function submitExam(id: string, data: SubmitExamData){
 				return { errors: ["Resposta inválida"] }
 			}
 
-			if(!(examQuestion._id as Types.ObjectId).equals(question.id)){
+			if(!examQuestion._id.equals(question.id)){
 				return { errors: [`A questão de ID ${question.id} não foi encontrada no teste`] }
 			}
 

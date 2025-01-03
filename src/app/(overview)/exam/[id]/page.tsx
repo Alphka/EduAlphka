@@ -2,8 +2,8 @@ import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IExam } from "@models/typings/Exam"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Exam, StartedExam, Submit } from "@models"
 import { Types } from "mongoose"
+import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
@@ -22,14 +22,13 @@ export const metadata: Metadata = {
 export default async function EditExamPage({ params }: PageProps){
 	const [{ id }] = await Promise.all([
 		params,
-		await connectDatabase()
+		connectDatabase()
 	])
 
 	if(!Types.ObjectId.isValid(id)) notFound()
 
 	const [exam, user] = await Promise.all([
-		Exam.findById(id)
-			.select({
+		Exam.findById(id, {
 				owner: 1,
 				title: 1,
 				subject: 1,
@@ -39,6 +38,7 @@ export default async function EditExamPage({ params }: PageProps){
 				description: 1
 			})
 			.lean<Pick<IExam,
+				| "_id"
 				| "owner"
 				| "title"
 				| "subject"
@@ -59,14 +59,45 @@ export default async function EditExamPage({ params }: PageProps){
 		redirect(routes.exam.children.template.children.submit.pathname.replace("[id]", id), RedirectType.replace)
 	}
 
-	if(user.accountType !== "professor" || !(exam.owner as Types.ObjectId).equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	if(user.accountType !== "professor" || !exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const hasSubmit = await Submit.exists({ exam: id })
-	const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
+	const { hasSubmit, hasStartedBySomeone } = await Exam.aggregate<{
+		hasSubmit: boolean
+		hasStartedBySomeone: boolean
+	}>([
+		{
+			$match: {
+				_id: exam._id
+			}
+		},
+		{
+			$lookup: {
+				from: "submits",
+				localField: "_id",
+				foreignField: "exam",
+				as: "submits"
+			}
+		},
+		{
+			$lookup: {
+				from: "startedexams",
+				localField: "_id",
+				foreignField: "exam",
+				as: "startedExams"
+			}
+		},
+		{
+			$project: {
+				hasSubmit: { $gt: [{ $size: "$submits" }, 0] },
+				hasStartedBySomeone: { $gt: [{ $size: "$startedExams" }, 0] }
+			}
+		}
+	]).then(result => result[0] || { hasSubmit: false, hasStartedBySomeone: false })
 
 	return (
 		<ExamForm
 			type="edit"
+			examId={id}
 			canEdit={!hasSubmit || !hasStartedBySomeone}
 			defaultValues={{
 				exam: {
@@ -81,7 +112,7 @@ export default async function EditExamPage({ params }: PageProps){
 					question_type: question.type,
 					...(question.type === "multiple_choice" ? {
 						option: question.options.map(({ text }) => ({ text })),
-						correct_answer: question.options.findIndex(({ _id }) => _id.equals(question.correctAnswer as Types.ObjectId))
+						correct_answer: question.options.findIndex(({ _id }) => _id.equals(question.correctAnswer))
 					} : undefined)
 				}))
 			}}

@@ -1,6 +1,5 @@
 "use server"
 
-import type { Types } from "mongoose"
 import { revalidatePath } from "next/cache"
 import { Exam, User } from "@models"
 import connectDatabase from "@lib/connectDatabase"
@@ -28,7 +27,7 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	if(!candidate) return { errors: ["Usuário não encontrado"] }
 	if(candidate.accountType !== "candidate") return { errors: ["Este usuário não é um candidato"] }
 
-	if(exam.candidates.some(id => (id as Types.ObjectId).equals(candidate._id))){
+	if(exam.candidates.some(id => id._id.equals(candidate._id))){
 		return { errors: ["Candidato já adicionado ao teste"] }
 	}
 

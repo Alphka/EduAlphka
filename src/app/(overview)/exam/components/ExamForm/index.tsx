@@ -11,7 +11,6 @@ import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { useCallback, useRef, type ChangeEvent } from "react"
 import { MdAccessTime, MdSettings } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
-import { useParams } from "next/navigation"
 import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
@@ -38,22 +37,27 @@ const defaultExamData: ExamFormData["question"][number] = {
 	required: false
 }
 
-interface ExamFormProps {
+type ExamFormProps = {
 	defaultValues?: DefaultValues<ExamFormData>
 	canEdit?: boolean
 	loading?: boolean
-	/** @default "create" */
-	type?: "create" | "edit"
-}
+	examId?: string
+} & ({
+	examId?: undefined
+	type?: "create"
+} | {
+	examId: string
+	type: "edit"
+})
 
 export default function ExamForm({
 	defaultValues,
 	canEdit,
 	loading,
+	examId,
 	type = "create"
 }: ExamFormProps){
-	const { id } = useParams()
-	const { isPending, handleServerAction } = useServerActionHandler()
+	const { handleServerAction, isPending } = useServerActionHandler()
 	const durationInputRef = useRef<HTMLInputElement>(null)
 	const isMobile = useMediaQuery("(max-width: 600px)")
 
@@ -138,7 +142,7 @@ export default function ExamForm({
 				{!loading && type === "edit" && (
 					<Button
 						className="flex-shrink-0"
-						href={routes.exam.children.template.children.manage.pathname.replace("[id]", id as string)}
+						href={routes.exam.children.template.children.manage.pathname.replace("[id]", examId as string)}
 						variant="filled"
 						component={Link}
 						leftSection={<MdSettings className="text-lg" />}
@@ -183,7 +187,7 @@ export default function ExamForm({
 							questions,
 							description
 						})
-						: editExamAction(id as string, {
+						: editExamAction(examId as string, {
 							title,
 							subject,
 							duration,

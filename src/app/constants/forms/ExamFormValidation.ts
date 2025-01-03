@@ -27,4 +27,7 @@ export default class ExamFormValidation {
 
 	static readonly answerContentMinLength = 1
 	static readonly answerContentMaxLength = 2000
+
+	static readonly submitFeedbackMinLength = 3
+	static readonly submitFeedbackMaxLength = 1000
 }

@@ -1,14 +1,16 @@
+import type { Model, PopulatedDoc, Types } from "mongoose"
 import type { QuestionTypes } from "@models/Exam"
-import type { Model, Types } from "mongoose"
+import type { ISubmit } from "./Submit"
 
 export interface IAnswer {
 	_id: Types.ObjectId
-	type: QuestionTypes
-	submit: string | Types.ObjectId
-	question: string | Types.ObjectId
-	option?: string | Types.ObjectId
+	type: keyof typeof QuestionTypes
+	submit: NonNullable<PopulatedDoc<ISubmit>>
+	question: Types.ObjectId
+	option?: Types.ObjectId
 	content?: string
 	isCorrect?: boolean
+	feedback?: string
 	createdAt: Date
 	updatedAt?: Date
 }

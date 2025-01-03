@@ -1,3 +1,4 @@
+import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import ExamForm from "../components/ExamForm"
 import routes from "@app/routes"
@@ -11,10 +12,13 @@ export const metadata: Metadata = {
 	}
 }
 
-export default function EditExamPageSkeleton(){
+export default async function EditExamPageSkeleton({ params }: PageProps){
+	const { id } = await params
+
 	return (
 		<ExamForm
 			type="edit"
+			examId={id}
 			loading
 		/>
 	)

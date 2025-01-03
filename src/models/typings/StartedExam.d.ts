@@ -11,9 +11,8 @@ export interface IStartedExam {
 }
 
 export interface IStartedExamMethods {
-	isExpired({ exam, submit }?: {
+	isExpired({ exam }?: {
 		exam?: HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
-		submit?: HydratedDocument<ISubmit> | boolean | null
 	}): Promise<boolean>
 }
 
