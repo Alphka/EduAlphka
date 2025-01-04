@@ -30,11 +30,11 @@ export interface ExamFormData {
 	})[]
 }
 
-const defaultExamData: ExamFormData["question"][number] = {
+const defaultQuestionData: ExamFormData["question"][number] = {
 	question_type: "" as keyof typeof QuestionTypes,
 	text: "",
 	option: [{ text: "" }],
-	required: false
+	required: true
 }
 
 type ExamFormProps = {
@@ -76,7 +76,7 @@ export default function ExamForm({
 	} = useForm<ExamFormData>({
 		reValidateMode: "onChange",
 		defaultValues: defaultValues || {
-			question: [defaultExamData]
+			question: [defaultQuestionData]
 		},
 		disabled: formDisabled,
 		mode: "onSubmit"
@@ -344,7 +344,7 @@ export default function ExamForm({
 									index !== length - 1 && [
 										"after:w-full after:absolute after:h-0.5 after:left-0 after:right-0 after:-bottom-4",
 										"after:translate-y-1/2",
-										"after:bg-[var(--mantine-color-default-border)]"
+										"after:bg-dark-400"
 									]
 								)}
 								key={id}
@@ -373,7 +373,7 @@ export default function ExamForm({
 						<Button
 							variant="default"
 							onClick={() => {
-								appendQuestion(defaultExamData)
+								appendQuestion(defaultQuestionData)
 							}}
 							disabled={formDisabled || questionFields.length === ExamFormValidation.maxQuestionsNumber}
 						>

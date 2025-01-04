@@ -206,7 +206,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 				<li>
 					<span className="font-semibold">Descrição: </span>
-					{exam.description}
+					<span className="whitespace-pre-wrap">{exam.description}</span>
 				</li>
 			</Paper>
 

@@ -75,7 +75,7 @@ export default function QuestionContainer({
 					label={isMobile ? "Obrigatória" : "Questão obrigatória"}
 					labelPosition="right"
 					{...register(`question.${index}.required`)}
-					defaultChecked={watch(`question.${index}.required`, true)}
+					defaultChecked={watch(`question.${index}.required`)}
 				/>
 			</div>
 
@@ -182,7 +182,7 @@ export default function QuestionContainer({
 											}
 										})}
 										name={undefined}
-										defaultValue={watch(path, undefined)}
+										defaultValue={watch(path)}
 									/>
 								)}
 

@@ -1,10 +1,10 @@
 import type { z } from "zod"
-import { Exam, type User } from "@models"
-import { Types } from "mongoose"
+import type getUserByToken from "@helpers/getUserByToken"
+import { Exam } from "@models"
 import getDurationMinutes from "@helpers/getDurationMinutes"
 import examSchema from "@app/schemas/exam"
 
-type TUser = Pick<InstanceType<typeof User>, "id" | "accountType"> | null
+type TUser = Awaited<ReturnType<typeof getUserByToken>>
 type TExamData = z.infer<typeof examSchema>
 type TExam = InstanceType<typeof Exam> | null
 
@@ -16,10 +16,16 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 		throw validatedFields.error.errors.map(error => error.message)
 	}
 
-	if(user?.accountType !== "professor" || (exam && !(exam.owner instanceof Types.ObjectId ? exam.owner : exam.owner._id).equals(user.id))) throw "Acesso negado"
+	if(user?.accountType !== "professor" || (exam && !exam.owner._id.equals(user.id))) throw "Acesso negado"
 	if(exam === null) throw "Teste não encontrado"
 
-	const { title, subject, description, duration, questions } = validatedFields.data
+	const {
+		title,
+		subject,
+		duration,
+		questions,
+		description
+	} = validatedFields.data
 
 	if(exam){
 		exam.updatedAt = new Date
@@ -65,7 +71,6 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 		if(examQuestion.type !== "multiple_choice") return
 
 		examQuestion.correctAnswer = examQuestion.options[question.correct_answer!]._id
-		examQuestion.isRequired = true
 	})
 
 	return exam
@@ -77,6 +82,6 @@ export function createExam(user: TUser, examData: TExamData){
 }
 
 /** @throws {string | string[]} */
-export default function editExam(user: TUser, exam: TExam, examData: TExamData){
+export default function editExam(user: TUser, exam: NonNullable<TExam>, examData: TExamData){
 	return createOrEditExam(user, examData, exam)
 }

@@ -1,7 +1,7 @@
 import type { IExam, ExamModel, IExamMethods } from "../typings/Exam"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
+import { model, models, Schema, type Types } from "mongoose"
 import { QuestionSchema, QuestionTypes } from "./Question"
-import { model, models, Schema } from "mongoose"
 
 const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 	owner: {
@@ -46,6 +46,47 @@ const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 
 examSchema.method("isExpired", function isExpired(){
 	return !!this.expiresAt && Date.now() > this.expiresAt.getTime()
+})
+
+examSchema.method("submitInfo", async function submitInfo(){
+	const [{ hasStartedBySomeone, hasSubmit }] = await Exam.aggregate<{
+		_id: Types.ObjectId
+		hasSubmit: boolean
+		hasStartedBySomeone: boolean
+	}>([
+		{
+			$match: {
+				_id: this._id
+			}
+		},
+		{
+			$lookup: {
+				from: "submits",
+				localField: "_id",
+				foreignField: "exam",
+				as: "submits"
+			}
+		},
+		{
+			$lookup: {
+				from: "startedexams",
+				localField: "_id",
+				foreignField: "exam",
+				as: "startedExams"
+			}
+		},
+		{
+			$project: {
+				hasSubmit: { $gt: [{ $size: "$submits" }, 0] },
+				hasStartedBySomeone: { $gt: [{ $size: "$startedExams" }, 0] }
+			}
+		}
+	])
+
+	return {
+		hasSubmit,
+		hasStartedBySomeone
+	}
 })
 
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)

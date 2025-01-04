@@ -107,7 +107,7 @@ export default function SubmitExamForm({
 							</h3>
 
 							<div className="flex flex-col mt-xs gap-md">
-								<p className="text-md font-medium">{text}</p>
+								<p className="text-md font-medium whitespace-pre-wrap">{text}</p>
 
 								<Divider />
 
@@ -157,7 +157,7 @@ export default function SubmitExamForm({
 																}
 															})}
 															name={undefined}
-															defaultValue={watch(optionPath, undefined)}
+															defaultValue={watch(optionPath)}
 														/>
 													)}
 

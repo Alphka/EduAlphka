@@ -1,23 +1,30 @@
 "use server"
 
 import type { z } from "zod"
-import { Exam, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { Exam } from "@models"
 import getSessionUserData from "@helpers/getSessionUserData"
+import connectDatabase from "@lib/connectDatabase"
 import examSchema from "@schemas/exam"
 import editExam from "@lib/editExam"
 import routes from "@app/routes"
 
 export default async function editExamAction(id: string, examData: z.infer<typeof examSchema>){
 	try{
+		await connectDatabase()
+
 		const [user, exam] = await Promise.all([
 			getSessionUserData(),
 			Exam.findById(id)
 		])
 
-		const hasSubmit = await Submit.exists({ exam: id })
-		const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
+		if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
+		if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
+		if(!exam) return { errors: ["Teste não encontrado"] }
+		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem permissão para editar esse teste"] }
+
+		const { hasSubmit, hasStartedBySomeone } = await exam.submitInfo()
 
 		if(hasSubmit) return { errors: ["Não é possível editar um teste que possui respostas"] }
 		if(hasStartedBySomeone) return { errors: ["Não é possível editar um teste que já foi iniciado"] }

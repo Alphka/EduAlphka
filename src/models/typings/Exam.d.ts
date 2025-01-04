@@ -42,6 +42,10 @@ export interface IExam {
 
 export interface IExamMethods {
 	isExpired(): boolean
+	submitInfo(): Promise<{
+		hasSubmit: boolean
+		hasStartedBySomeone: boolean
+	}>
 }
 
 export type QuestionModel = Model<ExamQuestion>

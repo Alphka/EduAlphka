@@ -38,7 +38,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 				}
 			}}
 			padding="xl"
-			zIndex={1}
+			zIndex={5}
 		>
 			<AppShell.Header>
 				<div className="h-full flex items-center justify-between p-md gap-md">

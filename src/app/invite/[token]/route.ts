@@ -15,8 +15,6 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 	const user = await verifyAuthorization()
 
-	if(!Types.ObjectId.isValid(token)) notFound()
-
 	const examInvite = await ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & {
 		exam: Types.ObjectId
 	}>>({ token }, {

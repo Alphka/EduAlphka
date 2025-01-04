@@ -44,8 +44,11 @@ export default async function authenticateUser({
 		}
 	}
 
-	const headersStore = await headers()
-	const cookiesStore = await cookies()
+	const [headersStore, cookiesStore] = await Promise.all([
+		headers(),
+		cookies()
+	])
+
 	const token = await User.generateToken()
 	const tokenExpirationDate = new Date
 

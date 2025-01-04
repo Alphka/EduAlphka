@@ -1,8 +1,8 @@
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
-import type { IExam } from "@models/typings/Exam"
+import type { IExam, IExamMethods } from "@models/typings/Exam"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Types } from "mongoose"
+import { Types, type HydratedDocument } from "mongoose"
 import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
@@ -28,29 +28,28 @@ export default async function EditExamPage({ params }: PageProps){
 	if(!Types.ObjectId.isValid(id)) notFound()
 
 	const [exam, user] = await Promise.all([
-		Exam.findById(id, {
-			owner: 1,
-			title: 1,
-			subject: 1,
-			duration: 1,
-			questions: 1,
-			candidates: 1,
-			description: 1
-		})
-		.lean<Pick<IExam,
-			| "_id"
-			| "owner"
-			| "title"
-			| "subject"
-			| "duration"
-			| "questions"
-			| "candidates"
-			| "description"
-		>>(),
+		Exam
+			.findById<HydratedDocument<Pick<IExam,
+				| "_id"
+				| "owner"
+				| "title"
+				| "subject"
+				| "duration"
+				| "questions"
+				| "candidates"
+				| "description"
+			>> & IExamMethods>(id, {
+				owner: 1,
+				title: 1,
+				subject: 1,
+				duration: 1,
+				questions: 1,
+				candidates: 1,
+				description: 1
+			})
+			.orFail(notFound),
 		verifyAuthorization()
 	])
-
-	if(!exam) notFound()
 
 	const candidates = exam.candidates.map(({ _id }) => _id.toString())
 
@@ -61,44 +60,13 @@ export default async function EditExamPage({ params }: PageProps){
 
 	if(user.accountType !== "professor" || !exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const { hasSubmit, hasStartedBySomeone } = await Exam.aggregate<{
-		hasSubmit: boolean
-		hasStartedBySomeone: boolean
-	}>([
-		{
-			$match: {
-				_id: exam._id
-			}
-		},
-		{
-			$lookup: {
-				from: "submits",
-				localField: "_id",
-				foreignField: "exam",
-				as: "submits"
-			}
-		},
-		{
-			$lookup: {
-				from: "startedexams",
-				localField: "_id",
-				foreignField: "exam",
-				as: "startedExams"
-			}
-		},
-		{
-			$project: {
-				hasSubmit: { $gt: [{ $size: "$submits" }, 0] },
-				hasStartedBySomeone: { $gt: [{ $size: "$startedExams" }, 0] }
-			}
-		}
-	]).then(result => result[0] || { hasSubmit: false, hasStartedBySomeone: false })
+	const { hasSubmit, hasStartedBySomeone } = await exam.submitInfo()
 
 	return (
 		<ExamForm
 			type="edit"
 			examId={id}
-			canEdit={!hasSubmit || !hasStartedBySomeone}
+			canEdit={!hasSubmit && !hasStartedBySomeone}
 			defaultValues={{
 				exam: {
 					title: exam.title,
