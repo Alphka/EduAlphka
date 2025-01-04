@@ -2,11 +2,12 @@ import { MdAddCircleOutline } from "react-icons/md"
 import { Suspense } from "react"
 import { Button } from "@mantine/core"
 import ExamListSkeleton from "../ExamListSkeleton"
+import SeeAllButton from "./SeeAllButton"
 import RecentExams from "./RecentExams"
 import routes from "@app/routes"
 import Link from "next/link"
 
-export interface ProfessorDashboardProps {
+interface ProfessorDashboardProps {
 	recentExamsLimit: number
 	userId: string
 }
@@ -37,14 +38,7 @@ export default function ProfessorDashboard({ userId, recentExamsLimit }: Profess
 				/>
 			</Suspense>
 
-			<Button
-				className="self-center"
-				variant="light"
-				component={Link}
-				href={routes.exam.children.list.pathname}
-			>
-				Ver mais
-			</Button>
+			<SeeAllButton userId={userId} />
 		</div>
 	</>
 }

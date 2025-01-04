@@ -1,8 +1,8 @@
-import type { ProfessorDashboardProps } from "."
 import { Exam } from "@models"
 import ExamList from "../../(overview)/components/Professor/ExamList"
 
-interface RecentExamsProps extends Pick<ProfessorDashboardProps, "userId"> {
+interface RecentExamsProps {
+	userId: string
 	limit: number
 }
 

@@ -36,7 +36,7 @@ export default async function authenticateUser({
 					]
 				}, { password: 1 })
 				.collation({ locale: "en", strength: 2 })
-				.orFail(new Error("Usuário não existe"))
+				.orFail()
 
 			if(!user.validatePassword(password)) throw "Senha inválida"
 		}catch{
