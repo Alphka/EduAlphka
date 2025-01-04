@@ -1,6 +1,6 @@
 "use server"
 
-import type { ExamMultipleChoiceQuestion } from "@models/typings/Exam"
+import type { ExamDissertativeQuestion, ExamMultipleChoiceQuestion, IExam } from "@models/typings/Exam"
 import { Answer, Exam, Session, StartedExam, Submit } from "@models"
 import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
@@ -23,7 +23,17 @@ interface SubmitExamData {
 export default async function submitExam(id: string, data: SubmitExamData){
 	if(!data?.questions) return { errors: ["As respostas do teste não foram encontradas"] }
 
-	const { questions } = data
+	const questions = data.questions.map(question => {
+		const { id } = question
+
+		if("content" in question){
+			const { content } = question
+			return content.trim() ? { id, content } : { id }
+		}else{
+			const { option } = question
+			return option.trim() ? { id, option } : { id }
+		}
+	})
 
 	try{
 		const user = await getSessionUserData()
@@ -31,13 +41,25 @@ export default async function submitExam(id: string, data: SubmitExamData){
 		if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
 		if(user.accountType !== "candidate") return { errors: ["Você não tem permissão para executar essa ação"] }
 
-		if(!await StartedExam.exists({ exam: id, user: user.id })) return { errors: ["Você ainda não iniciou esse teste"] }
-		if(await Submit.exists({ exam: id, user: user.id })) return { errors: ["Você já respondeu esse teste"] }
+		const [hasStartedExam, hasSubmittedExam] = await Promise.all([
+			StartedExam.exists({ exam: id, user: user.id }),
+			Submit.exists({ exam: id, user: user.id })
+		])
 
-		const exam = await Exam.findById(id, { questions: 1 }).lean()
+		if(!hasStartedExam) return { errors: ["Você ainda não iniciou esse teste"] }
+		if(hasSubmittedExam) return { errors: ["Você já respondeu esse teste"] }
 
-		if(!exam) return { errors: ["Teste não encontrado"] }
-		if(exam.questions.length !== questions.length) return { errors: ["Quantidade de respostas inválida"] }
+		const exam = await Exam
+			.findById(id, { questions: 1 })
+			.lean<Pick<IExam, "_id" | "questions">>()
+
+		if(!exam){
+			return { errors: ["Teste não encontrado"] }
+		}
+
+		if(exam.questions.length !== questions.length){
+			return { errors: ["A quantidade de respostas é diferente da quantidade de questões do teste"] }
+		}
 
 		const submit = new Submit({
 			exam: id,
@@ -48,30 +70,25 @@ export default async function submitExam(id: string, data: SubmitExamData){
 
 		for(let index = 0, { length } = questions; index < length; index++){
 			const examQuestion = exam.questions[index]
+			const { isRequired } = examQuestion
 			const question = questions[index]
 			const isDissertative = "content" in question
 			const isMultipleChoice = "option" in question
 
 			if(
 				(isDissertative && isMultipleChoice) ||
-				(!isDissertative && !isMultipleChoice) ||
 				(isDissertative && examQuestion.type !== "dissertative") ||
 				(isMultipleChoice && examQuestion.type !== "multiple_choice")
 			){
-				return { errors: ["Resposta inválida"] }
+				return { errors: ["Há uma resposta inválida"] }
 			}
 
 			if(!examQuestion._id.equals(question.id)){
 				return { errors: [`A questão de ID ${question.id} não foi encontrada no teste`] }
 			}
 
-			if(examQuestion.isRequired){
-				if(
-					(isDissertative && !question.content) ||
-					(isMultipleChoice && !question.option)
-				){
-					return { errors: ["Há uma questão obrigatória que não foi respondida"] }
-				}
+			if(isRequired && (!isDissertative && !isMultipleChoice)){
+				return { errors: ["Há uma questão obrigatória que não foi respondida"] }
 			}
 
 			const answer = new Answer({
@@ -81,27 +98,28 @@ export default async function submitExam(id: string, data: SubmitExamData){
 
 			if(isMultipleChoice){
 				const { type, options, correctAnswer } = examQuestion as ExamMultipleChoiceQuestion
-				const { option } = question
+				const { option: chosenOption } = question as MultipleChoiceAnswer
 
-				if(!options.some(({ _id }) => _id.equals(option))){
+				if(!options.some(({ _id }) => _id.equals(chosenOption))){
 					return { errors: ["Uma opção selecionada não foi encontrada na questão"] }
 				}
 
-				const isCorrect = correctAnswer.equals(option)
-
 				answers.push(Object.assign(answer, {
 					type,
-					option,
-					isCorrect
+					option: chosenOption,
+					isCorrect: isRequired ? correctAnswer.equals(chosenOption) : undefined
 				}))
-			}else{
-				const { content } = question
+			}else if(isDissertative){
+				const { type } = examQuestion as ExamDissertativeQuestion
+				const { content } = question as DissertativeAnswer
 
-				if(content.length > ExamFormValidation.answerContentMaxLength){
-					return { errors: [`A resposta deve ter no máximo ${ExamFormValidation.answerContentMaxLength} caracteres`] }
+				if(content!.length < ExamFormValidation.answerContentMinLength){
+					return { errors: [`A resposta deve ter no mínimo ${ExamFormValidation.answerContentMinLength} caracteres`] }
 				}
 
-				const { type } = examQuestion
+				if(content && content.length > ExamFormValidation.answerContentMaxLength){
+					return { errors: [`A resposta deve ter no máximo ${ExamFormValidation.answerContentMaxLength} caracteres`] }
+				}
 
 				answers.push(Object.assign(answer, {
 					type,
@@ -110,18 +128,20 @@ export default async function submitExam(id: string, data: SubmitExamData){
 			}
 		}
 
-		try{
-			await Promise.all([
-				Answer.bulkSave(answers),
-				submit.save()
-			])
-		}catch(error){
+		const [answersResult, submitResult] = await Promise.allSettled([
+			Answer.bulkSave(answers),
+			submit.save()
+		])
+
+		if(answersResult.status === "rejected" || submitResult.status === "rejected"){
 			await Promise.allSettled([
 				Answer.deleteMany({ submit: submit.id }),
-				Session.deleteMany({ exam: id, user: user.id })
+				Session.deleteMany({ exam: id, user: user.id }),
+				submit.deleteOne()
 			])
 
-			throw error
+			if(answersResult.status === "rejected") throw answersResult.reason
+			if(submitResult.status === "rejected") throw submitResult.reason
 		}
 	}catch(error){
 		if(typeof error === "string") return { errors: [error] }
