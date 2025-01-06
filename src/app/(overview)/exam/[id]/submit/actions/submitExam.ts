@@ -1,6 +1,6 @@
 "use server"
 
-import type { ExamDissertativeQuestion, ExamMultipleChoiceQuestion, IExam } from "@models/typings/Exam"
+import type { ExamMultipleChoiceQuestion, IExam } from "@models/typings/Exam"
 import { Answer, Exam, Session, StartedExam, Submit } from "@models"
 import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
@@ -92,12 +92,13 @@ export default async function submitExam(id: string, data: SubmitExamData){
 			}
 
 			const answer = new Answer({
+				type: examQuestion.type,
 				submit,
 				question: examQuestion._id,
 			})
 
 			if(isMultipleChoice){
-				const { type, options, correctAnswer } = examQuestion as ExamMultipleChoiceQuestion
+				const { options, correctAnswer } = examQuestion as ExamMultipleChoiceQuestion
 				const { option: chosenOption } = question as MultipleChoiceAnswer
 
 				if(!options.some(({ _id }) => _id.equals(chosenOption))){
@@ -105,12 +106,10 @@ export default async function submitExam(id: string, data: SubmitExamData){
 				}
 
 				answers.push(Object.assign(answer, {
-					type,
 					option: chosenOption,
 					isCorrect: isRequired ? correctAnswer.equals(chosenOption) : undefined
 				}))
 			}else if(isDissertative){
-				const { type } = examQuestion as ExamDissertativeQuestion
 				const { content } = question as DissertativeAnswer
 
 				if(content!.length < ExamFormValidation.answerContentMinLength){
@@ -121,10 +120,9 @@ export default async function submitExam(id: string, data: SubmitExamData){
 					return { errors: [`A resposta deve ter no máximo ${ExamFormValidation.answerContentMaxLength} caracteres`] }
 				}
 
-				answers.push(Object.assign(answer, {
-					type,
-					content
-				}))
+				answers.push(Object.assign(answer, { content }))
+			}else{
+				answers.push(answer)
 			}
 		}
 
