@@ -1,9 +1,10 @@
 "use server"
 
-import type { Types } from "mongoose"
 import { Exam, ExamInvite } from "@models"
 import { revalidatePath } from "next/cache"
 import { randomBytes } from "crypto"
+import { IExamInvite } from "@models/typings/ExamInvite"
+import { Types } from "mongoose"
 import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
 
@@ -33,11 +34,17 @@ async function saveInviteURL(examId: string, inviteId?: Types.ObjectId){
 }
 
 export async function generateExamInviteURL(id: string){
+	if(!Types.ObjectId.isValid(id)){
+		return { errors: ["ID do teste inválido"] }
+	}
+
 	await connectDatabase()
 
 	if(!(await Exam.exists({ _id: id }))) return { errors: ["Teste não encontrado"] }
 
-	const oldInvite = await ExamInvite.findOne({ exam: id }, { _id: 1 })
+	const oldInvite = await ExamInvite
+		.findOne<Pick<IExamInvite, "_id">>({ exam: id }, { _id: 1 })
+		.lean()
 
 	try{
 		await saveInviteURL(id, oldInvite?._id)

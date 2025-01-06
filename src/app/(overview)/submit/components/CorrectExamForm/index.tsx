@@ -1,7 +1,12 @@
+"use client"
+
 import type { ExamMultipleChoiceQuestion, ExamQuestion } from "@models/typings/Exam"
 import type { IAnswer } from "@models/typings/Answer"
+import { Button } from "@mantine/core"
 import { useId } from "react"
 import CorrectExamFormQuestion from "./Question"
+import useServerActionHandler from "@hooks/useServerActionHandler"
+import sendCorrection from "../../actions/sendCorrection"
 
 export interface CorrectExamFormProps {
 	submitId: string
@@ -19,9 +24,11 @@ export interface CorrectExamFormProps {
 		option?: string
 		question: string
 	})[]
+	formDisabled: boolean
 }
 
-export default function CorrectExamForm({ submitId, exam, answers }: CorrectExamFormProps){
+export default function CorrectExamForm({ submitId, exam, answers, formDisabled }: CorrectExamFormProps){
+	const { handleServerAction, isPending } = useServerActionHandler()
 	const titleId = useId()
 
 	const answersByQuestion = new Map(answers.map(({ question, ...answer }) => [question, answer]))
@@ -51,12 +58,34 @@ export default function CorrectExamForm({ submitId, exam, answers }: CorrectExam
 							text,
 							options,
 							submitId,
-							isRequired
+							isRequired,
+							formDisabled
 						}}
 						key={questionId}
 					/>
 				))}
 			</ul>
+
+			<div className="flex flex-col items-start gap-md">
+				<div className="text-xs">
+					<p>Após o envio da correção, não será possível editá-la.</p>
+					<p>Corrija todas as informações antes de enviar o formulário.</p>
+				</div>
+
+				<Button
+					type="submit"
+					variant="filled"
+					loading={isPending}
+					onClick={event => {
+						event.preventDefault()
+
+						handleServerAction(sendCorrection(submitId))
+					}}
+					disabled={formDisabled}
+				>
+					Enviar correção
+				</Button>
+			</div>
 		</form>
 	)
 }

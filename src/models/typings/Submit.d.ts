@@ -8,6 +8,7 @@ export interface ISubmit {
 	user: NonNullable<PopulatedDoc<IUser>>
 	exam: NonNullable<PopulatedDoc<IExam>>
 	createdAt: Date
+	publishedAt?: Date
 }
 
 export interface ISubmitMethods {

@@ -2,10 +2,15 @@
 
 import { revalidatePath } from "next/cache"
 import { Exam, User } from "@models"
+import { Types } from "mongoose"
 import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
 
 export async function addCandidate(examId: string, usernameOrEmail: string){
+	if(!Types.ObjectId.isValid(examId)){
+		return { errors: ["ID do teste inválido"] }
+	}
+
 	await connectDatabase()
 
 	const exam = await Exam.findById(examId, { candidates: 1 })
@@ -40,6 +45,10 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 }
 
 export async function removeCandidate(examId: string, userId: string){
+	if(!Types.ObjectId.isValid(examId)){
+		return { errors: ["ID do teste inválido"] }
+	}
+
 	await connectDatabase()
 
 	const exam = await Exam.findById(examId, { candidates: 1 })

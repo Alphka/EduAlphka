@@ -3,6 +3,7 @@
 import type { z } from "zod"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { Types } from "mongoose"
 import { Exam } from "@models"
 import getSessionUserData from "@helpers/getSessionUserData"
 import connectDatabase from "@lib/connectDatabase"
@@ -11,6 +12,10 @@ import editExam from "@lib/editExam"
 import routes from "@app/routes"
 
 export default async function editExamAction(id: string, examData: z.infer<typeof examSchema>){
+	if(!Types.ObjectId.isValid(id)){
+		return { errors: ["ID do teste inválido"] }
+	}
+
 	try{
 		await connectDatabase()
 

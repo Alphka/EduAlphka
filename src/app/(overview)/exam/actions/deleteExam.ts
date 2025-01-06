@@ -3,10 +3,15 @@
 import { Answer, Exam, ExamInvite, StartedExam, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { Types } from "mongoose"
 import getSessionUserData from "@helpers/getSessionUserData"
 import routes from "@app/routes"
 
 export default async function deleteExamAction(id: string){
+	if(!Types.ObjectId.isValid(id)){
+		return { errors: ["ID do teste inválido"] }
+	}
+
 	try{
 		const user = await getSessionUserData()
 

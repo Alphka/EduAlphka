@@ -5,6 +5,7 @@ import { Answer, Exam, Session, StartedExam, Submit } from "@models"
 import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
+import { Types } from "mongoose"
 import getSessionUserData from "@helpers/getSessionUserData"
 import routes from "@app/routes"
 
@@ -21,7 +22,11 @@ interface SubmitExamData {
 }
 
 export default async function submitExam(id: string, data: SubmitExamData){
-	if(!data?.questions) return { errors: ["As respostas do teste não foram encontradas"] }
+	if(!Types.ObjectId.isValid(id)){
+		return { errors: ["ID do teste inválido"] }
+	}
+
+	if(!Array.isArray(data?.questions) || !data.questions.length) return { errors: ["As respostas do teste não foram encontradas"] }
 
 	const questions = data.questions.map(question => {
 		const { id } = question

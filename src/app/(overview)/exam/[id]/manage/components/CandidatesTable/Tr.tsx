@@ -83,25 +83,20 @@ export default function Tr({
 						</MenuTarget>
 
 						<MenuDropdown>
-							{!!submitId && (pendingCorrection ? (
+							{!!submitId && (
 								<MenuItem
 									href={routes.submit.children.template.pathname.replace("[id]", submitId)}
 									component={Link}
-									leftSection={<MdEdit className="text-base" />}
+									leftSection={pendingCorrection
+										? <MdEdit className="text-base" />
+										: <MdChecklist className="text-base" />
+									}
 									px="md"
 									py="sm"
 								>
-									Corrigir respostas
+									{pendingCorrection ? "Corrigir respostas" : "Visualizar respostas"}
 								</MenuItem>
-							) : (
-								<MenuItem
-									leftSection={<MdChecklist className="text-base" />}
-									px="md"
-									py="sm"
-								>
-									Visualizar respostas
-								</MenuItem>
-							))}
+							)}
 
 							<RemoveCandidateButton
 								candidateId={id}

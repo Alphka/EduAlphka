@@ -116,35 +116,19 @@ export default async function SubmitExamPage({ params }: PageProps){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
-	const pendingCorrection = !!startedExam.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+	const pendingCorrection = !!startedExam?.pendingCorrection
 
-	// TODO: Replace this with the 'answers' prop, like in the CorrectExamForm component
-	// TODO: Display correct and wrong answers to the candidate
-	const incorrectAnswers: string[] = []
-	const correctAnswers: string[] = []
-	const pendingAnswers: string[] = []
-
-	if(startedExam.submit){
-		const questionsMap = new Map(exam.questions.map(question => [question.id, question]))
-
-		for(const answer of startedExam.submit.answers){
-			const questionId = answer.question.toString()
-			const question = questionsMap.get(questionId)
-
-			if(!question){
-				console.error("Answer's question was not found in exam. Answer ID: %s, Question ID: %s", answer._id.toString(), questionId)
-				continue
-			}
-
-			if(answer.isCorrect) correctAnswers.push(questionId)
-			else if(answer.isCorrect === false) incorrectAnswers.push(questionId)
-			else if(question.isRequired) pendingAnswers.push(questionId)
-		}
-	}
+	const answers = startedExam.submit?.answers.map(({ _id, type, question, feedback, option, content, isCorrect }) => ({
+		_id: _id.toString(),
+		option: option?.toString(),
+		question: question.toString(),
+		content,
+		feedback,
+		isCorrect: pendingCorrection && type === "dissertative" ? undefined : isCorrect
+	}))
 
 	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
 	const maxGrade = requiredQuestions.length
-	const grade = correctAnswers.length
 
 	return (
 		<div className="flex flex-col gap-3xl">
@@ -160,10 +144,10 @@ export default async function SubmitExamPage({ params }: PageProps){
 							pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
 						)}
 						title={pendingCorrection ? "Nota final pendente de correção" : undefined}
-						aria-label={`${grade} ${grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
+						aria-label={`${startedExam.grade} ${startedExam.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
 						withBorder
 					>
-						Nota: {grade}
+						Nota: {startedExam.grade}
 					</Paper>
 				) : (
 					<RemainingTime
@@ -212,11 +196,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 			<SubmitExamForm
 				exam={pick(examClient, ["_id", "questions"] as const)}
-				submit={startedExam.submit ? {
-					incorrectAnswers,
-					correctAnswers,
-					pendingAnswers
-				} : undefined}
+				answers={answers}
 				defaultValues={startedExam.submit ? {
 					question: startedExam.submit.answers.map(({ option, content }) => ({
 						option: option?.toString(),

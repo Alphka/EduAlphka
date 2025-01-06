@@ -1,8 +1,6 @@
-import type { HydratedDocument } from "mongoose"
+import type { StartedExamWithSubmit } from "@app/(overview)/exam/helpers/getSubmitData"
 import type { HTMLAttributes } from "react"
 import type { ExamListProps } from "./ExamList"
-import type { IStartedExam } from "@models/typings/StartedExam"
-import type { ISubmit } from "@models/typings/Submit"
 import { Avatar, Badge, Box, Card, Divider, Text, Title, Tooltip } from "@mantine/core"
 import { getSubmitStatus, submitStatusColors } from "@helpers/getSubmitStatus"
 import { MdOutlineQuiz, MdOutlineTimer } from "react-icons/md"
@@ -16,28 +14,22 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface ExamCardProps {
-	pendingCorrection: boolean
-	startedExam: IStartedExam | HydratedDocument<IStartedExam> | null
-	submit: ISubmit | null
-	grade: number | null
+	startedExam: StartedExamWithSubmit | null
 	exam: ExamListProps["exams"][number]
 }
 
-export default async function ExamCard({
-	pendingCorrection,
-	startedExam,
-	submit,
-	grade,
-	exam
-}: ExamCardProps){
+export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 	const history = getHistoryMessage({
 		createdAt: exam.createdAt,
 		updatedAt: exam.updatedAt
 	})
 
 	const isExamStarted = !!startedExam
-	const isExamSubmitted = !!submit
-	const isExamExpired = await StartedExam.hydrate(startedExam).isExpired({ exam })
+	const isExamSubmitted = !!startedExam?.submit
+	const isExamExpired = isExamStarted && await StartedExam
+		.hydrate(startedExam)
+		.isExpired({ exam })
+	const pendingCorrection = !!startedExam?.pendingCorrection
 
 	const submitStatus = getSubmitStatus({
 		hasStartedExam: isExamStarted,
@@ -111,7 +103,7 @@ export default async function ExamCard({
 
 							{pendingCorrection && (
 								<p className="text-dark-100 text-sm">
-									Nota parcial: <b className="font-medium">{grade} de {maxGrade}</b>
+									Nota parcial: <b className="font-medium">{startedExam.grade} de {maxGrade}</b>
 								</p>
 							)}
 						</div>

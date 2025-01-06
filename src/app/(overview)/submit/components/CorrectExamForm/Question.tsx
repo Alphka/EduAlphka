@@ -8,9 +8,10 @@ import { useRef } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import correctExamAnswer from "../../actions/correctExamAnswer"
 
-interface CorrectExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" | "text" | "type"> {
+interface CorrectExamFormQuestionProps extends
+	Pick<ExamQuestion, "isRequired" | "text" | "type">,
+	Pick<CorrectExamFormProps, "formDisabled"> {
 	questionNumber: number
-	submitId: string
 	options: {
 		_id: string
 		text: string
@@ -20,8 +21,8 @@ interface CorrectExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" |
 
 export default function CorrectExamFormQuestion({
 	questionNumber,
+	formDisabled,
 	isRequired,
-	submitId,
 	options,
 	answer: {
 		_id: answerId,
@@ -43,7 +44,7 @@ export default function CorrectExamFormQuestion({
 		<Paper
 			className={twJoin(
 				"p-xl border shadow-xs",
-				isPending && "border-yellow-900",
+				isPending && "border-yellow-900"
 			)}
 			component="li"
 			withBorder
@@ -93,6 +94,7 @@ export default function CorrectExamFormQuestion({
 								input: "cursor-default overflow-hidden"
 							}}
 							spellCheck
+							disabled={formDisabled}
 							autosize
 							readOnly
 							inert
@@ -113,60 +115,61 @@ export default function CorrectExamFormQuestion({
 									withAsterisk={false}
 									defaultValue={feedback}
 									spellCheck
+									disabled={formDisabled}
 									autosize
 									ref={feedbackRef}
 								/>
 
 								<Divider hiddenFrom="xs" />
 
-								<div className="relative flex flex-col xs:self-start xs:flex-row xs:flex-wrap gap-md">
-									<LoadingOverlay
-										overlayProps={{
-											radius: "sm",
-											blur: 2
-										}}
-										visible={isLoading}
-										zIndex={1}
-									/>
+								{!formDisabled && (
+									<div className="relative flex flex-col xs:self-start xs:flex-row xs:flex-wrap gap-md">
+										<LoadingOverlay
+											overlayProps={{
+												radius: "sm",
+												blur: 2
+											}}
+											visible={isLoading}
+											zIndex={1}
+										/>
 
-									<Button
-										size="sm"
-										color="green.9"
-										variant="light"
-										onClick={() => {
-											if(isCorrect) return
+										<Button
+											size="sm"
+											color="green.9"
+											variant="light"
+											onClick={() => {
+												if(isCorrect) return
 
-											handleServerAction(correctExamAnswer(
-												submitId,
-												answerId,
-												true,
-												feedbackRef.current?.value.trim() || undefined
-											))
-										}}
-										aria-label="Marcar resposta como correta"
-									>
-										Marcar como correta
-									</Button>
+												handleServerAction(correctExamAnswer(
+													answerId,
+													true,
+													feedbackRef.current?.value.trim() || undefined
+												))
+											}}
+											aria-label="Marcar resposta como correta"
+										>
+											Marcar como correta
+										</Button>
 
-									<Button
-										size="sm"
-										color="red.9"
-										variant="light"
-										onClick={() => {
-											if(isWrong) return
+										<Button
+											size="sm"
+											color="red.9"
+											variant="light"
+											onClick={() => {
+												if(isWrong) return
 
-											handleServerAction(correctExamAnswer(
-												submitId,
-												answerId,
-												false,
-												feedbackRef.current?.value.trim() || undefined
-											))
-										}}
-										aria-label="Marcar resposta como incorreta"
-									>
-										Marcar como incorreta
-									</Button>
-								</div>
+												handleServerAction(correctExamAnswer(
+													answerId,
+													false,
+													feedbackRef.current?.value.trim() || undefined
+												))
+											}}
+											aria-label="Marcar resposta como incorreta"
+										>
+											Marcar como incorreta
+										</Button>
+									</div>
+								)}
 							</section>
 						</>}
 					</div>
@@ -199,8 +202,5 @@ export default function CorrectExamFormQuestion({
 	)
 }
 
-// TODO: Add button to submit correction
-// TODO: Add a property to the Submit collection to save when the correction is submitted
 // TODO: Do not show feedbacks or corrected answers until all the corrections is sent
-// TODO: Add warning for the professor saying the correction can't be modified after being sent
 // TODO: Notify user after the corrections are submitted

@@ -1,18 +1,24 @@
 "use server"
 
-import type { HydratedDocument } from "mongoose"
 import type { IAnswer } from "@models/typings/Answer"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IExam } from "@models/typings/Exam"
+import { Types, type HydratedDocument } from "mongoose"
 import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
-import { notFound } from "next/navigation"
 import { Answer } from "@models"
-import connectDatabase from "@lib/connectDatabase"
+import getSessionUserData from "@helpers/getSessionUserData"
 import routes from "@app/routes"
 
-export default async function correctExamAnswer(submitId: string, answerId: string, isCorrect: boolean, feedback?: string){
-	await connectDatabase()
+export default async function correctExamAnswer(answerId: string, isCorrect: boolean, feedback?: string){
+	if(!Types.ObjectId.isValid(answerId)){
+		return { errors: ["ID da resposta inválido"] }
+	}
+
+	const user = await getSessionUserData()
+
+	if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
+	if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
 
 	const answer = await Answer
 		.findById<HydratedDocument<Pick<IAnswer,
@@ -25,23 +31,22 @@ export default async function correctExamAnswer(submitId: string, answerId: stri
 		>>>(answerId)
 		.populate<{
 			submit: HydratedDocument<Pick<ISubmit, "_id"> & {
-				exam: HydratedDocument<Pick<IExam, "_id" | "questions">>
+				exam: HydratedDocument<Pick<IExam, "_id" | "questions">> & {
+					owner: Types.ObjectId
+				}
 			}>
 		}>({
 			path: "submit",
 			select: "exam",
 			populate: {
 				path: "exam",
-				select: "questions"
+				select: "owner questions"
 			}
 		})
-		.orFail(notFound)
 
-	if(!answer.submit._id.equals(submitId)) notFound()
-
-	if(answer.type !== "dissertative"){
-		return { errors: ["Não é possível corrigir esse tipo de resposta"] }
-	}
+	if(!answer) return { errors: ["Resposta não encontrada"] }
+	if(!answer.submit.exam.owner._id.equals(user.id)) return { errors: ["Você não tem permissão para executar essa ação"] }
+	if(answer.type !== "dissertative") return { errors: ["Não é possível corrigir esse tipo de resposta"] }
 
 	const examQuestion = answer.submit.exam.questions.find(question => question._id.equals(answer.question))
 
@@ -68,6 +73,5 @@ export default async function correctExamAnswer(submitId: string, answerId: stri
 		await answer.save()
 	}
 
-	revalidatePath(routes.homepage.pathname)
-	revalidatePath(routes.submit.children.template.pathname.replace("[id]", submitId))
+	revalidatePath(routes.submit.children.template.pathname.replace("[id]", answer.submit.id))
 }

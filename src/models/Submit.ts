@@ -16,7 +16,8 @@ const submitSchema = new Schema<ISubmit, SubmitModel, ISubmitMethods>({
 		type: Date,
 		default: Date.now,
 		required: true
-	}
+	},
+	publishedAt: Date
 }, { versionKey: false })
 
 submitSchema.method("getAnswers", async function getAnswers(){

@@ -208,6 +208,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 				submitId={submit.id}
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers}
+				formDisabled={!!submit.publishedAt}
 			/>
 		</div>
 	)

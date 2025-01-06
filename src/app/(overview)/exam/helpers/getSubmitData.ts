@@ -12,13 +12,16 @@ interface SubmitWithAnswers extends ISubmit {
 	answers: IAnswer[]
 }
 
-interface StartedExamWithSubmit extends IStartedExam {
+export interface StartedExamWithSubmit extends IStartedExam {
 	exam: Types.ObjectId
 	user: Types.ObjectId
 	submit?: SubmitWithAnswers
+	/** Is null if the exam was not submitted */
+	grade: number | null
+	pendingCorrection: boolean
 }
 
-export default async function getExamSubmitData(examId: Id, candidate: Id): Promise<StartedExamWithSubmit>
+export default async function getExamSubmitData(examId: Id, candidate: Id): Promise<StartedExamWithSubmit | null>
 export default async function getExamSubmitData(examId: Id, candidates: Id[]): Promise<StartedExamWithSubmit[]>
 export default async function getExamSubmitData(examId: Id, candidates: Id | Id[]){
 	const isMultipleCandidates = Array.isArray(candidates)
@@ -74,7 +77,35 @@ export default async function getExamSubmitData(examId: Id, candidates: Id | Id[
 		}
 	])
 
-	return isMultipleCandidates
-		? startedExamResult
-		: startedExamResult[0] || null
+	const results = startedExamResult.map(startedExam => {
+		if(!startedExam) return null
+
+		const pendingCorrection = !!startedExam?.submit && !startedExam?.submit.publishedAt
+
+		let pendingAnswers = 0
+		let grade: number | null = 0
+
+		if(startedExam.submit){
+			for(const answer of startedExam.submit.answers){
+				if(pendingCorrection && answer.type === "dissertative"){
+					pendingAnswers++
+					continue
+				}
+
+				//? This should not happen
+				if(answer.isCorrect === undefined) pendingAnswers++
+				else if(answer.isCorrect) grade++
+			}
+		}else{
+			grade = null
+		}
+
+		return {
+			...startedExam,
+			grade,
+			pendingCorrection
+		}
+	})
+
+	return isMultipleCandidates ? results : results[0]
 }
