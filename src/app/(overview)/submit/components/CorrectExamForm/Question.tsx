@@ -98,75 +98,77 @@ export default function CorrectExamFormQuestion({
 							inert
 						/>
 
-						<Divider />
+						{isRequired && <>
+							<Divider />
 
-						<section className="flex flex-col gap-md">
-							<h4 className="text-h4">Corrigir resposta</h4>
+							<section className="flex flex-col gap-md">
+								<h4 className="text-h4">Corrigir resposta</h4>
 
-							<Textarea
-								size="md"
-								label="Feedback"
-								placeholder="Adicione um feedback para o usuário"
-								minRows={2}
-								maxRows={12}
-								withAsterisk={false}
-								defaultValue={feedback}
-								spellCheck
-								autosize
-								ref={feedbackRef}
-							/>
-
-							<Divider hiddenFrom="xs" />
-
-							<div className="relative flex flex-col xs:self-start xs:flex-row xs:flex-wrap gap-md">
-								<LoadingOverlay
-									overlayProps={{
-										radius: "sm",
-										blur: 2
-									}}
-									visible={isLoading}
-									zIndex={1}
+								<Textarea
+									size="md"
+									label="Feedback"
+									placeholder="Adicione um feedback para o usuário"
+									minRows={2}
+									maxRows={12}
+									withAsterisk={false}
+									defaultValue={feedback}
+									spellCheck
+									autosize
+									ref={feedbackRef}
 								/>
 
-								<Button
-									size="sm"
-									color="green.9"
-									variant="light"
-									onClick={() => {
-										if(isCorrect) return
+								<Divider hiddenFrom="xs" />
 
-										handleServerAction(correctExamAnswer(
-											submitId,
-											answerId,
-											true,
-											feedbackRef.current?.value.trim() || undefined
-										))
-									}}
-									aria-label="Marcar resposta como correta"
-								>
-									Marcar como correta
-								</Button>
+								<div className="relative flex flex-col xs:self-start xs:flex-row xs:flex-wrap gap-md">
+									<LoadingOverlay
+										overlayProps={{
+											radius: "sm",
+											blur: 2
+										}}
+										visible={isLoading}
+										zIndex={1}
+									/>
 
-								<Button
-									size="sm"
-									color="red.9"
-									variant="light"
-									onClick={() => {
-										if(!isCorrect) return
+									<Button
+										size="sm"
+										color="green.9"
+										variant="light"
+										onClick={() => {
+											if(isCorrect) return
 
-										handleServerAction(correctExamAnswer(
-											submitId,
-											answerId,
-											false,
-											feedbackRef.current?.value.trim() || undefined
-										))
-									}}
-									aria-label="Marcar resposta como correta"
-								>
-									Marcar como incorreta
-								</Button>
-							</div>
-						</section>
+											handleServerAction(correctExamAnswer(
+												submitId,
+												answerId,
+												true,
+												feedbackRef.current?.value.trim() || undefined
+											))
+										}}
+										aria-label="Marcar resposta como correta"
+									>
+										Marcar como correta
+									</Button>
+
+									<Button
+										size="sm"
+										color="red.9"
+										variant="light"
+										onClick={() => {
+											if(isWrong) return
+
+											handleServerAction(correctExamAnswer(
+												submitId,
+												answerId,
+												false,
+												feedbackRef.current?.value.trim() || undefined
+											))
+										}}
+										aria-label="Marcar resposta como incorreta"
+									>
+										Marcar como incorreta
+									</Button>
+								</div>
+							</section>
+						</>}
 					</div>
 				) : (
 					<ul className="flex flex-col gap-md">

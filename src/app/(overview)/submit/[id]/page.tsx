@@ -1,7 +1,7 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
+import type { ISubmit, ISubmitMethods } from "@models/typings/Submit"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
-import type { ISubmit, ISubmitMethods } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
@@ -47,8 +47,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		}>("user", {
 			name: 1
 		})
-
-	if(!submit) notFound()
+		.orFail(notFound)
 
 	const [exam, user] = await Promise.all([
 		Exam
@@ -71,14 +70,13 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 				candidates: 1,
 				description: 1,
 				expiresAt: 1
+			})
+			.orFail(() => {
+				console.error("Submit exam not found")
+				notFound()
 			}),
 		verifyAuthorization({ accountType: "professor" })
 	])
-
-	if(!exam){
-		console.error("Submit exam not found")
-		notFound()
-	}
 
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
@@ -89,9 +87,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		notFound()
 	}
 
-	const examClient = pick(exam.toJSON({
-		flattenObjectIds: true
-	}), [
+	const examClient = pick(exam.toJSON({ flattenObjectIds: true }), [
 		"_id",
 		"title",
 		"owner",
