@@ -10,7 +10,6 @@ import { Exam, Submit } from "@models"
 import { useId } from "react"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
-import getExamSubmitData from "@app/(overview)/exam/helpers/getSubmitData"
 import connectDatabase from "@lib/connectDatabase"
 import CorrectExamForm from "../components/CorrectExamForm"
 import routes from "@app/routes"
@@ -80,9 +79,9 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const startedExam = await getExamSubmitData(exam._id, submit.user._id)
+	const submitData = await exam.submitData(submit.user._id)
 
-	if(!startedExam?.submit){
+	if(!submitData?.submit){
 		console.error("Started exam for submit not found")
 		notFound()
 	}
@@ -125,25 +124,16 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		options: options.map(option => pick(option, ["_id", "text"] as const))
 	}))
 
-	const pendingCorrection = !!startedExam.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+	const answers = submitData.submit.answers.map(({ _id, question, feedback, option, content, isCorrect }) => ({
+		_id: _id.toString(),
+		option: option?.toString(),
+		question: question.toString(),
+		content,
+		feedback,
+		isCorrect
+	}))
 
-	let grade = 0
-	let pendingAnswers = 0
-
-	const answers = startedExam.submit.answers.map(({ _id, question, feedback, option, content, isCorrect }) => {
-		if(isCorrect === undefined) pendingAnswers++
-		else if(isCorrect) grade++
-
-		return {
-			_id: _id.toString(),
-			option: option?.toString(),
-			question: question.toString(),
-			content,
-			feedback,
-			isCorrect
-		}
-	})
-
+	const pendingAnswers = answers.filter(({ isCorrect }) => isCorrect === undefined).length
 	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
 	const maxGrade = requiredQuestions.length
 
@@ -186,8 +176,8 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					)}
 
 					<li>
-						<span className="font-semibold">Nota {pendingCorrection && "parcial"} do aluno: </span>
-						{grade} de {maxGrade} {!!pendingAnswers && <>({pendingAnswers} respostas pendentes)</>}
+						<span className="font-semibold" aria-live="polite">Nota {pendingAnswers > 0 && "parcial"} do aluno: </span>
+						{submitData.grade} de {maxGrade} {!!pendingAnswers && `(${pendingAnswers} ${pendingAnswers === 1 ? "resposta pendente" : "respostas pendentes"})`}
 					</li>
 
 					{exam.expiresAt && (

@@ -7,7 +7,6 @@ import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, ExamInvite } from "@models"
 import { Divider } from "@mantine/core"
 import verifyAuthorization from "@helpers/verifyAuthorization"
-import getExamSubmitData from "../../helpers/getSubmitData"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
@@ -31,25 +30,19 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById<HydratedDocument<Pick<IExam,
-				| "_id"
-				| "owner"
-				| "title"
-				| "candidates"
-			>> & IExamMethods>(id, {
+			.findById<HydratedDocument<Pick<IExam, "_id" | "owner" | "title" | "candidates">> & IExamMethods>(id, {
 				owner: 1,
 				title: 1,
 				candidates: 1,
 				__v: 1
 			})
 			.populate<{
-				candidates: Pick<IUser, "_id" | "name" | "email" | "username">[]
+				candidates: HydratedDocument<Pick<IUser, "_id" | "name" | "email" | "username">>[]
 			}>("candidates", {
 				name: 1,
 				email: 1,
 				username: 1
 			})
-			.lean()
 			.orFail()
 			.catch(notFound),
 		verifyAuthorization({ accountType: "professor" })
@@ -57,14 +50,14 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const [examInvite, startedExams] = await Promise.all([
+	const [examInvite, submitData] = await Promise.all([
 		ExamInvite.findOne({ exam }),
-		getExamSubmitData(exam._id, exam.candidates.map(({ _id }) => _id))
+		exam.submitData(exam.candidates.map(({ _id }) => _id))
 	])
 
-	const candidatesStartedExams = new Map<string, typeof startedExams[number]>
+	const candidatesStartedExams = new Map<string, typeof submitData[number]>
 
-	for(const startedExam of startedExams){
+	for(const startedExam of submitData){
 		candidatesStartedExams.set(startedExam.user.toString(), startedExam)
 	}
 
@@ -95,7 +88,7 @@ export default async function ManageExamPage({ params }: PageProps){
 					const id = _id.toString()
 					const startedExam = candidatesStartedExams.get(id)
 					const submitId = startedExam?.submit?._id.toString() as string | undefined
-					const pendingCorrection = !!startedExam?.submit && startedExam.submit.answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
+					const pendingCorrection = !!startedExam?.pendingCorrection
 
 					return {
 						id,
@@ -104,7 +97,7 @@ export default async function ManageExamPage({ params }: PageProps){
 						submitId,
 						username,
 						startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
-						isExpired: submitId ? Date.now() > startedExam!.submit!.createdAt.getTime() : false,
+						isExpired: startedExam ? startedExam.isExamExpired : false,
 						pendingCorrection
 					}
 				})}

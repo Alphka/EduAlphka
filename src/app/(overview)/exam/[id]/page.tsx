@@ -1,6 +1,6 @@
+import type { MixedExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
-import type { IExam, IExamMethods } from "@models/typings/Exam"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
 import { Exam } from "@models"
@@ -74,13 +74,13 @@ export default async function EditExamPage({ params }: PageProps){
 					duration: formatTimeDuration(exam.duration),
 					description: exam.description
 				},
-				question: exam.questions.map(question => ({
-					text: question.text,
-					required: question.isRequired,
-					question_type: question.type,
-					...(question.type === "multiple_choice" ? {
-						option: question.options.map(({ text }) => ({ text })),
-						correct_answer: question.options.findIndex(({ _id }) => _id.equals(question.correctAnswer))
+				question: (exam.questions as Types.DocumentArray<MixedExamQuestion, Types.Subdocument<MixedExamQuestion, any, MixedExamQuestion> & MixedExamQuestion>).map(({ type, text, options, correctAnswer, isRequired }) => ({
+					text: text,
+					required: isRequired,
+					question_type: type,
+					...(type === "multiple_choice" ? {
+						option: options.map(({ text }) => ({ text })),
+						correct_answer: options.findIndex(({ _id }) => _id.equals(correctAnswer))
 					} : undefined)
 				}))
 			}}

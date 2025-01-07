@@ -1,4 +1,4 @@
-import type { StartedExamWithSubmit } from "@app/(overview)/exam/helpers/getSubmitData"
+import type { StartedExamWithSubmit } from "@models/typings/Exam"
 import type { HTMLAttributes } from "react"
 import type { ExamListProps } from "./ExamList"
 import { Avatar, Badge, Box, Card, Divider, Text, Title, Tooltip } from "@mantine/core"

@@ -3,12 +3,11 @@ import type { PageProps } from "@typings/index"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
-import { Exam, StartedExam } from "@models"
 import { Divider, Paper } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
+import { Exam } from "@models"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
-import getExamSubmitData from "../../helpers/getSubmitData"
 import connectDatabase from "@lib/connectDatabase"
 import SubmitExamForm from "./components/SubmitExamForm"
 import StartExamModal from "./components/StartExamModal"
@@ -60,11 +59,9 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const startedExam = await getExamSubmitData(exam._id, user.id)
+	const submitData = await exam.submitData(user.id)
 
-	const examClient = pick(exam.toJSON({
-		flattenObjectIds: true
-	}), [
+	const examClient = pick(exam.toJSON({ flattenObjectIds: true }), [
 		"_id",
 		"title",
 		"owner",
@@ -102,23 +99,19 @@ export default async function SubmitExamPage({ params }: PageProps){
 		options: options.map(option => pick(option, ["_id", "text"] as const))
 	}))
 
-	if(!startedExam){
+	if(!submitData){
 		return (
 			<StartExamModal exam={examClient} />
 		)
 	}
 
-	const isExamExpired = await StartedExam
-		.hydrate(startedExam)
-		.isExpired({ exam })
-
-	if(!startedExam.submit && isExamExpired){
+	if(!submitData.submit && submitData.isExamExpired){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
-	const pendingCorrection = !!startedExam?.pendingCorrection
+	const pendingCorrection = !!submitData.pendingCorrection
 
-	const answers = startedExam.submit?.answers.map(({ _id, type, question, feedback, option, content, isCorrect }) => ({
+	const answers = submitData.submit?.answers.map(({ _id, type, question, feedback, option, content, isCorrect }) => ({
 		_id: _id.toString(),
 		option: option?.toString(),
 		question: question.toString(),
@@ -137,22 +130,22 @@ export default async function SubmitExamPage({ params }: PageProps){
 					{exam.title}
 				</h1>
 
-				{!!startedExam && !!startedExam.submit ? (
+				{!!submitData && !!submitData.submit ? (
 					<Paper
 						className={twJoin(
 							"leading-none px-sm py-xs shadow-xs",
 							pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
 						)}
 						title={pendingCorrection ? "Nota final pendente de correção" : undefined}
-						aria-label={`${startedExam.grade} ${startedExam.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
+						aria-label={`${submitData.grade} ${submitData.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
 						withBorder
 					>
-						Nota: {startedExam.grade}
+						Nota: {submitData.grade}
 					</Paper>
 				) : (
 					<RemainingTime
 						examDuration={exam.duration}
-						startedAt={startedExam.startedAt}
+						startedAt={submitData.startedAt}
 					/>
 				)}
 			</header>
@@ -197,8 +190,8 @@ export default async function SubmitExamPage({ params }: PageProps){
 			<SubmitExamForm
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers}
-				defaultValues={startedExam.submit ? {
-					question: startedExam.submit.answers.map(({ option, content }) => ({
+				defaultValues={submitData.submit ? {
+					question: submitData.submit.answers.map(({ option, content }) => ({
 						option: option?.toString(),
 						content
 					}))

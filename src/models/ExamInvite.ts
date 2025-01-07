@@ -24,9 +24,7 @@ examInviteSchema.pre("updateOne", function updateOneMiddleware(){
 
 	if("__v" in update) delete update.__v
 
-	const keys = ["$set", "$setOnInsert"] as const
-
-	for(const key of keys){
+	for(const key of ["$set", "$setOnInsert"] as const){
 		if(update[key] && "__v" in update[key]){
 			delete update[key].__v
 			if(!Object.keys(update[key]).length) delete update[key]

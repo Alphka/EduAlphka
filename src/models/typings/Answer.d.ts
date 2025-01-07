@@ -1,5 +1,5 @@
 import type { Model, PopulatedDoc, Types } from "mongoose"
-import type { QuestionTypes } from "@models/Exam"
+import type { QuestionTypes } from "../Exam"
 import type { ISubmit } from "./Submit"
 
 export interface IAnswer {

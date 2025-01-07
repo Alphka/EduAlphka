@@ -1,5 +1,8 @@
 import type { Model, PopulatedDoc, Types } from "mongoose"
-import type { QuestionTypes } from "@models/Exam"
+import type { QuestionTypes } from "../Exam/Question"
+import type { IStartedExam } from "./StartedExam"
+import type { IAnswer } from "./Answer"
+import type { ISubmit } from "./Submit"
 import type { IUser } from "./User"
 
 export interface ExamQuestionBase {
@@ -26,6 +29,11 @@ export type ExamQuestion = (ExamMultipleChoiceQuestion | ExamDissertativeQuestio
 	_id: Types.ObjectId
 }
 
+export type MixedExamQuestion =
+	& ExamQuestionBase
+	& Omit<ExamMultipleChoiceQuestion, "type">
+	& Omit<ExamDissertativeQuestion, "type">
+
 export interface IExam {
 	_id: Types.ObjectId
 	owner: NonNullable<PopulatedDoc<IUser>>
@@ -40,12 +48,30 @@ export interface IExam {
 	expiresAt?: Date
 }
 
+interface SubmitWithAnswers extends ISubmit {
+	exam: Types.ObjectId
+	user: Types.ObjectId
+	answers: IAnswer[]
+}
+
+export interface StartedExamWithSubmit extends IStartedExam {
+	exam: Types.ObjectId
+	user: Types.ObjectId
+	/** Is null if the exam was not submitted */
+	grade: number | null
+	submit?: SubmitWithAnswers
+	isExamExpired: boolean
+	pendingCorrection: boolean
+}
+
 export interface IExamMethods {
 	isExpired(): boolean
 	submitInfo(): Promise<{
 		hasSubmit: boolean
 		hasStartedBySomeone: boolean
 	}>
+	submitData(candidate: Types.ObjectId | string): Promise<StartedExamWithSubmit | null>
+	submitData(candidates: (Types.ObjectId | string)[]): Promise<StartedExamWithSubmit[]>
 }
 
 export type QuestionModel = Model<ExamQuestion>

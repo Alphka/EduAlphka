@@ -26,16 +26,36 @@ startedExamSchema.method("isExpired", async function isExpired({
 }: {
 	exam?: HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
 } = {}){
-	if(!(exam && exam.expiresAt && exam.duration)){
-		const { default: Exam } = await import("@models/Exam")
+	if(exam && typeof exam !== "object") throw new Error("Invalid exam object given for StartedExam.isExpired() function")
 
-		if(!(exam && exam.expiresAt && exam.duration)){
-			if(!exam && !this.exam) throw new Error("Missing 'exam' property in StartedExam")
+	if(!exam && !this.exam) throw new Error("Missing 'exam' property in StartedExam")
 
-			exam = (await Exam.findById(exam || this.exam, {
-				duration: 1,
-				expiresAt: 1
-			}))!
+	if(!exam || !exam.expiresAt || !exam.duration){
+		if(
+			"expiresAt" in this.exam && this.exam.expiresAt instanceof Date &&
+			"duration" in this.exam && typeof this.exam.duration === "number"
+		){
+			let _exam = this.exam
+
+			if(!("isExpired" in this.exam)){
+				const { default: Exam } = await import("./Exam")
+				_exam = Exam.hydrate(_exam)
+			}
+
+			exam = _exam as unknown as HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
+		}else{
+			const { default: Exam } = await import("./Exam")
+
+			if(!exam || !exam.expiresAt || !exam.duration){
+				if(!exam && !this.exam?._id) throw new Error("No exam found for StartedExam")
+
+				exam = await Exam
+					.findById(exam || this.exam, {
+						duration: 1,
+						expiresAt: 1
+					})
+					.orFail()
+			}
 		}
 	}
 

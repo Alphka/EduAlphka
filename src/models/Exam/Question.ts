@@ -1,4 +1,4 @@
-import type { ExamDissertativeQuestion, ExamMultipleChoiceQuestion, ExamQuestionBase, QuestionModel } from "../typings/Exam"
+import type { MixedExamQuestion, QuestionModel } from "../typings/Exam"
 import { ExamFormValidation } from "@constants/forms"
 import { OptionSchema } from "./Option"
 import { Schema } from "mongoose"
@@ -8,11 +8,7 @@ export enum QuestionTypes {
 	dissertative = "Dissertativa"
 }
 
-export const QuestionSchema = new Schema<
-	& ExamQuestionBase
-	& Omit<ExamMultipleChoiceQuestion, "type">
-	& Omit<ExamDissertativeQuestion, "type">
-, QuestionModel>({
+export const QuestionSchema = new Schema<MixedExamQuestion, QuestionModel>({
 	type: {
 		type: String,
 		enum: Object.keys(QuestionTypes),
