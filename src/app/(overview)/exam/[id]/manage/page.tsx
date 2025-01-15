@@ -3,7 +3,7 @@ import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Exam, ExamInvite } from "@models"
+import { Exam, ExamInvite, StartedExam } from "@models"
 import { Divider } from "@mantine/core"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
@@ -32,6 +32,8 @@ export default async function ManageExamPage({ params }: PageProps){
 			.findById(id, {
 				owner: 1,
 				title: 1,
+				duration: 1,
+				expiresAt: 1,
 				candidates: 1,
 				__v: 1
 			})
@@ -83,7 +85,7 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<CandidatesTable
 				examId={id}
-				data={exam.candidates.map(({ _id, name, email, username }) => {
+				data={await Promise.all(exam.candidates.map(async ({ _id, name, email, username }) => {
 					const id = _id.toString()
 					const startedExam = candidatesStartedExams.get(id)
 					const submitId = startedExam?.submit?._id.toString() as string | undefined
@@ -96,10 +98,10 @@ export default async function ManageExamPage({ params }: PageProps){
 						submitId,
 						username,
 						startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
-						isExpired: startedExam ? startedExam.isExamExpired : false,
+						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
 						pendingCorrection
 					}
-				})}
+				}))}
 				key={`${exam.__v}.${exam.candidates.length}`}
 			/>
 		</div>

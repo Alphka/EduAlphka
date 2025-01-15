@@ -105,6 +105,7 @@ export default function CorrectExamFormQuestion({
 								<Textarea
 									size="md"
 									label="Feedback"
+									className={twJoin(formDisabled && "cursor-not-allowed")}
 									placeholder="Adicione um feedback para o usuário"
 									minRows={2}
 									maxRows={12}
@@ -135,8 +136,6 @@ export default function CorrectExamFormQuestion({
 											color="green.9"
 											variant="light"
 											onClick={() => {
-												if(isCorrect) return
-
 												handleServerAction(correctExamAnswer(
 													answer!._id,
 													true,
@@ -153,8 +152,6 @@ export default function CorrectExamFormQuestion({
 											color="red.9"
 											variant="light"
 											onClick={() => {
-												if(isWrong) return
-
 												handleServerAction(correctExamAnswer(
 													answer!._id,
 													false,

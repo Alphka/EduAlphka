@@ -99,6 +99,7 @@ export default function SubmitExamFormQuestion({
 					<Textarea
 						size="md"
 						label="Resposta"
+						className={twJoin(formDisabled && "cursor-not-allowed")}
 						placeholder="Digite sua resposta"
 						aria-label="Resposta"
 						maxRows={12}
