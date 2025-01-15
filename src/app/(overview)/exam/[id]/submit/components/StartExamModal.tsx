@@ -91,7 +91,7 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 									withBorder
 								>
 									<li>
-										<span className="text-blue-300">Professor: </span>
+										<span className="text-blue-300">Aplicador do teste: </span>
 										<span className="font-normal">{exam.owner.name}</span>
 									</li>
 

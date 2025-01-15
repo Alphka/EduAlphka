@@ -24,12 +24,14 @@ export interface CorrectExamFormProps {
 		option?: string
 		question: string
 	})[]
-	formDisabled: boolean
+	hasPublished: boolean
 }
 
-export default function CorrectExamForm({ submitId, exam, answers, formDisabled }: CorrectExamFormProps){
+export default function CorrectExamForm({ submitId, exam, answers, hasPublished }: CorrectExamFormProps){
 	const { handleServerAction, isPending } = useServerActionHandler()
 	const titleId = useId()
+
+	const formDisabled = hasPublished
 
 	const answersByQuestion = new Map(answers.map(({ question, ...answer }) => [question, answer]))
 
@@ -52,7 +54,7 @@ export default function CorrectExamForm({ submitId, exam, answers, formDisabled 
 				}, questionIndex) => (
 					<CorrectExamFormQuestion
 						questionNumber={questionIndex + 1}
-						answer={answersByQuestion.get(questionId)!}
+						answer={answersByQuestion.get(questionId)}
 						{...{
 							type,
 							text,

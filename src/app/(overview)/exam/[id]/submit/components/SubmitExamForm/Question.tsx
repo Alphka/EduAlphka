@@ -9,6 +9,7 @@ interface SubmitExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" | 
 	questionIndex: number
 	formDisabled: boolean
 	clearErrors: UseFormClearErrors<SubmitFormData>
+	hasSubmit: boolean
 	setValue: UseFormSetValue<SubmitFormData>
 	register: UseFormRegister<SubmitFormData>
 	errors: FieldErrors<SubmitFormData>
@@ -17,10 +18,10 @@ interface SubmitExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" | 
 		_id: string
 		text: string
 	}[]
-	answer: Pick<IAnswer, "content" | "feedback" | "isCorrect"> & {
+	answer: (Pick<IAnswer, "content" | "feedback" | "isCorrect"> & {
 		_id: string
 		option?: string
-	}
+	}) | undefined
 }
 
 export default function SubmitExamFormQuestion({
@@ -28,23 +29,20 @@ export default function SubmitExamFormQuestion({
 	formDisabled,
 	clearErrors,
 	isRequired,
+	hasSubmit,
 	setValue,
 	register,
 	options,
 	errors,
-	answer: {
-		_id: answerId,
-		option: chosenOption,
-		feedback,
-		...answer
-	},
+	answer,
 	watch,
 	text,
 	type
 }: SubmitExamFormQuestionProps){
-	const isCorrect = isRequired && answer.isCorrect === true
-	const isPending = isRequired && !isCorrect && answer.isCorrect === undefined
-	const isWrong = isRequired && !isCorrect && !isPending
+	const isAnswered = hasSubmit && !!answer && ("option" in answer || "content" in answer)
+	const isCorrect = isRequired && isAnswered && answer.isCorrect === true
+	const isPending = isRequired && isAnswered && !isCorrect && answer.isCorrect === undefined
+	const isWrong = isRequired && isAnswered && !isCorrect && !isPending
 
 	return (
 		<Paper
@@ -56,7 +54,14 @@ export default function SubmitExamFormQuestion({
 			component="li"
 			withBorder
 		>
-			<div className="flex flex-row-reverse flex-wrap-reverse gap-x-md gap-y-xs">
+			<div
+				className={twJoin(
+					"flex gap-x-md gap-y-xs",
+					isRequired && hasSubmit
+						? "flex-row-reverse flex-wrap-reverse"
+						: (isRequired || hasSubmit) && "flex-col-reverse"
+				)}
+			>
 				<h3 className="flex-grow basis-full text-dark-200 text-h6">
 					Questão {questionIndex + 1}
 				</h3>
@@ -71,16 +76,18 @@ export default function SubmitExamFormQuestion({
 					</p>
 				)}
 
-				<p
-					className={twJoin(
-						"flex-grow text-dark-200 text-md",
-						isCorrect && "text-green-600",
-						isPending && "text-yellow-600",
-						isWrong && "text-red-600"
-					)}
-				>
-					Resposta {isCorrect ? "correta" : isWrong ? "incorreta" : "pendente de correção"}
-				</p>
+				{hasSubmit && isRequired && isAnswered && (
+					<p
+						className={twJoin(
+							"flex-grow text-dark-200 text-md",
+							isCorrect && "text-green-600",
+							isPending && "text-yellow-600",
+							isWrong && "text-red-600"
+						)}
+					>
+						Resposta {isCorrect ? "correta" : isWrong ? "incorreta" : isPending && "pendente de correção"}
+					</p>
+				)}
 			</div>
 
 			<div className="flex flex-col mt-xs gap-md">
@@ -105,6 +112,9 @@ export default function SubmitExamFormQuestion({
 						error={errors.question?.[questionIndex]?.content?.message}
 						spellCheck
 						autosize
+						disabled={false}
+						readOnly={formDisabled}
+						inert={formDisabled}
 					/>
 				) : (
 					<ul className="flex flex-col gap-md">
@@ -149,7 +159,8 @@ export default function SubmitExamFormQuestion({
 										defaultChecked={watch(`question.${questionIndex}.option`) === _id}
 										aria-label="Selecionar resposta"
 										title={optionError || (!formDisabled ? "Selecionar resposta" : undefined)}
-										disabled={formDisabled}
+										readOnly={formDisabled}
+										inert={formDisabled}
 										error={!!optionError}
 									/>
 

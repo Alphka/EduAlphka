@@ -52,15 +52,24 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 					</div>
 
 					<div className="flex gap-md">
-						<Avatar
-							name={user.name}
-							size="md"
-							radius="xl"
-							color="initials"
-							className="leading-none"
-						>
-							{getNameInitials(user.name)}
-						</Avatar>
+						<div className="flex items-center gap-md">
+							<div className="text-right">
+								<p className="text-sm font-medium">{user.name}</p>
+								<p className="text-dark-100 text-xs">
+									{user.accountType === "professor" ? "Aplicador de testes" : "Candidato"}
+								</p>
+							</div>
+
+							<Avatar
+								className="flex-shrink-0 leading-none"
+								name={user.name}
+								size="md"
+								radius="xl"
+								color="initials"
+							>
+								{getNameInitials(user.name)}
+							</Avatar>
+						</div>
 					</div>
 				</div>
 			</AppShell.Header>

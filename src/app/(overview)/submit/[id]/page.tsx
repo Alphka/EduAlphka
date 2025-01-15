@@ -1,5 +1,4 @@
-import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
-import type { ISubmit, ISubmitMethods } from "@models/typings/Submit"
+import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
@@ -34,12 +33,10 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 	if(!Types.ObjectId.isValid(id)) notFound()
 
 	const submit = await Submit
-		.findById<HydratedDocument<Pick<ISubmit, "_id"> & {
-			exam: Types.ObjectId
-			user: Types.ObjectId
-		}> & ISubmitMethods>(id, {
+		.findById(id, {
 			exam: 1,
-			user: 1
+			user: 1,
+			publishedAt: 1
 		})
 		.populate<{
 			user: HydratedDocument<Pick<IUser, "_id" | "name">>
@@ -50,17 +47,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById<HydratedDocument<Pick<IExam,
-				| "_id"
-				| "owner"
-				| "title"
-				| "subject"
-				| "duration"
-				| "questions"
-				| "candidates"
-				| "description"
-				| "expiresAt"
-			>> & IExamMethods>(submit.exam, {
+			.findById(submit.exam, {
 				owner: 1,
 				title: 1,
 				subject: 1,
@@ -133,9 +120,9 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		isCorrect
 	}))
 
-	const pendingAnswers = answers.filter(({ isCorrect }) => isCorrect === undefined).length
-	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
-	const maxGrade = requiredQuestions.length
+	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id))
+	const maxGrade = requiredQuestions.size
+	const grade = answers.filter(({ isCorrect }) => isCorrect).length
 
 	return (
 		<div className="flex flex-col gap-3xl">
@@ -176,8 +163,8 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					)}
 
 					<li>
-						<span className="font-semibold" aria-live="polite">Nota {pendingAnswers > 0 && "parcial"} do aluno: </span>
-						{submitData.grade} de {maxGrade} {!!pendingAnswers && `(${pendingAnswers} ${pendingAnswers === 1 ? "resposta pendente" : "respostas pendentes"})`}
+						<span className="font-semibold" aria-live="polite">Nota {submitData.pendingAnswers > 0 && "parcial"} do aluno: </span>
+						{grade} de {maxGrade} {!!submitData.pendingAnswers && `(${submitData.pendingAnswers} ${submitData.pendingAnswers === 1 ? "resposta pendente" : "respostas pendentes"})`}
 					</li>
 
 					{exam.expiresAt && (
@@ -198,7 +185,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 				submitId={submit.id}
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers}
-				formDisabled={!!submit.publishedAt}
+				hasPublished={!!submit.publishedAt}
 			/>
 		</div>
 	)

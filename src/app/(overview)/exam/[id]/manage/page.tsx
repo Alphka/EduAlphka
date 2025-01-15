@@ -1,4 +1,3 @@
-import type { IExam, IExamMethods } from "@models/typings/Exam"
 import type { HydratedDocument } from "mongoose"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
@@ -30,7 +29,7 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById<HydratedDocument<Pick<IExam, "_id" | "owner" | "title" | "candidates">> & IExamMethods>(id, {
+			.findById(id, {
 				owner: 1,
 				title: 1,
 				candidates: 1,

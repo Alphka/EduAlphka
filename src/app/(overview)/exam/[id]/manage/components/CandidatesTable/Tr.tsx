@@ -3,6 +3,7 @@ import { ActionIcon, Avatar, Badge, Menu, MenuDropdown, MenuItem, MenuTarget, Ta
 import { MdMenu, MdEdit, MdChecklist } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
 import RemoveCandidateButton from "./components/RemoveCandidateButton"
+import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
 import Link from "next/link"
 
@@ -30,16 +31,18 @@ export default function Tr({
 			<Table.Td>
 				<div className="flex items-center gap-sm">
 					<Avatar
+						className="flex-shrink-0 leading-none"
 						name={name}
 						size="md"
 						radius="xl"
 						color="initials"
-						className="leading-none"
-					/>
+					>
+						{getNameInitials(name)}
+					</Avatar>
 
 					<div>
 						<p className="text-sm font-medium">{name}</p>
-						<p className="text-xs text-gray-200">{username}</p>
+						<p className="text-dark-200 text-xs">{username}</p>
 					</div>
 				</div>
 			</Table.Td>

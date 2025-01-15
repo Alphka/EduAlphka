@@ -60,7 +60,7 @@ export interface StartedExamWithSubmit extends IStartedExam {
 	/** Is null if the exam was not submitted */
 	grade: number | null
 	submit?: SubmitWithAnswers
-	isExamExpired: boolean
+	pendingAnswers: number
 	pendingCorrection: boolean
 }
 

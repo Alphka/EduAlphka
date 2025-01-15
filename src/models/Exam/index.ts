@@ -148,9 +148,7 @@ examSchema.method("submitData", async function submitData(candidates: (Types.Obj
 	const results = startedExamResult.map(async submitData => {
 		if(!submitData) return null
 
-		const isExamExpired = await StartedExam.hydrate(submitData).isExpired()
-
-		const pendingCorrection = !!submitData?.submit && !submitData?.submit.publishedAt
+		const pendingCorrection = !!submitData?.submit && !submitData.submit.publishedAt
 
 		let pendingAnswers = 0
 		let grade: number | null = 0
@@ -171,7 +169,7 @@ examSchema.method("submitData", async function submitData(candidates: (Types.Obj
 		return {
 			...submitData,
 			grade,
-			isExamExpired,
+			pendingAnswers,
 			pendingCorrection
 		}
 	})

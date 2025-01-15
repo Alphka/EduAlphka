@@ -1,8 +1,8 @@
-import type { MixedExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
+import type { MixedExamQuestion } from "@models/typings/Exam"
 import type { PageProps } from "@typings/index"
 import type { Metadata } from "next"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Types, type HydratedDocument } from "mongoose"
+import { Types } from "mongoose"
 import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
@@ -29,16 +29,7 @@ export default async function EditExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById<HydratedDocument<Pick<IExam,
-				| "_id"
-				| "owner"
-				| "title"
-				| "subject"
-				| "duration"
-				| "questions"
-				| "candidates"
-				| "description"
-			>> & IExamMethods>(id, {
+			.findById(id, {
 				owner: 1,
 				title: 1,
 				subject: 1,
@@ -61,6 +52,7 @@ export default async function EditExamPage({ params }: PageProps){
 	if(user.accountType !== "professor" || !exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const { hasSubmit, hasStartedBySomeone } = await exam.submitInfo()
+	const questions = exam.questions as Types.DocumentArray<MixedExamQuestion, Types.Subdocument<MixedExamQuestion, any, MixedExamQuestion> & MixedExamQuestion>
 
 	return (
 		<ExamForm
@@ -74,7 +66,7 @@ export default async function EditExamPage({ params }: PageProps){
 					duration: formatTimeDuration(exam.duration),
 					description: exam.description
 				},
-				question: (exam.questions as Types.DocumentArray<MixedExamQuestion, Types.Subdocument<MixedExamQuestion, any, MixedExamQuestion> & MixedExamQuestion>).map(({ type, text, options, correctAnswer, isRequired }) => ({
+				question: questions.map(({ type, text, options, correctAnswer, isRequired }) => ({
 					text: text,
 					required: isRequired,
 					question_type: type,

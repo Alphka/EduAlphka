@@ -24,8 +24,6 @@ export default async function startExam(id: string){
 	if(!exam) return { errors: ["Teste não encontrado"] }
 	if(!exam.candidates.some(candidate => candidate._id.equals(user.id))) return { errors: ["Você não está inscrito nesse teste"] }
 
-	if(!(await Exam.exists({ _id: id })))
-
 	await StartedExam.create({
 		exam: id,
 		user: user.id

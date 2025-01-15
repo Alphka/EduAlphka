@@ -6,20 +6,19 @@ import { useRouter } from "next/navigation"
 import { twJoin } from "tailwind-merge"
 import { toast } from "react-toastify"
 import { Paper } from "@mantine/core"
+import revalidateSubmitCache from "../actions/revalidateSubmitCache"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import routes from "@app/routes"
 
 const criticalMinutesRemaining = 5
 
 interface RemainingTimeProps {
-	examDuration: number
+	examId: string
 	startedAt: Date
+	examDuration: number
 }
 
-export default function RemainingTime({
-	examDuration,
-	startedAt
-}: RemainingTimeProps){
+export default function RemainingTime({ examId, examDuration, startedAt }: RemainingTimeProps){
 	const router = useRouter()
 
 	const getRemainingMinutes = useCallback(() => {
@@ -48,6 +47,7 @@ export default function RemainingTime({
 		if(remainingTime.hours === 0 && remainingTime.minutes === 0 && remainingTime.seconds === 0){
 			stopTimer()
 			toast.warn("O seu teste expirou!")
+			revalidateSubmitCache(examId)
 			router.push(routes.homepage.pathname)
 		}
 	}, 1000, { autoInvoke: true })

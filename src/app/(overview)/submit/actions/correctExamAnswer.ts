@@ -1,6 +1,5 @@
 "use server"
 
-import type { IAnswer } from "@models/typings/Answer"
 import type { ISubmit } from "@models/typings/Submit"
 import type { IExam } from "@models/typings/Exam"
 import { Types, type HydratedDocument } from "mongoose"
@@ -21,14 +20,14 @@ export default async function correctExamAnswer(answerId: string, isCorrect: boo
 	if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
 
 	const answer = await Answer
-		.findById<HydratedDocument<Pick<IAnswer,
-			| "_id"
-			| "type"
-			| "submit"
-			| "isCorrect"
-			| "feedback"
-			| "updatedAt"
-		>>>(answerId)
+		.findById(answerId, {
+			type: 1,
+			submit: 1,
+			question: 1,
+			feedback: 1,
+			updatedAt: 1,
+			isCorrect: 1
+		})
 		.populate<{
 			submit: HydratedDocument<Pick<ISubmit, "_id"> & {
 				exam: HydratedDocument<Pick<IExam, "_id" | "questions">> & {

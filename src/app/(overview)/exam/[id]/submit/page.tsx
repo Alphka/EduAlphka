@@ -1,11 +1,11 @@
-import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam, IExamMethods } from "@models/typings/Exam"
+import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
 import type { PageProps } from "@typings/index"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
 import { Divider, Paper } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
-import { Exam } from "@models"
+import { Exam, StartedExam } from "@models"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
@@ -25,17 +25,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 	if(!Types.ObjectId.isValid(id)) notFound()
 
 	const exam = await Exam
-		.findById<HydratedDocument<Pick<IExam,
-			| "_id"
-			| "owner"
-			| "title"
-			| "subject"
-			| "duration"
-			| "questions"
-			| "candidates"
-			| "description"
-			| "expiresAt"
-		>> & IExamMethods>(id, {
+		.findById(id, {
 			title: 1,
 			owner: 1,
 			subject: 1,
@@ -105,7 +95,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 		)
 	}
 
-	if(!submitData.submit && submitData.isExamExpired){
+	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired({ exam })){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
@@ -140,12 +130,13 @@ export default async function SubmitExamPage({ params }: PageProps){
 						aria-label={`${submitData.grade} ${submitData.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
 						withBorder
 					>
-						Nota: {submitData.grade}
+						Nota: {submitData.grade} de {maxGrade}
 					</Paper>
 				) : (
 					<RemainingTime
-						examDuration={exam.duration}
+						examId={exam.id}
 						startedAt={submitData.startedAt}
+						examDuration={exam.duration}
 					/>
 				)}
 			</header>
@@ -158,7 +149,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 				withBorder
 			>
 				<li>
-					<span className="font-semibold">Professor: </span>
+					<span className="font-semibold">Aplicador do teste: </span>
 					{exam.owner.name}
 				</li>
 

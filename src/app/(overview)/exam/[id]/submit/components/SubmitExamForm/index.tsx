@@ -46,7 +46,8 @@ export default function SubmitExamForm({
 
 	const answersByQuestion = answers && new Map(answers.map(({ question, ...answer }) => [question, answer]))
 
-	const formDisabled = loading || !!answers
+	const hasSubmit = !!answers
+	const formDisabled = loading || hasSubmit
 
 	const {
 		watch,
@@ -90,11 +91,12 @@ export default function SubmitExamForm({
 							errors,
 							register,
 							setValue,
+							hasSubmit,
 							clearErrors,
 							formDisabled,
 							questionIndex
 						}}
-						answer={answersByQuestion?.get(_id)!}
+						answer={answersByQuestion?.get(_id)}
 						key={_id}
 					/>
 				))}

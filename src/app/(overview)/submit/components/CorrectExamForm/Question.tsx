@@ -8,15 +8,14 @@ import { useRef } from "react"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import correctExamAnswer from "../../actions/correctExamAnswer"
 
-interface CorrectExamFormQuestionProps extends
-	Pick<ExamQuestion, "isRequired" | "text" | "type">,
-	Pick<CorrectExamFormProps, "formDisabled"> {
+interface CorrectExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" | "text" | "type"> {
 	questionNumber: number
+	formDisabled: boolean
 	options: {
 		_id: string
 		text: string
 	}[]
-	answer: Omit<CorrectExamFormProps["answers"][number], "question">
+	answer: Omit<CorrectExamFormProps["answers"][number], "question"> | undefined
 }
 
 export default function CorrectExamFormQuestion({
@@ -24,20 +23,16 @@ export default function CorrectExamFormQuestion({
 	formDisabled,
 	isRequired,
 	options,
-	answer: {
-		_id: answerId,
-		option: chosenOption,
-		feedback,
-		...answer
-	},
+	answer,
 	text,
 	type
 }: CorrectExamFormQuestionProps){
 	const { handleServerAction, isPending: isLoading } = useServerActionHandler()
 	const feedbackRef = useRef<HTMLTextAreaElement>(null)
 
-	const isCorrect = isRequired && answer.isCorrect === true
-	const isPending = isRequired && !isCorrect && answer.isCorrect === undefined
+	const isAnswered = !!answer && ("option" in answer || "content" in answer)
+	const isCorrect = isRequired && answer?.isCorrect === true
+	const isPending = isRequired && !isCorrect && !!answer && answer.isCorrect === undefined
 	const isWrong = isRequired && !isCorrect && !isPending
 
 	return (
@@ -64,16 +59,18 @@ export default function CorrectExamFormQuestion({
 					</p>
 				)}
 
-				<p
-					className={twJoin(
-						"flex-grow text-dark-200 text-md",
-						isCorrect && "text-green-600",
-						isPending && "text-yellow-600",
-						isWrong && "text-red-600"
-					)}
-				>
-					Resposta {isCorrect ? "correta" : isWrong ? "incorreta" : "pendente de correção"}
-				</p>
+				{isRequired && isAnswered && (
+					<p
+						className={twJoin(
+							"flex-grow text-dark-200 text-md",
+							isCorrect && "text-green-600",
+							isPending && "text-yellow-600",
+							isWrong && "text-red-600"
+						)}
+					>
+						Resposta {isCorrect ? "correta" : isWrong ? "incorreta" : isPending && "pendente de correção"}
+					</p>
+				)}
 			</div>
 
 			<div className="flex flex-col mt-xs gap-md">
@@ -88,13 +85,12 @@ export default function CorrectExamFormQuestion({
 							label="Resposta"
 							variant="filled"
 							aria-label="Resposta"
-							value={answer.content || ""}
+							value={answer?.content || ""}
 							withAsterisk={false}
 							classNames={{
 								input: "cursor-default overflow-hidden"
 							}}
 							spellCheck
-							disabled={formDisabled}
 							autosize
 							readOnly
 							inert
@@ -113,10 +109,11 @@ export default function CorrectExamFormQuestion({
 									minRows={2}
 									maxRows={12}
 									withAsterisk={false}
-									defaultValue={feedback}
+									defaultValue={answer!.feedback}
 									spellCheck
-									disabled={formDisabled}
 									autosize
+									readOnly={formDisabled}
+									inert={formDisabled}
 									ref={feedbackRef}
 								/>
 
@@ -141,7 +138,7 @@ export default function CorrectExamFormQuestion({
 												if(isCorrect) return
 
 												handleServerAction(correctExamAnswer(
-													answerId,
+													answer!._id,
 													true,
 													feedbackRef.current?.value.trim() || undefined
 												))
@@ -159,7 +156,7 @@ export default function CorrectExamFormQuestion({
 												if(isWrong) return
 
 												handleServerAction(correctExamAnswer(
-													answerId,
+													answer!._id,
 													false,
 													feedbackRef.current?.value.trim() || undefined
 												))
@@ -176,7 +173,7 @@ export default function CorrectExamFormQuestion({
 				) : (
 					<ul className="flex flex-col gap-md">
 						{options.map(({ _id: optionId, text }) => {
-							const checked = chosenOption === optionId
+							const checked = !!answer && answer.option === optionId
 
 							return (
 								<li className="flex items-center gap-md" key={optionId}>
@@ -202,5 +199,4 @@ export default function CorrectExamFormQuestion({
 	)
 }
 
-// TODO: Do not show feedbacks or corrected answers until all the corrections is sent
 // TODO: Notify user after the corrections are submitted

@@ -9,6 +9,7 @@ import { FaAsterisk } from "react-icons/fa"
 import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import getHistoryMessage from "../ExamCard/helpers/getHistoryMessage"
+import getNameInitials from "@helpers/getNameInitials"
 import getStringColor from "@helpers/getStringColor"
 import routes from "@app/routes"
 import Link from "next/link"
@@ -26,9 +27,7 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!startedExam?.submit
-	const isExamExpired = isExamStarted && await StartedExam
-		.hydrate(startedExam)
-		.isExpired({ exam })
+	const isExamExpired = isExamStarted && await StartedExam.hydrate(startedExam).isExpired({ exam })
 	const pendingCorrection = !!startedExam?.pendingCorrection
 
 	const submitStatus = getSubmitStatus({
@@ -76,18 +75,20 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 
 				<div className="h-full flex flex-col gap-md">
 					<div className="flex items-start justify-between gap-md">
-						<div className="flex items-center gap-sm">
+						<div className="flex items-center gap-md">
 							<Avatar
+								className="flex-shrink-0 leading-none"
 								name={exam.owner.name}
 								size="md"
 								radius="xl"
 								color="initials"
-								className="leading-none"
-							/>
+							>
+								{getNameInitials(exam.owner.name)}
+							</Avatar>
 
 							<div>
 								<p className="text-sm font-medium">{exam.owner.name}</p>
-								<p className="text-xs text-dark-200">{exam.owner.username}</p>
+								<p className="text-dark-200 text-xs">{exam.owner.username}</p>
 							</div>
 						</div>
 

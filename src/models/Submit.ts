@@ -18,7 +18,7 @@ const submitSchema = new Schema<ISubmit, SubmitModel, ISubmitMethods>({
 		required: true
 	},
 	publishedAt: Date
-}, { versionKey: false })
+})
 
 submitSchema.method("getAnswers", async function getAnswers(){
 	const { default: Answer } = await import("./Answer")
