@@ -59,7 +59,7 @@ export default function SubmitExamFormQuestion({
 					"flex gap-x-md gap-y-xs",
 					isRequired && hasSubmit
 						? "flex-row-reverse flex-wrap-reverse"
-						: (isRequired || hasSubmit) && "flex-col-reverse"
+						: hasSubmit && "flex-col-reverse"
 				)}
 			>
 				<h3 className="flex-grow basis-full text-dark-200 text-h6">
@@ -99,7 +99,6 @@ export default function SubmitExamFormQuestion({
 					<Textarea
 						size="md"
 						label="Resposta"
-						className={twJoin(formDisabled && "cursor-not-allowed")}
 						placeholder="Digite sua resposta"
 						aria-label="Resposta"
 						maxRows={12}
@@ -110,10 +109,10 @@ export default function SubmitExamFormQuestion({
 							}
 						})}
 						withAsterisk={false}
+						defaultValue={watch(`question.${questionIndex}.content`)}
 						error={errors.question?.[questionIndex]?.content?.message}
 						spellCheck
 						autosize
-						disabled={false}
 						readOnly={formDisabled}
 						inert={formDisabled}
 					/>

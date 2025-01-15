@@ -4,7 +4,6 @@ import type { ExamMultipleChoiceQuestion, IExam } from "@models/typings/Exam"
 import { Answer, Exam, Session, StartedExam, Submit } from "@models"
 import { ExamFormValidation } from "@constants/forms"
 import { revalidatePath } from "next/cache"
-import { redirect } from "next/navigation"
 import { Types } from "mongoose"
 import getSessionUserData from "@helpers/getSessionUserData"
 import routes from "@app/routes"
@@ -17,7 +16,7 @@ interface MultipleChoiceAnswer {
 	option: string
 }
 
-interface SubmitExamData {
+export interface SubmitExamData {
 	questions: ({ id: string } & (DissertativeAnswer | MultipleChoiceAnswer))[]
 }
 
@@ -158,5 +157,4 @@ export default async function submitExam(id: string, data: SubmitExamData){
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", id))
 	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", id))
-	redirect(routes.homepage.pathname)
 }

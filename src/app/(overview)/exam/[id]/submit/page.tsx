@@ -3,7 +3,7 @@ import type { PageProps } from "@typings/index"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
-import { Divider, Paper } from "@mantine/core"
+import { Divider, Paper, Tooltip } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
 import { Exam, StartedExam } from "@models"
 import { pick } from "lodash"
@@ -121,17 +121,27 @@ export default async function SubmitExamPage({ params }: PageProps){
 				</h1>
 
 				{!!submitData && !!submitData.submit ? (
-					<Paper
-						className={twJoin(
-							"leading-none px-sm py-xs shadow-xs",
-							pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
-						)}
-						title={pendingCorrection ? "Nota final pendente de correção" : undefined}
-						aria-label={`${submitData.grade} ${submitData.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
-						withBorder
+					<Tooltip
+						py="sm"
+						px="md"
+						fz="xs"
+						label="Nota final pendente de correção"
+						opened={pendingCorrection ? undefined : false}
+						events={{ hover: true, focus: false, touch: true }}
+						position="right"
+						withArrow
 					>
-						Nota: {submitData.grade} de {maxGrade}
-					</Paper>
+						<Paper
+							className={twJoin(
+								"leading-none px-sm py-xs shadow-xs",
+								pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
+							)}
+							aria-label={`${submitData.grade} ${submitData.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
+							withBorder
+						>
+							Nota: {submitData.grade} de {maxGrade}
+						</Paper>
+					</Tooltip>
 				) : (
 					<RemainingTime
 						examId={exam.id}

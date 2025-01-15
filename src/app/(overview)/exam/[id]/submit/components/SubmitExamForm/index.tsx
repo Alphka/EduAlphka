@@ -5,9 +5,9 @@ import type { IAnswer } from "@models/typings/Answer"
 import { useForm, type DefaultValues } from "react-hook-form"
 import { Button } from "@mantine/core"
 import { useId } from "react"
+import submitExam, { type SubmitExamData } from "../../actions/submitExam"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import SubmitExamFormQuestion from "./Question"
-import submitExam from "../../actions/submitExam"
 
 interface SubmitExamFormProps {
 	defaultValues?: DefaultValues<SubmitFormData>
@@ -41,8 +41,12 @@ export default function SubmitExamForm({
 	answers,
 	exam
 }: SubmitExamFormProps){
-	const { handleServerAction, isPending } = useServerActionHandler()
 	const titleId = useId()
+	const { handleServerAction, isPending } = useServerActionHandler({
+		successOptions: {
+			message: "Formulário enviado com sucesso!"
+		}
+	})
 
 	const answersByQuestion = answers && new Map(answers.map(({ question, ...answer }) => [question, answer]))
 
@@ -59,7 +63,6 @@ export default function SubmitExamForm({
 	} = useForm<SubmitFormData>({
 		reValidateMode: "onChange",
 		defaultValues,
-		disabled: formDisabled,
 		mode: "onSubmit"
 	})
 
@@ -72,7 +75,7 @@ export default function SubmitExamForm({
 						id: exam.questions[index]._id,
 						...data
 					}))
-				} as Parameters<typeof submitExam>[1]))
+				} as SubmitExamData))
 			})}
 		>
 			<h2 id={titleId} className="text-h3">

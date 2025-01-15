@@ -28,8 +28,8 @@ export interface CorrectExamFormProps {
 }
 
 export default function CorrectExamForm({ submitId, exam, answers, hasPublished }: CorrectExamFormProps){
-	const { handleServerAction, isPending } = useServerActionHandler()
 	const titleId = useId()
+	const { handleServerAction, isPending } = useServerActionHandler()
 
 	const formDisabled = hasPublished
 

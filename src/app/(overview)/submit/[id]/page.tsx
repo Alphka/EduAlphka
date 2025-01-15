@@ -121,6 +121,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 	}))
 
 	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id))
+	const pendingAnswers = answers.filter(({ isCorrect }) => isCorrect === undefined).length
 	const maxGrade = requiredQuestions.size
 	const grade = answers.filter(({ isCorrect }) => isCorrect).length
 
@@ -163,8 +164,8 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					)}
 
 					<li>
-						<span className="font-semibold" aria-live="polite">Nota {submitData.pendingAnswers > 0 && "parcial"} do aluno: </span>
-						{grade} de {maxGrade} {!!submitData.pendingAnswers && `(${submitData.pendingAnswers} ${submitData.pendingAnswers === 1 ? "resposta pendente" : "respostas pendentes"})`}
+						<span className="font-semibold" aria-live="polite">Nota {pendingAnswers > 0 && "parcial"} do aluno: </span>
+						{grade} de {maxGrade} {!!pendingAnswers && `(${pendingAnswers} ${pendingAnswers === 1 ? "resposta pendente" : "respostas pendentes"})`}
 					</li>
 
 					{exam.expiresAt && (
