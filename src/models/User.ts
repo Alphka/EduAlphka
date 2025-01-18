@@ -20,8 +20,13 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		type: String,
 		required: true,
 		minlength: GenericFormValidation.emailMinLength,
-		maxlength: GenericFormValidation.emailMaxLength,
-		unique: true
+		maxlength: GenericFormValidation.emailMaxLength
+	},
+	normalizedEmail: {
+		type: String,
+		unique: true,
+		required: true,
+		maxlength: GenericFormValidation.emailMaxLength
 	},
 	username: {
 		type: String,

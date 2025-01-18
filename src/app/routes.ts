@@ -74,6 +74,10 @@ const routes = {
 		title: "Sair da conta",
 		pathname: "/logout",
 		Icon: MdLogout
+	},
+	recoverPassword: {
+		title: "Recuperar senha",
+		pathname: "/recover-password"
 	}
 } as const
 

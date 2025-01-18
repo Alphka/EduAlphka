@@ -7,7 +7,9 @@ type ServerActionPromise = Promise<{ errors: string[] } | undefined>
 
 type ToastOptions = Pick<import("react-toastify").ToastOptions, "autoClose">
 
-type Options =  & ToastOptions
+type Options = {
+	action?: () => any
+} & ToastOptions
 
 interface ServerActionHandlerProps extends ToastOptions {
 	successOptions?: Partial<{
@@ -42,10 +44,14 @@ export default function useServerActionHandler({ successOptions = {}, errorOptio
 					console.error("Server action failed:", result)
 					toast.error("Algo deu errado", options(true))
 				}
+
+				errorOptions.action?.()
 			}else{
 				if(successOptions.message){
 					toast.success(successOptions.message, options(false))
 				}
+
+				successOptions.action?.()
 			}
 
 			setIsPending(false)

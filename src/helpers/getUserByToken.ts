@@ -1,7 +1,7 @@
 import type { ISession } from "@models/typings/Session"
 import type { IUser } from "@models/typings/User"
 import type { Types } from "mongoose"
-import { TOKEN_KEY } from "@constants/index"
+import { TOKEN_KEY } from "@constants"
 import { cookies } from "next/headers"
 import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"

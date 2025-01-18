@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { APPLICATION_NAME } from "@constants/index"
+import { APPLICATION_NAME } from "@constants"
 import getRequestURL from "@helpers/getRequestURL"
 import RegisterForm from "./components/RegisterForm"
 import routes from "@app/routes"

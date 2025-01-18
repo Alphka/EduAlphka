@@ -7,6 +7,7 @@ import { GenericFormValidation } from "@constants/forms"
 import { useMemo, useState } from "react"
 import { useForm } from "react-hook-form"
 import useServerActionHandler from "@hooks/useServerActionHandler"
+import routes from "@app/routes"
 import Link from "next/link"
 
 interface LoginFormProps {
@@ -18,7 +19,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 	const { handleServerAction, isPending } = useServerActionHandler()
 
 	const registerURL = useMemo(() => {
-		const searchParams = new URLSearchParams()
+		const searchParams: URLSearchParams = new URLSearchParams()
 
 		if(
 			redirectURL &&
@@ -29,7 +30,9 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 			searchParams.set("redirect", redirectURL)
 		}
 
-		return "/register" + searchParams
+		const searchParamsString = searchParams.toString()
+
+		return `${routes.register.pathname}${searchParamsString.toString() as "" | `?${string}`}` as const
 	}, [redirectURL])
 
 	const {
@@ -77,10 +80,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 								value: Math.max(GenericFormValidation.emailMaxLength, GenericFormValidation.usernameMaxLength),
 								message: `O email ou nome de usuário deve ter no máximo ${Math.max(GenericFormValidation.emailMaxLength, GenericFormValidation.usernameMaxLength)} caracteres`
 							},
-							required: {
-								value: true,
-								message: "O email ou nome de usuário é obrigatório"
-							}
+							required: "O email ou nome de usuário é obrigatório"
 						})}
 						error={errors.username?.message}
 						withAsterisk
@@ -118,10 +118,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 								value: new RegExp(GenericFormValidation.validPasswordPattern),
 								message: "A senha contém caracteres inválidos"
 							},
-							required: {
-								value: true,
-								message: "A senha é obrigatória"
-							}
+							required: "A senha é obrigatória"
 						})}
 						error={errors.password?.message}
 						withAsterisk
@@ -138,7 +135,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 					/>
 
 					<Anchor
-						href="/recover-password"
+						href={routes.recoverPassword.pathname}
 						className="px-0.5 rounded-sm"
 						component={Link}
 						prefetch={false}

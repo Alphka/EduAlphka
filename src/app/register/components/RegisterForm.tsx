@@ -69,10 +69,7 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 								value: new RegExp(GenericFormValidation.validNamePattern),
 								message: "O nome contém caracteres inválidos"
 							},
-							required: {
-								value: true,
-								message: "O nome é obrigatório"
-							}
+							required: "O nome é obrigatório"
 						})}
 						error={errors.name?.message}
 						withAsterisk
@@ -97,10 +94,7 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 								value: new RegExp(GenericFormValidation.validUsernamePattern),
 								message: "O nome de usuário contém caracteres inválidos"
 							},
-							required: {
-								value: true,
-								message: "O nome de usuário é obrigatório"
-							}
+							required: "O nome de usuário é obrigatório"
 						})}
 						error={errors.username?.message}
 						withAsterisk
@@ -125,10 +119,7 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 								value: new RegExp(GenericFormValidation.validEmailPattern),
 								message: "E-mail inválido"
 							},
-							required: {
-								value: true,
-								message: "O email é obrigatório"
-							}
+							required: "O email é obrigatório"
 						})}
 						error={errors.email?.message}
 						withAsterisk
@@ -166,10 +157,7 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 								value: new RegExp(GenericFormValidation.validPasswordPattern),
 								message: "A senha contém caracteres inválidos"
 							},
-							required: {
-								value: true,
-								message: "A senha é obrigatória"
-							}
+							required: "A senha é obrigatória"
 						})}
 						error={errors.password?.message}
 						withAsterisk

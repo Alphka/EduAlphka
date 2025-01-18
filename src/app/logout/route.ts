@@ -1,4 +1,4 @@
-import { TOKEN_KEY, TOKEN_LENGTH } from "@constants/index"
+import { TOKEN_KEY, TOKEN_LENGTH } from "@constants"
 import { NextResponse } from "next/server"
 import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"

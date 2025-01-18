@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server"
-import { TOKEN_KEY } from "@constants/index"
+import { TOKEN_KEY } from "@constants"
 import validateToken from "@helpers/validateToken"
 
 function getToken(request: NextRequest){

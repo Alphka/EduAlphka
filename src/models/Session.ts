@@ -1,6 +1,6 @@
 import type { ISession, SessionModel } from "./typings/Session"
 import { model, models, Schema } from "mongoose"
-import { TOKEN_LENGTH } from "@constants/index"
+import { TOKEN_LENGTH } from "@constants"
 
 export const sessionSchema = new Schema<ISession, SessionModel>({
 	token: {

@@ -5,6 +5,7 @@ export interface IUser {
 	_id: Types.ObjectId
 	name: string
 	email: string
+	normalizedEmail: string
 	username: string
 	password: string
 	accountType: typeof ACCOUNT_TYPES[number]

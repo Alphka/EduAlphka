@@ -78,10 +78,7 @@ export default function OptionContainer({
 					value: new RegExp(GenericFormValidation.validDescriptionPattern),
 					message: "O texto da opção contém caracteres inválidos"
 				},
-				required: {
-					value: true,
-					message: "O conteúdo da opção é obrigatório"
-				}
+				required: "O conteúdo da opção é obrigatório"
 			})}
 			defaultValue={watch(`question.${questionIndex}.option.${optionIndex}.text`)}
 			onKeyDown={event => {

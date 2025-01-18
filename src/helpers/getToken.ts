@@ -1,5 +1,5 @@
 import { cookies, headers } from "next/headers"
-import { TOKEN_KEY } from "@constants/index"
+import { TOKEN_KEY } from "@constants"
 import validateToken from "./validateToken"
 
 export default async function getToken(){

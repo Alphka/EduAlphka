@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache"
 import { Exam, User } from "@models"
 import { Types } from "mongoose"
 import connectDatabase from "@lib/connectDatabase"
+import normalizeEmail from "normalize-email"
 import routes from "@app/routes"
 
 export async function addCandidate(examId: string, usernameOrEmail: string){
@@ -20,7 +21,7 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	const candidate = await User
 		.findOne({
 			$or: [
-				{ email: usernameOrEmail },
+				{ normalizedEmail: normalizeEmail(usernameOrEmail) },
 				{ username: usernameOrEmail }
 			]
 		}, {

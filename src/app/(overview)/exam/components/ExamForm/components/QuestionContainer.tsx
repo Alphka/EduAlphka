@@ -117,10 +117,7 @@ export default function QuestionContainer({
 					value: new RegExp(GenericFormValidation.validDescriptionPattern),
 					message: "O conteúdo da questão contém caracteres inválidos"
 				},
-				required: {
-					value: true,
-					message: "O conteúdo da questão é obrigatório"
-				}
+				required: "O conteúdo da questão é obrigatório"
 			})}
 			defaultValue={watch(`question.${index}.text`)}
 			error={errors.question?.[index]?.text?.message}
@@ -140,10 +137,7 @@ export default function QuestionContainer({
 					value
 				}))}
 				{...register(`question.${index}.question_type`, {
-					required: {
-						value: true,
-						message: "O tipo da questão é obrigatório"
-					}
+					required: "O tipo da questão é obrigatório"
 				})}
 				defaultValue={watch(`question.${index}.question_type`) || null}
 				onChange={value => {
@@ -176,10 +170,7 @@ export default function QuestionContainer({
 											options[0]?.focus()
 										}}
 										{...register(path, {
-											required: {
-												value: true,
-												message: "Nenhuma opção foi selecionada como a resposta correta"
-											}
+											required: "Nenhuma opção foi selecionada como a resposta correta"
 										})}
 										name={undefined}
 										defaultValue={watch(path)}

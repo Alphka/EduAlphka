@@ -5,6 +5,9 @@ declare global {
 			HASH_SALT?: string
 			MONGODB_URI?: string
 			DATABASE_NAME?: string
+
+			RECOVERY_PASSWORD_EMAIL?: string
+			RECOVERY_PASSWORD_PASSWORD?: string
 		}
 	}
 }

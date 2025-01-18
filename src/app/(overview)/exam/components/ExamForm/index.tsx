@@ -124,10 +124,7 @@ export default function ExamForm({
 	const examDuration = register("exam.duration", {
 		onBlur: handleDurationChange,
 		onChange: handleDurationChange,
-		required: {
-			value: true,
-			message: "A duração do teste é obrigatória"
-		}
+		required: "A duração do teste é obrigatória"
 	})
 
 	examDuration.ref(durationInputRef.current)
@@ -223,10 +220,7 @@ export default function ExamForm({
 									value: new RegExp(GenericFormValidation.validSpecialNamePattern),
 									message: "O título do teste contém caracteres inválidos"
 								},
-								required: {
-									value: true,
-									message: "O título do teste é obrigatório"
-								}
+								required: "O título do teste é obrigatório"
 							})}
 							defaultValue={watch("exam.title")}
 							error={errors.exam?.title?.message}
@@ -254,10 +248,7 @@ export default function ExamForm({
 									value: new RegExp(GenericFormValidation.validDescriptionPattern),
 									message: "A descrição do teste contém caracteres inválidos"
 								},
-								required: {
-									value: true,
-									message: "A descrição do teste é obrigatória"
-								}
+								required: "A descrição do teste é obrigatória"
 							})}
 							defaultValue={watch("exam.description")}
 							error={errors.exam?.description?.message}

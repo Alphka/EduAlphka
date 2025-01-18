@@ -1,6 +1,7 @@
 import type { AccountType } from "@typings/api"
 import { User } from "@models"
 import connectDatabase from "./connectDatabase"
+import normalizeEmail from "normalize-email"
 
 export default async function registerUser({
 	name,
@@ -33,6 +34,7 @@ export default async function registerUser({
 	return await User.create({
 		name,
 		email,
+		normalizedEmail: normalizeEmail(email),
 		username,
 		password: User.hashPassword(password),
 		accountType,

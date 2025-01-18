@@ -1,7 +1,11 @@
+import type { IUser, IUserMethods } from "@models/typings/User"
+import type { HydratedDocument } from "mongoose"
 import { cookies, headers } from "next/headers"
 import { Session, User } from "@models"
 import { TOKEN_KEY } from "@constants"
 import connectDatabase from "./connectDatabase"
+import normalizeEmail from "normalize-email"
+import getToken from "@helpers/getToken"
 
 type LoginProps = {
 	usernameOrEmail: string
@@ -9,7 +13,7 @@ type LoginProps = {
 }
 
 type SigninProps = {
-	user: InstanceType<typeof User>
+	user: HydratedDocument<IUser> & IUserMethods
 }
 
 export default async function authenticateUser({
@@ -18,9 +22,11 @@ export default async function authenticateUser({
 }: (LoginProps | SigninProps) & {
 	keepLoggedIn: boolean
 }){
+	const oldToken = await getToken()
+
 	await connectDatabase()
 
-	let user: InstanceType<typeof User>
+	let user: HydratedDocument<IUser> & IUserMethods
 
 	if("user" in data){
 		user = data.user
@@ -31,7 +37,7 @@ export default async function authenticateUser({
 			user = await User
 				.findOne({
 					$or: [
-						{ email: usernameOrEmail },
+						{ normalizedEmail: normalizeEmail(usernameOrEmail) },
 						{ username: usernameOrEmail }
 					]
 				}, { password: 1 })
@@ -54,18 +60,21 @@ export default async function authenticateUser({
 
 	tokenExpirationDate.setMonth(tokenExpirationDate.getMonth() + 1)
 
-	await Session.create({
-		token,
-		user: user.id,
-		userAgent: headersStore.get("user-agent")?.trim().substring(0, 255) || "",
-		expiresAt: tokenExpirationDate
-	})
-
-	cookiesStore.set({
-		name: TOKEN_KEY,
-		value: token,
-		path: "/",
-		expires: keepLoggedIn ? tokenExpirationDate : undefined,
-		sameSite: "lax"
-	})
+	await Promise.all([
+		Session.create({
+			token,
+			user: user.id,
+			userAgent: headersStore.get("user-agent")?.trim().substring(0, 255) || "",
+			expiresAt: tokenExpirationDate
+		}).then(() => {
+			cookiesStore.set({
+				name: TOKEN_KEY,
+				value: token,
+				path: "/",
+				expires: keepLoggedIn ? tokenExpirationDate : undefined,
+				sameSite: "lax"
+			})
+		}),
+		oldToken && Session.deleteOne({ token: oldToken })
+	])
 }
