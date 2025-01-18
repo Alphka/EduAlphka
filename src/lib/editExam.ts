@@ -1,3 +1,5 @@
+import type { HydratedDocument } from "mongoose"
+import type { IExam } from "@models/typings/Exam"
 import type { z } from "zod"
 import type getUserByToken from "@helpers/getUserByToken"
 import { Exam } from "@models"
@@ -5,8 +7,8 @@ import getDurationMinutes from "@helpers/getDurationMinutes"
 import examSchema from "@app/schemas/exam"
 
 type TUser = Awaited<ReturnType<typeof getUserByToken>>
+type TExam = HydratedDocument<IExam> | null
 type TExamData = z.infer<typeof examSchema>
-type TExam = InstanceType<typeof Exam> | null
 
 /** @throws {string | string[]} */
 function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
@@ -18,6 +20,8 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 
 	if(user?.accountType !== "professor" || (exam && !exam.owner._id.equals(user.id))) throw "Acesso negado"
 	if(exam === null) throw "Teste não encontrado"
+	if(!examData.questions.length) throw "O teste deve possuir pelo menos uma questão"
+	if(!examData.questions.filter(({ required }) => required).length) throw "O teste deve possuir pelo menos uma questão obrigatória"
 
 	const {
 		title,

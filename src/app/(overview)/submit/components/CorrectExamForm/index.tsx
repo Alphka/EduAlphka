@@ -10,6 +10,7 @@ import sendCorrection from "../../actions/sendCorrection"
 
 export interface CorrectExamFormProps {
 	submitId: string
+	canEdit: boolean
 	exam: {
 		_id: string
 		questions: (Pick<ExamQuestion, "type" | "text" | "isRequired"> & {
@@ -24,14 +25,11 @@ export interface CorrectExamFormProps {
 		option?: string
 		question: string
 	})[]
-	hasPublished: boolean
 }
 
-export default function CorrectExamForm({ submitId, exam, answers, hasPublished }: CorrectExamFormProps){
+export default function CorrectExamForm({ submitId, exam, answers, canEdit }: CorrectExamFormProps){
 	const titleId = useId()
 	const { handleServerAction, isPending } = useServerActionHandler()
-
-	const formDisabled = hasPublished
 
 	const answersByQuestion = new Map(answers.map(({ question, ...answer }) => [question, answer]))
 
@@ -54,14 +52,14 @@ export default function CorrectExamForm({ submitId, exam, answers, hasPublished 
 				}, questionIndex) => (
 					<CorrectExamFormQuestion
 						questionNumber={questionIndex + 1}
+						formDisabled={canEdit}
 						answer={answersByQuestion.get(questionId)}
 						{...{
 							type,
 							text,
 							options,
 							submitId,
-							isRequired,
-							formDisabled
+							isRequired
 						}}
 						key={questionId}
 					/>
@@ -83,7 +81,7 @@ export default function CorrectExamForm({ submitId, exam, answers, hasPublished 
 
 						handleServerAction(sendCorrection(submitId))
 					}}
-					disabled={formDisabled}
+					disabled={canEdit}
 				>
 					Enviar correção
 				</Button>

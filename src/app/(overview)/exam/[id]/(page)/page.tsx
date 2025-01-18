@@ -7,7 +7,7 @@ import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
-import ExamForm from "../components/ExamForm"
+import ExamForm from "../../components/ExamForm"
 import routes from "@app/routes"
 
 const title = routes.exam.children.template.title

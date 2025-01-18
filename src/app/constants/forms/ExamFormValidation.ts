@@ -9,6 +9,7 @@ export default class ExamFormValidation {
 
 	static readonly subjectMinLength = GenericFormValidation.nameMinLength
 	static readonly subjectMaxLength = 45
+	static readonly validSubjectPattern = `^[${GenericFormValidation.validSpecialNameChars}]*$` as const
 
 	static readonly minDurationInMinutes = 5
 	static readonly maxDurationInMinutes = 900 // 15 hours

@@ -94,7 +94,7 @@ examSchema.method("submitData", async function submitData(candidates: (Types.Obj
 
 	const isMultipleCandidates = Array.isArray(candidates)
 
-	const startedExamResult = await StartedExam.aggregate<StartedExamWithSubmit>([
+	const startedExamResult = await StartedExam.aggregate<Omit<StartedExamWithSubmit, "grade" | "pendingAnswers" | "pendingCorrection">>([
 		{
 			$match: {
 				exam: this._id,
@@ -148,7 +148,7 @@ examSchema.method("submitData", async function submitData(candidates: (Types.Obj
 	const results = startedExamResult.map(async submitData => {
 		if(!submitData) return null
 
-		const pendingCorrection = !!submitData?.submit && !submitData.submit.publishedAt
+		const pendingCorrection = submitData.submit?.answers.some(answer => answer.type === "dissertative") && !submitData.submit.publishedAt
 
 		let pendingAnswers = 0
 		let grade: number | null = 0
@@ -171,12 +171,11 @@ examSchema.method("submitData", async function submitData(candidates: (Types.Obj
 			grade,
 			pendingAnswers,
 			pendingCorrection
-		}
+		} as StartedExamWithSubmit
 	})
 
 	return isMultipleCandidates ? Promise.all(results) : results[0]
 })
-
 
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)
 

@@ -25,7 +25,7 @@ const examSchema = z.object({
 		.trim()
 		.min(ExamFormValidation.subjectMinLength, `O nome da disciplina deve ter no mínimo ${ExamFormValidation.subjectMinLength} caracteres`)
 		.max(ExamFormValidation.subjectMaxLength, `O nome da disciplina deve ter no máximo ${ExamFormValidation.subjectMaxLength} caracteres`)
-		.regex(new RegExp(GenericFormValidation.validSpecialNamePattern), "O nome da disciplina contém caracteres inválidos")
+		.regex(new RegExp(ExamFormValidation.validSubjectPattern), "O nome da disciplina contém caracteres inválidos")
 		.optional(),
 	questions: z.array(questionSchema)
 		.min(ExamFormValidation.minQuestionsNumber, `O teste deve ter no mínimo ${ExamFormValidation.minQuestionsNumber} questões`)

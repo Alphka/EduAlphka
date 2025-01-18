@@ -1,7 +1,7 @@
 "use client"
 
 import { useParams } from "next/navigation"
-import ExamForm from "../components/ExamForm"
+import ExamForm from "../../components/ExamForm"
 
 export default function EditExamPageSkeleton(){
 	const { id } = useParams()

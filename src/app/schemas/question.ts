@@ -13,12 +13,12 @@ const questionSchema = z.object({
 		required_error: "O texto da pergunta é obrigatório"
 	})
 		.trim()
-		.min(ExamFormValidation.questionTextMinLength, `O texto da pergunta deve ter no mínimo ${ExamFormValidation.questionTextMinLength} caracteres`)
-		.max(ExamFormValidation.questionTextMaxLength, `O texto da pergunta deve ter no máximo ${ExamFormValidation.questionTextMaxLength} caracteres`)
-		.regex(new RegExp(GenericFormValidation.validDescriptionPattern), "O texto da pergunta contém caracteres inválidos"),
+		.min(ExamFormValidation.questionTextMinLength, `A pergunta da questão deve ter no mínimo ${ExamFormValidation.questionTextMinLength} caracteres`)
+		.max(ExamFormValidation.questionTextMaxLength, `A pergunta da questão deve ter no máximo ${ExamFormValidation.questionTextMaxLength} caracteres`)
+		.regex(new RegExp(GenericFormValidation.validDescriptionPattern), "A pergunta da questão contém caracteres inválidos"),
 	options: z.array(optionSchema)
-		.min(ExamFormValidation.minOptionsNumber, `A questão deve ter no mínimo ${ExamFormValidation.minOptionsNumber} opções`)
-		.max(ExamFormValidation.maxOptionsNumber, `A questão deve ter no máximo ${ExamFormValidation.maxOptionsNumber} opções`)
+		.min(ExamFormValidation.minOptionsNumber, `As questões de múltipla escolha devem possuir no mínimo ${ExamFormValidation.minOptionsNumber} opções`)
+		.max(ExamFormValidation.maxOptionsNumber, `As questões de múltipla escolha devem possuir no máximo ${ExamFormValidation.maxOptionsNumber} opções`)
 		.optional(),
 	required: z.boolean({
 		invalid_type_error: "Valor inválido para o campo 'Questão obrigatória'",

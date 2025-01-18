@@ -182,7 +182,7 @@ export default function ExamForm({
 					const promise = type === "create"
 						? createExamAction({
 							title,
-							subject,
+							subject: subject || undefined,
 							duration,
 							questions,
 							description
@@ -291,7 +291,7 @@ export default function ExamForm({
 										message: `O nome da disciplina deve ter no máximo ${ExamFormValidation.subjectMaxLength} caracteres`
 									},
 									pattern: {
-										value: new RegExp(GenericFormValidation.validSpecialNamePattern),
+										value: new RegExp(ExamFormValidation.validSubjectPattern),
 										message: "O nome da disciplina contém caracteres inválidos"
 									}
 								})}

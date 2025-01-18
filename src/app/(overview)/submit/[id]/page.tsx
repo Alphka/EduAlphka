@@ -152,7 +152,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					</li>
 
 					<li>
-						<span className="font-semibold">Aluno: </span>
+						<span className="font-semibold">Candidato: </span>
 						{submit.user.name}
 					</li>
 
@@ -164,7 +164,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					)}
 
 					<li>
-						<span className="font-semibold" aria-live="polite">Nota {pendingAnswers > 0 && "parcial"} do aluno: </span>
+						<span className="font-semibold" aria-live="polite">Nota {pendingAnswers > 0 && "parcial"} do candidato: </span>
 						{grade} de {maxGrade} {!!pendingAnswers && `(${pendingAnswers} ${pendingAnswers === 1 ? "resposta pendente" : "respostas pendentes"})`}
 					</li>
 
@@ -176,7 +176,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					)}
 
 					<li>
-						<span className="font-semibold">Descrição: </span>
+						<span className="font-semibold">Descrição do teste: </span>
 						{exam.description}
 					</li>
 				</Paper>
@@ -184,9 +184,9 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 			<CorrectExamForm
 				submitId={submit.id}
+				canEdit={!submitData.pendingCorrection}
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers}
-				hasPublished={!!submit.publishedAt}
 			/>
 		</div>
 	)
