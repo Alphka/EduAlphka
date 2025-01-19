@@ -1,4 +1,4 @@
-import { MdHome, MdLogout, MdOutlineMenuBook } from "react-icons/md"
+import { MdHome, MdLogout, MdOutlineMenuBook, MdPerson } from "react-icons/md"
 import { APPLICATION_NAME } from "./constants"
 
 const routes = {
@@ -50,6 +50,11 @@ const routes = {
 				pathname: "/exam/list"
 			}
 		}
+	},
+	account: {
+		title: "Minha conta",
+		pathname: "/account",
+		Icon: MdPerson
 	},
 	invite: {
 		pathname: "/invite",

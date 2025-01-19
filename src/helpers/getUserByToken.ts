@@ -1,12 +1,17 @@
+import type { HydratedDocument, Types } from "mongoose"
+import type { IUser, IUserMethods } from "@models/typings/User"
 import type { ISession } from "@models/typings/Session"
-import type { IUser } from "@models/typings/User"
-import type { Types } from "mongoose"
+import { Session, User } from "@models"
 import { TOKEN_KEY } from "@constants"
 import { cookies } from "next/headers"
-import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"
 
-export default async function getUserByToken(token: string){
+export type UserByToken = Omit<IUser, "_id"> & { id: string }
+
+function getUserByToken(token: string, hydrated: true): Promise<(HydratedDocument<IUser> & IUserMethods) | null>
+function getUserByToken(token: string, hydrated?: false): Promise<UserByToken | null>
+function getUserByToken(token: string, hydrated: boolean): Promise<UserByToken | (HydratedDocument<IUser> & IUserMethods) | null>
+async function getUserByToken(token: string, hydrated = false){
 	const [cookiesStore] = await Promise.all([
 		cookies(),
 		connectDatabase()
@@ -42,6 +47,10 @@ export default async function getUserByToken(token: string){
 		return null
 	}
 
+	if(hydrated){
+		return User.hydrate(session.user)
+	}
+
 	const { _id, ...rest } = session.user
 
 	return {
@@ -49,3 +58,5 @@ export default async function getUserByToken(token: string){
 		...rest
 	}
 }
+
+export default getUserByToken

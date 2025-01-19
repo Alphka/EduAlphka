@@ -20,15 +20,13 @@ export default async function registerUser({
 
 	const user = await User.findOne({
 		$or: [
-			{ email },
+			{ normalizedEmail: normalizeEmail(email) },
 			{ username }
 		]
 	})
 
 	if(user){
-		if(user.username.toLowerCase() === username.toLowerCase()) throw "Esse nome de usuário já está em uso"
-		if(user.email === email) throw "Esse e-mail já está em uso"
-		throw "Essas credenciais já estão em uso"
+		throw "Esse e-mail ou nome de usuário já está em uso"
 	}
 
 	return await User.create({

@@ -118,6 +118,10 @@ export default function PasswordRecoveryForm(){
 									value: GenericFormValidation.emailMaxLength,
 									message: `O email deve ter no máximo ${GenericFormValidation.emailMaxLength} caracteres`
 								},
+								pattern: {
+									value: new RegExp(GenericFormValidation.validEmailPattern),
+									message: "E-mail inválido"
+								},
 								required: "O email é obrigatório"
 							})}
 							error={errors.email?.message}

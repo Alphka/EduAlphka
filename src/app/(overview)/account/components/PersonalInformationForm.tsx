@@ -1,59 +1,101 @@
 "use client"
 
-import { ActionIcon, Button, Checkbox, Text, TextInput } from "@mantine/core"
-import { signInAction, type UserSignInData } from "../actions/signIn"
-import { MdVisibility, MdVisibilityOff } from "react-icons/md"
+import type { PersonalInformationData } from "../actions/editPersonalInformation"
+import type verifyAuthorization from "@helpers/verifyAuthorization"
+import { MdEdit, MdVisibility, MdVisibilityOff } from "react-icons/md"
+import { ActionIcon, Button, Paper, TextInput } from "@mantine/core"
 import { GenericFormValidation } from "@constants/forms"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
+import editPersonalInformation from "../actions/editPersonalInformation"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 
-interface RegisterFormProps {
-	redirectURL: string | undefined
+interface PersonalInformationFormProps {
+	user: Pick<Awaited<ReturnType<typeof verifyAuthorization>>, "name" | "username" | "email">
 }
 
-export default function RegisterForm({ redirectURL }: RegisterFormProps){
+export default function PersonalInformationForm({ user }: PersonalInformationFormProps){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
-	const [isProfessor, setIsMasterSelected] = useState(true)
-	const { handleServerAction, isPending } = useServerActionHandler()
+	const [enabled, setEnabled] = useState(false)
+	const router = useRouter()
+
+	const { handleServerAction, isPending } = useServerActionHandler({
+		successOptions: {
+			message: "Informações pessoais atualizadas com sucesso!",
+			action: () => router.refresh()
+		}
+	})
 
 	const {
 		register,
+		setFocus,
+		getValues,
 		handleSubmit,
-		formState: { errors }
-	} = useForm<Omit<UserSignInData, "account_type">>()
+		formState: { errors, isDirty }
+	} = useForm<PersonalInformationData>({
+		reValidateMode: "onChange",
+		defaultValues: {
+			username: user.username,
+			email: user.email,
+			name: user.name
+		},
+		mode: "onChange"
+	})
+
+	useEffect(() => {
+		if(!isDirty && !isPending) return
+
+		const handler = (event: BeforeUnloadEvent) => {
+			event.preventDefault()
+			return event.returnValue = "As alterações no formulário de informações pessoais precisam ser salvas"
+		}
+
+		window.addEventListener("beforeunload", handler)
+
+		return () => window.removeEventListener("beforeunload", handler)
+	}, [isDirty, isPending])
 
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
 	return (
-		<form
-			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
-			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
-				handleServerAction(signInAction({
-					name,
-					email,
-					username,
-					password,
-					account_type: isProfessor ? "professor" : "candidate",
-					keep_logged_in
-				}, redirectURL))
+		<Paper
+			className="flex flex-col p-lg rounded shadow-xs gap-md"
+			component="form"
+			onSubmit={handleSubmit(({ password, ...data }) => {
+				handleServerAction(editPersonalInformation({
+					password: password?.trim() || undefined,
+					...data
+				}))
 			})}
+			withBorder
 		>
-			<header className="flex flex-col gap-xs">
-				<h1 className="text-6xl font-extrabold">
-					Crie uma conta
-				</h1>
-				<h2 className="text-gray-500 text-4xl font-medium tracking-tight">
-					Junte-se à nossa plataforma de testes online e comece sua jornada de aprendizado!
+			<header className="flex justify-between">
+				<h2 className="text-h5">
+					Informações pessoais
 				</h2>
+
+				<Button
+					size="compact-sm"
+					variant="light"
+					leftSection={<MdEdit className="text-base" />}
+					aria-label="Editar informações pessoais"
+					onClick={event => {
+						event.preventDefault()
+						setEnabled(enabled => !enabled)
+						setTimeout(() => setFocus("name"))
+					}}
+				>
+					Editar
+				</Button>
 			</header>
 
-			<div className="flex flex-col gap-2xl">
-				<div className="flex flex-col gap-md">
+			<ul className="flex flex-col gap-sm">
+				<li>
 					<TextInput
-						size="md"
 						type="text"
-						label="Nome"
+						label="Nome completo"
+						variant={enabled ? "default" : "filled"}
 						placeholder="Digite o seu nome"
 						autoComplete="name"
 						{...register("name", {
@@ -69,16 +111,19 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 								value: new RegExp(GenericFormValidation.validNamePattern),
 								message: "O nome contém caracteres inválidos"
 							},
-							required: "O nome é obrigatório"
+							required: "O e-mail é obrigatório"
 						})}
-						error={errors.name?.message}
-						withAsterisk
+						defaultValue={user.name}
+						readOnly={!enabled}
+						inert={!enabled}
+						error={enabled ? errors.name?.message : undefined}
 					/>
-
+				</li>
+				<li>
 					<TextInput
-						size="md"
 						type="text"
 						label="Nome de usuário"
+						variant={enabled ? "default" : "filled"}
 						placeholder="Digite o seu usuário"
 						autoComplete="username"
 						{...register("username", {
@@ -96,14 +141,17 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 							},
 							required: "O nome de usuário é obrigatório"
 						})}
-						error={errors.username?.message}
-						withAsterisk
+						defaultValue={user.username}
+						readOnly={!enabled}
+						inert={!enabled}
+						error={enabled ? errors.username?.message : undefined}
 					/>
-
+				</li>
+				<li>
 					<TextInput
-						size="md"
-						type="text"
+						type="email"
 						label="Email"
+						variant={enabled ? "default" : "filled"}
 						placeholder="Digite o seu endereço de email"
 						autoComplete="email"
 						{...register("email", {
@@ -119,26 +167,31 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 								value: new RegExp(GenericFormValidation.validEmailPattern),
 								message: "E-mail inválido"
 							},
-							required: "O email é obrigatório"
+							required: "O e-mail é obrigatório"
 						})}
-						error={errors.email?.message}
-						withAsterisk
+						defaultValue={user.email}
+						readOnly={!enabled}
+						inert={!enabled}
+						error={enabled ? errors.email?.message : undefined}
 					/>
-
+				</li>
+				<li>
 					<TextInput
 						size="md"
-						type={isPasswordVisible ? "text" : "password"}
+						type={enabled && isPasswordVisible ? "text" : "password"}
 						label="Senha"
-						placeholder={isPasswordVisible ? "exemplo" : "•".repeat(9)}
+						variant={enabled ? "default" : "filled"}
+						placeholder="Digite uma nova senha"
 						autoComplete="new-password"
 						rightSection={(
 							<ActionIcon
 								size="md"
 								variant="subtle"
 								className="text-current"
-								onClick={() => setIsPasswordVisible(!isPasswordVisible)}
 								aria-label={isPasswordVisible ? "Esconder senha" : "Mostrar senha"}
 								onPointerDown={event => event.detail === 1 || event.preventDefault()}
+								onClick={() => setIsPasswordVisible(!isPasswordVisible)}
+								hidden={!enabled || getValues("password") === undefined}
 							>
 								<PasswordEyeIcon className="text-[1.25rem]" />
 							</ActionIcon>
@@ -155,54 +208,25 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 							pattern: {
 								value: new RegExp(GenericFormValidation.validPasswordPattern),
 								message: "A senha contém caracteres inválidos"
-							},
-							required: "A senha é obrigatória"
+							}
 						})}
-						error={errors.password?.message}
-						withAsterisk
+						readOnly={!enabled}
+						inert={!enabled}
+						error={enabled ? errors.password?.message : undefined}
 					/>
-				</div>
+				</li>
+			</ul>
 
-				<div className="flex flex-col gap-xs">
-					<Text size="md">
-						Tipo de conta
-					</Text>
-
-					<Button.Group>
-						<Button
-							variant={isProfessor ? "filled" : "default"}
-							onClick={() => setIsMasterSelected(true)}
-							fullWidth
-						>
-							Aplicador de testes
-						</Button>
-						<Button
-							variant={isProfessor ? "default" : "filled"}
-							onClick={() => setIsMasterSelected(false)}
-							fullWidth
-						>
-							Candidato
-						</Button>
-					</Button.Group>
-				</div>
-
-				<Checkbox
-					size="sm"
-					label="Manter logado"
-					{...register("keep_logged_in")}
-					error={errors.keep_logged_in?.message}
-					defaultChecked
-				/>
-
+			{enabled && (
 				<Button
 					type="submit"
-					variant="filled"
+					className="self-start"
+					aria-label="Enviar formulário"
 					loading={isPending}
-					aria-label="Criar conta"
 				>
-					Continuar
+					Salvar
 				</Button>
-			</div>
-		</form>
+			)}
+		</Paper>
 	)
 }

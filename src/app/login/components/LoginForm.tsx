@@ -92,7 +92,6 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 						label="Senha"
 						placeholder={isPasswordVisible ? "exemplo" : "•".repeat(9)}
 						autoComplete="current-password"
-						pattern={GenericFormValidation.validPasswordPattern}
 						rightSection={(
 							<ActionIcon
 								size="md"
