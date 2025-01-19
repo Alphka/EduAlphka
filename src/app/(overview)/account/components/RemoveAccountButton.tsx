@@ -1,31 +1,31 @@
 "use client"
 
+import type { IUser } from "@models/typings/User"
 import { MdDeleteForever, MdWarningAmber } from "react-icons/md"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
-import { Modal, Button, Badge } from "@mantine/core"
+import { Badge, Button, Modal } from "@mantine/core"
 import useServerActionHandler from "@hooks/useServerActionHandler"
-import deleteExamAction from "../../../actions/deleteExam"
+import removeAccount from "../actions/removeAccount"
 
-interface RemoveExamButtonProps {
-	examName: string
-	examId: string
+interface RemoveAccountButtonProps {
+	user: Pick<IUser, "accountType">
 }
 
-export default function RemoveExamButton({ examId, examName }: RemoveExamButtonProps){
-	const { handleServerAction, isPending } = useServerActionHandler({ autoClose: 10e3 })
+export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
+	const { handleServerAction, isPending } = useServerActionHandler({})
 	const [opened, { open, close }] = useDisclosure(false)
 	const isMobile = useMediaQuery("(max-width: 50em)")
 
 	return <>
 		<Button
-			className="flex-shrink-0"
-			color="red.9"
-			variant="filled"
+			size="md"
+			color="red"
+			className="self-start"
 			leftSection={<MdDeleteForever className="text-lg" />}
-			aria-label="Excluir teste"
+			aria-label="Excluir conta"
 			onClick={open}
 		>
-			Excluir teste
+			Excluir conta
 		</Button>
 
 		<Modal
@@ -55,12 +55,18 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 					</Badge>
 
 					<h1 className="text-h4 font-medium">
-						Deseja realmente excluir este teste?
+						Deseja realmente excluir a sua conta?
 					</h1>
 				</div>
 
 				<h2 className="text-dark-200 text-h6 font-normal">
-					Você está excluindo o teste "{examName}", deseja continuar?
+					Você está excluindo a sua conta na plataforma.{" "}
+					{user.accountType === "professor" && <>
+						<br />
+						Todos os testes criados por você serão excluídos.
+						<br />
+					</>}
+					Deseja continuar?
 				</h2>
 			</header>
 
@@ -81,8 +87,8 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(deleteExamAction(examId))}
-					aria-label="Excluir teste"
+					onClick={() => handleServerAction(removeAccount())}
+					aria-label="Excluir conta"
 					loading={isPending}
 				>
 					Excluir
