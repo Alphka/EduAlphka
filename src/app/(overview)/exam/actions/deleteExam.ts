@@ -1,6 +1,6 @@
 "use server"
 
-import { Answer, Exam, ExamInvite, StartedExam, Submit } from "@models"
+import { Answer, Exam, ExamInvite, StartedExam, Submit, User } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { Types } from "mongoose"
@@ -24,11 +24,23 @@ export default async function deleteExamAction(id: string){
 		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
 
 		if(!exam.isExpired()){
-			const hasSubmit = await Submit.exists({ exam: id })
-			const hasStartedBySomeone = hasSubmit || await StartedExam.exists({ exam: id })
+			const startedExams = await StartedExam.find({ exam: id }, "user").lean()
+			const startedUsers = startedExams.map(startedExam => startedExam.user)
 
-			if(hasStartedBySomeone && !hasSubmit){
-				return { errors: ["Não é possível excluir esse teste pois há candidatos que iniciaram o teste mas ainda não o responderam"] }
+			const validUsers = await User.find({ _id: { $in: startedUsers } }, { _id: 1 }).lean()
+			const validUserIds = validUsers.map(user => user._id.toString())
+
+			const submits = await Submit.find({
+				exam: id,
+				user: {
+					$in: validUserIds
+				}
+			}, { user: 1 }).lean()
+
+			const usersWithSubmits = new Set(submits.map(submit => submit.user.toString()))
+
+			if(validUserIds.filter(id => !usersWithSubmits.has(id)).length){
+				return { errors: ["Não é possível excluir esse teste pois há candidatos que iniciaram o teste, mas ainda não o responderam"] }
 			}
 		}
 

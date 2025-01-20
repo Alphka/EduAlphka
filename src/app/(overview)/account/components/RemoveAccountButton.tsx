@@ -5,7 +5,7 @@ import { MdDeleteForever, MdWarningAmber } from "react-icons/md"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { Badge, Button, Modal } from "@mantine/core"
 import useServerActionHandler from "@hooks/useServerActionHandler"
-import removeAccount from "../actions/removeAccount"
+import deleteUser from "../actions/deleteUser"
 
 interface RemoveAccountButtonProps {
 	user: Pick<IUser, "accountType">
@@ -87,7 +87,7 @@ export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(removeAccount())}
+					onClick={() => handleServerAction(deleteUser())}
 					aria-label="Excluir conta"
 					loading={isPending}
 				>

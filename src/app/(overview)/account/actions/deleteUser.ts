@@ -1,6 +1,6 @@
 "use server"
 
-import { Answer, Exam, ExamInvite, Session, StartedExam, Submit } from "@models"
+import { Answer, Exam, ExamInvite, Session, StartedExam, Submit, VerificationCode } from "@models"
 import { TOKEN_KEY } from "@constants/index"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
@@ -9,7 +9,7 @@ import getUserByToken from "@helpers/getUserByToken"
 import getToken from "@helpers/getToken"
 import routes from "@app/routes"
 
-export default async function removeAccount(){
+export default async function deleteUser(){
 	const cookiesStore = await cookies()
 
 	try{
@@ -42,6 +42,7 @@ export default async function removeAccount(){
 					})
 				]))
 			}),
+			VerificationCode.deleteMany({ user }),
 			Session.deleteMany({
 				$or: [
 					{ token },
