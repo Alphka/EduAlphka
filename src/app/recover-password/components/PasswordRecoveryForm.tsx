@@ -1,14 +1,14 @@
 "use client"
 
-import recoverPassword, { type PasswordRecoveryData } from "../actions/recoverPassword"
-import useServerActionHandler from "@hooks/useServerActionHandler"
-import sendVerificationCode from "../actions/sendVerificationCode"
 import { GenericFormValidation, PasswordRecoveryFormValidation } from "@constants/forms"
 import { Button, PinInput, TextInput } from "@mantine/core"
 import { MdChevronLeft } from "react-icons/md"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { pick } from "lodash"
+import recoverPassword, { type PasswordRecoveryData } from "../actions/recoverPassword"
+import useServerActionHandler from "@hooks/useServerActionHandler"
+import sendVerificationCode from "../actions/sendVerificationCode"
 
 type FormSteps = "email" | "code"
 

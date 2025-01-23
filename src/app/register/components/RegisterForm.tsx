@@ -129,7 +129,7 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 						size="md"
 						type={isPasswordVisible ? "text" : "password"}
 						label="Senha"
-						placeholder={isPasswordVisible ? "exemplo" : "•".repeat(9)}
+						placeholder="Digite uma nova senha"
 						autoComplete="new-password"
 						rightSection={(
 							<ActionIcon

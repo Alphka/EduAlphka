@@ -33,17 +33,18 @@ export default function OptionContainer({
 	const optionError = errors.question?.[questionIndex]?.correct_answer?.message
 	const optionPath = `question.${questionIndex}.correct_answer` as const
 
+	const chosenOption = watch(optionPath)
+
 	const removeOption: typeof _removeOption = useCallback((index) => {
 		if(!index) return
 
-		const indexes = Array.isArray(index) ? index : [index]
-
-		if(indexes.includes(optionIndex)){
-			setValue(optionPath, undefined)
+		if(chosenOption && Array.isArray(index) ? index.includes(chosenOption) : chosenOption === index){
+			// @ts-expect-error
+			setValue(optionPath, "")
 		}
 
 		_removeOption(index)
-	}, [_removeOption, optionIndex, setValue])
+	}, [_removeOption, setValue, optionIndex, chosenOption])
 
 	return <>
 		<Radio
@@ -57,7 +58,7 @@ export default function OptionContainer({
 			defaultChecked={watch(`question.${questionIndex}.correct_answer`) === optionIndex}
 			aria-label="Definir como a resposta correta"
 			title={optionError || "Definir como a resposta correta"}
-			disabled={disabled || watch(optionPath) === undefined}
+			disabled={disabled || chosenOption === undefined}
 			error={!!optionError}
 		/>
 
