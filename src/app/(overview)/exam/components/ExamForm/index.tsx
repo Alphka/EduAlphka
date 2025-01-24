@@ -176,10 +176,12 @@ export default function ExamForm({
 						...questionData
 					}))
 
+					subject ||= undefined
+
 					const promise = type === "create"
 						? createExamAction({
 							title,
-							subject: subject || undefined,
+							subject,
 							duration,
 							questions,
 							description
