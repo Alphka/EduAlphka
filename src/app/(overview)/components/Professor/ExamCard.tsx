@@ -1,7 +1,9 @@
+import type { ComponentPropsWithoutRef } from "react"
 import type { IExam, IExamMethods } from "@models/typings/Exam"
 import type { HydratedDocument } from "mongoose"
 import { Badge, Box, Card, Text, Title, Tooltip } from "@mantine/core"
 import { MdOutlineTimer, MdPerson } from "react-icons/md"
+import { getSubmitStatus } from "@helpers/getSubmitStatus"
 import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import getHistoryMessage from "../ExamCard/helpers/getHistoryMessage"
@@ -9,17 +11,24 @@ import getStringColor from "@helpers/getStringColor"
 import routes from "@app/routes"
 import Link from "next/link"
 
-interface ExamCardProps {
+interface ExamCardProps extends Pick<ComponentPropsWithoutRef<typeof Link>, "prefetch"> {
 	exam: HydratedDocument<IExam> & IExamMethods
 }
 
-export default async function ExamCard({ exam }: ExamCardProps){
+export default async function ExamCard({ exam, prefetch = false }: ExamCardProps){
 	const history = getHistoryMessage({
 		createdAt: exam.createdAt,
 		updatedAt: exam.updatedAt
 	})
 
 	const isExamExpired = exam.isExpired()
+
+	const submitStatus = getSubmitStatus({
+		hasStartedExam: true,
+		hasSubmit: false,
+		isExpired: isExamExpired,
+		pendingCorrection: false
+	})
 
 	return (
 		<Link
@@ -28,7 +37,7 @@ export default async function ExamCard({ exam }: ExamCardProps){
 				"group relative h-full rounded-md overflow-hidden shadow-xs",
 				"focus:outline-none"
 			)}
-			prefetch={false}
+			prefetch={prefetch}
 		>
 			<Card
 				className={twJoin(
@@ -62,7 +71,7 @@ export default async function ExamCard({ exam }: ExamCardProps){
 							className="shrink-0"
 							color={isExamExpired ? "yellow" : "blue"}
 						>
-							{isExamExpired ? "Expirado" : "Ativo"}
+							{submitStatus}
 						</Badge>
 					</div>
 

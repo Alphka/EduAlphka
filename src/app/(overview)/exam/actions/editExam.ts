@@ -32,7 +32,7 @@ export default async function editExamAction(id: string, examData: z.infer<typeo
 		const { hasSubmit, hasStartedBySomeone } = await exam.submitInfo()
 
 		if(hasSubmit) return { errors: ["Não é possível editar um teste que possui respostas"] }
-		if(hasStartedBySomeone) return { errors: ["Não é possível editar um teste que já foi iniciado"] }
+		if(hasStartedBySomeone) return { errors: ["Não é possível editar um teste que já foi iniciado por um candidato"] }
 
 		editExam(user, exam, examData)
 

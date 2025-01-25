@@ -27,7 +27,9 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!startedExam?.submit
-	const isExamExpired = isExamStarted && await StartedExam.hydrate(startedExam).isExpired({ exam })
+	const isExamExpired = isExamStarted
+		? !isExamSubmitted && await StartedExam.hydrate(startedExam).isExpired({ exam })
+		: exam.isExpired()
 	const pendingCorrection = !!startedExam?.pendingCorrection
 
 	const submitStatus = getSubmitStatus({
@@ -38,7 +40,7 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 	})
 
 	const Container = (props: HTMLAttributes<HTMLElement>) => {
-		return !isExamSubmitted && isExamExpired ? (
+		return isExamExpired ? (
 			<div {...props} />
 		) : (
 			<Link
@@ -56,7 +58,7 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 		<Container
 			className={twJoin(
 				"group relative h-full rounded-md overflow-hidden shadow-xs",
-				"focus:outline-none"
+				!isExamExpired && "focus:outline-none"
 			)}
 		>
 			<Card
@@ -68,8 +70,10 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 				<div
 					className={twJoin(
 						"absolute inset-0 pointer-events-none z-1",
-						"group-hover:bg-blue-500/5",
-						"group-focus-visible:bg-blue-500/10"
+						!isExamExpired && [
+							"group-hover:bg-blue-500/5",
+							"group-focus-visible:bg-blue-500/10"
+						]
 					)}
 				/>
 

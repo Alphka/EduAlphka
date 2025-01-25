@@ -34,7 +34,10 @@ export default async function RecentExams({ userId, limit }: RecentExamsProps){
 		.limit(limit)
 
 	return exams.length ? (
-		<ExamList exams={exams} />
+		<ExamList
+			exams={exams}
+			prefetch
+		/>
 	) : (
 		<p className="text-md text-dark-200">
 			Não há testes recentemente criados.

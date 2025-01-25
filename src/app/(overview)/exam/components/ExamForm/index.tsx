@@ -312,9 +312,10 @@ export default function ExamForm({
 										<MdAccessTime className="text-[1.25rem]" />
 									</ActionIcon>
 								)}
+								{...examDuration}
 								minTime={formatTimeDuration(ExamFormValidation.minDurationInMinutes)}
 								maxTime={formatTimeDuration(ExamFormValidation.maxDurationInMinutes)}
-								{...examDuration}
+								defaultValue={watch("exam.duration")}
 								error={errors.exam?.duration?.message}
 								ref={durationInputRef}
 								withAsterisk
