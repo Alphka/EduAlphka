@@ -2,8 +2,8 @@
 
 import type { IUser } from "@models/typings/User"
 import { MdDeleteForever, MdWarningAmber } from "react-icons/md"
-import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { Badge, Button, Modal } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import deleteUser from "../actions/deleteUser"
 
@@ -14,7 +14,6 @@ interface RemoveAccountButtonProps {
 export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 	const { handleServerAction, isPending } = useServerActionHandler({})
 	const [opened, { open, close }] = useDisclosure(false)
-	const isMobile = useMediaQuery("(max-width: 50em)")
 
 	return <>
 		<Button
@@ -32,7 +31,6 @@ export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 			size="auto"
 			opened={opened}
 			onClose={close}
-			fullScreen={isMobile}
 			transitionProps={{ transition: "fade", duration: 200 }}
 			withCloseButton={false}
 			closeOnClickOutside
@@ -70,9 +68,9 @@ export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 				</h2>
 			</header>
 
-			<div className="flex items-center justify-end gap-lg">
+			<div className="self-stretch flex flex-col xs:flex-row items-end xs:items-center xs:justify-end gap-lg">
 				<Button
-					className="flex-shrink-0"
+					className="flex-shrink-0 w-full xs:w-auto"
 					size="sm"
 					color="gray"
 					variant="light"
@@ -83,7 +81,7 @@ export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 				</Button>
 
 				<Button
-					className="flex-shrink-0"
+					className="flex-shrink-0 w-full xs:w-auto"
 					size="sm"
 					color="red"
 					variant="filled"

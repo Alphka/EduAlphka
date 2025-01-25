@@ -1,8 +1,8 @@
 "use client"
 
 import { MdDeleteForever, MdWarningAmber } from "react-icons/md"
-import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { Modal, Button, Badge } from "@mantine/core"
+import { useDisclosure } from "@mantine/hooks"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import deleteExamAction from "../../../actions/deleteExam"
 
@@ -14,7 +14,6 @@ interface RemoveExamButtonProps {
 export default function RemoveExamButton({ examId, examName }: RemoveExamButtonProps){
 	const { handleServerAction, isPending } = useServerActionHandler({ autoClose: 10e3 })
 	const [opened, { open, close }] = useDisclosure(false)
-	const isMobile = useMediaQuery("(max-width: 50em)")
 
 	return <>
 		<Button
@@ -32,7 +31,6 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 			size="auto"
 			opened={opened}
 			onClose={close}
-			fullScreen={isMobile}
 			transitionProps={{ transition: "fade", duration: 200 }}
 			withCloseButton={false}
 			closeOnClickOutside
@@ -64,9 +62,9 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 				</h2>
 			</header>
 
-			<div className="flex items-center justify-end gap-lg">
+			<div className="flex flex-col xs:flex-row items-end xs:items-center xs:justify-end gap-lg">
 				<Button
-					className="flex-shrink-0"
+					className="flex-shrink-0 w-full xs:w-auto"
 					size="sm"
 					color="gray"
 					variant="light"
@@ -77,7 +75,7 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 				</Button>
 
 				<Button
-					className="flex-shrink-0"
+					className="flex-shrink-0 w-full xs:w-auto"
 					size="sm"
 					color="red"
 					variant="filled"

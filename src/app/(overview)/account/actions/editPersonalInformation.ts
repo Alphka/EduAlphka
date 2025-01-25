@@ -18,24 +18,10 @@ export interface PersonalInformationData {
 	name: string
 }
 
-export default async function editPersonalInformation({ name, email, username, password }: Partial<PersonalInformationData> = {}){
-	const validatedFields = personalInformationSchema.safeParse({
-		name,
-		email,
-		username,
-		password
-	})
-
-	if(!Object.keys(validatedFields).length || !Object.values(validatedFields).filter(Boolean).length){
-		return { errors: ["Nenhum campo foi preenchido"] }
-	}
-
-	if(!validatedFields.success){
-		return {
-			errors: validatedFields.error.errors.map(error => error.message)
-		}
-	}
-
+export default async function editPersonalInformation(
+	currentPassword: string,
+	{ name, email, username, password }: Partial<PersonalInformationData> = {}
+){
 	try{
 		await connectDatabase()
 
@@ -43,6 +29,27 @@ export default async function editPersonalInformation({ name, email, username, p
 
 		if(!user){
 			return { errors: ["Você precisa estar logado para executar essa ação"] }
+		}
+
+		if(!user.validatePassword(currentPassword)){
+			return { errors: ["Credenciais inválidas"] }
+		}
+
+		const validatedFields = personalInformationSchema.safeParse({
+			name,
+			email,
+			username,
+			password
+		})
+
+		if(!Object.keys(validatedFields).length || !Object.values(validatedFields).filter(Boolean).length){
+			return { errors: ["Nenhum campo foi preenchido"] }
+		}
+
+		if(!validatedFields.success){
+			return {
+				errors: validatedFields.error.errors.map(error => error.message)
+			}
 		}
 
 		if(validatedFields.data.email){
