@@ -12,7 +12,9 @@
 		"eg2.vscode-npm-script",
 		"christian-kohler.npm-intellisense",
 		"mrmlnc.vscode-scss",
-		"bradlc.vscode-tailwindcss"
+		"bradlc.vscode-tailwindcss",
+		"tomoyukim.vscode-mermaid-editor",
+		"bpruitt-goddard.mermaid-markdown-syntax-highlighting"
 	],
 	"unwantedRecommendations": [
 		"dbaeumer.vscode-eslint",

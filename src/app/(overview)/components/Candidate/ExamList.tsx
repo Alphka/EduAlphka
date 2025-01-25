@@ -15,7 +15,7 @@ export default async function ExamList({ userId, exams }: ExamListProps){
 	return (
 		<Grid gutter="md">
 			{exams.map(async exam => {
-				const startedExam = await exam.submitData(userId)
+				const startedExam = await exam.getSubmitData(userId)
 
 				return (
 					<GridCol

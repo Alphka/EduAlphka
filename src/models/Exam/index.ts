@@ -48,7 +48,7 @@ examSchema.method("isExpired", function isExpired(){
 	return !!this.expiresAt && Date.now() > this.expiresAt.getTime()
 })
 
-examSchema.method("submitInfo", async function submitInfo(){
+examSchema.method("getSubmitInfo", async function getSubmitInfo(){
 	const [{ hasStartedBySomeone, hasSubmit }] = await Exam.aggregate<{
 		_id: Types.ObjectId
 		hasSubmit: boolean
@@ -89,7 +89,7 @@ examSchema.method("submitInfo", async function submitInfo(){
 	}
 })
 
-examSchema.method("submitData", async function submitData(candidates: (Types.ObjectId | string) | (Types.ObjectId | string)[]){
+examSchema.method("getSubmitData", async function getSubmitData(candidates: (Types.ObjectId | string) | (Types.ObjectId | string)[]){
 	const { default: StartedExam } = await import("../StartedExam")
 
 	const isMultipleCandidates = Array.isArray(candidates)
@@ -167,7 +167,7 @@ examSchema.method("submitData", async function submitData(candidates: (Types.Obj
 		}
 
 		return {
-			...submitData,
+			...getSubmitData,
 			grade,
 			pendingAnswers,
 			pendingCorrection

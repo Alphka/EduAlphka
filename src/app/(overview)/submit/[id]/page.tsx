@@ -66,7 +66,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const submitData = await exam.submitData(submit.user._id)
+	const submitData = await exam.getSubmitData(submit.user._id)
 
 	if(!submitData?.submit){
 		console.error("Started exam for submit not found")

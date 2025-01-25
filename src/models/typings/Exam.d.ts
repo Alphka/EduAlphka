@@ -43,9 +43,12 @@ export interface IExam {
 	duration: number
 	questions: Types.DocumentArray<ExamQuestion, Types.Subdocument<ExamQuestion, any, ExamQuestion> & ExamQuestion>
 	candidates: Types.Array<NonNullable<PopulatedDoc<IUser>>>
+	// TODO: Add disallowedCandidates: Types.Array<NonNullable<PopulatedDoc<IUser>>>
+	// TODO: Asks if the candidate must be added to the disallowed list before removing them
 	createdAt: Date
 	updatedAt?: Date
 	expiresAt?: Date
+	// TODO: Add startsAt?: Date
 }
 
 interface SubmitWithAnswers extends ISubmit {
@@ -66,12 +69,12 @@ export interface StartedExamWithSubmit extends IStartedExam {
 
 export interface IExamMethods {
 	isExpired(): boolean
-	submitInfo(): Promise<{
+	getSubmitInfo(): Promise<{
 		hasSubmit: boolean
 		hasStartedBySomeone: boolean
 	}>
-	submitData(candidate: Types.ObjectId | string): Promise<StartedExamWithSubmit | null>
-	submitData(candidates: (Types.ObjectId | string)[]): Promise<StartedExamWithSubmit[]>
+	getSubmitData(candidate: Types.ObjectId | string): Promise<StartedExamWithSubmit | null>
+	getSubmitData(candidates: (Types.ObjectId | string)[]): Promise<StartedExamWithSubmit[]>
 }
 
 export type QuestionModel = Model<ExamQuestion>

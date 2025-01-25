@@ -57,7 +57,7 @@ async function getUserByToken(token: string, hydrated = false){
 
 	if(hydrated){
 		return User.hydrate(Object.assign(session.user, {
-			session: Session.hydrate(omit(session, ["user"] as const))
+			session: Session.hydrate(omit(session, "user"))
 		}))
 	}
 

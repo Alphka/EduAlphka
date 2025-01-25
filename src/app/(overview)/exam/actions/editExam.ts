@@ -29,7 +29,7 @@ export default async function editExamAction(id: string, examData: z.infer<typeo
 		if(!exam) return { errors: ["Teste não encontrado"] }
 		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem permissão para editar esse teste"] }
 
-		const { hasSubmit, hasStartedBySomeone } = await exam.submitInfo()
+		const { hasSubmit, hasStartedBySomeone } = await exam.getSubmitInfo()
 
 		if(hasSubmit) return { errors: ["Não é possível editar um teste que possui respostas"] }
 		if(hasStartedBySomeone) return { errors: ["Não é possível editar um teste que já foi iniciado por um candidato"] }

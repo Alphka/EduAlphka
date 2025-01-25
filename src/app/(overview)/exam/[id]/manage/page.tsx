@@ -53,7 +53,7 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [examInvite, submitData] = await Promise.all([
 		ExamInvite.findOne({ exam }),
-		exam.submitData(exam.candidates.map(({ _id }) => _id))
+		exam.getSubmitData(exam.candidates.map(({ _id }) => _id))
 	])
 
 	const candidatesStartedExams = new Map<string, typeof submitData[number]>

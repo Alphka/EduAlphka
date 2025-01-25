@@ -3,6 +3,7 @@ import { redirect, RedirectType } from "next/navigation"
 import { TOKEN_KEY } from "@constants/index"
 import { cookies } from "next/headers"
 import { Session } from "@models"
+import { omit } from "lodash"
 import getSessionUserData from "./getSessionUserData"
 import getRequestURL from "./getRequestURL"
 import routes from "@app/routes"
@@ -37,7 +38,7 @@ export default async function verifyAuthorization(options: AuthorizationOptions 
 		}
 	}
 
-	return user
+	return omit(user, "session")
 }
 
 async function redirectToLogin(): Promise<never> {

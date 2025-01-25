@@ -49,7 +49,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const submitData = await exam.submitData(user.id)
+	const submitData = await exam.getSubmitData(user.id)
 
 	const examClient = pick(exam.toJSON({ flattenObjectIds: true }), [
 		"_id",

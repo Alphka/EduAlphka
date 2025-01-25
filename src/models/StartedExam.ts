@@ -16,10 +16,7 @@ const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExa
 		default: Date.now,
 		required: true
 	}
-}, {
-	id: false,
-	versionKey: false
-})
+}, { versionKey: false })
 
 startedExamSchema.method("isExpired", async function isExpired({
 	exam

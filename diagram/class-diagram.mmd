@@ -1,0 +1,144 @@
+---
+config:
+    class:
+        hideEmptyMembersBox: true
+    theme: default
+    look: classic
+    layout: dagre
+---
+classDiagram
+    direction LR
+
+    class Session {
+        +string id
+        +string token
+        +User user
+        +string userAgent
+        +Date createdAt
+        +Date expiresAt
+
+        +isExpired() Boolean*
+    }
+    Session "0..*" <-- "1" User : creates
+
+    class VerificationCode {
+        +string id
+        +User user
+        +string code
+        +Date createdAt
+        +Date expiresAt
+    }
+    VerificationCode "1..*" --> "1" User : contains
+
+    class User {
+        +string id
+        +string name
+        +string email
+        +string normalizedEmail
+        +string username
+        +string password
+        +string accountType
+        +Date createdAt
+        +Date? updatedAt
+
+        +generateToken() Promise~String~$
+        +hashPassword(password: string) String$
+
+        +validatePassword(password: string) Boolean
+        +authenticate() Promise~Session~*
+        +logout() Promise~void~*
+
+        +createExam(exam: Exam) ~Promise~*
+        +startExam(exam: Exam) Promise~StartedExam~*
+        +submitExam(exam: Exam) Promise~Submit~*
+
+        +sendAnswerFeedback(answer: Answer, isCorrect: Boolean, feedback?: String) Promise~void~*
+    }
+    User "1" --> "0..*" StartedExam : contains
+    User "1" --> "0..*" Exam : creates
+    User "0..*" --> "0..*" Exam : participates
+    User "1" --> "0..*" Submit : performs
+
+    class StartedExam {
+        +Exam exam
+        +User user
+        +Date startedAt
+
+        +isExpired() Promise~Boolean~
+        +getSubmitData() Promise~object~*
+    }
+    StartedExam "1" --> "1" Exam : refers
+
+    class Exam {
+        +string id
+        +User owner
+        +string title
+        +string description
+        +string? subject
+        +number duration
+        +Question[] questions
+        +User[] candidates
+        +User[] disallowedCandidates
+        +Date createdAt
+        +Date? updatedAt
+        +Date? expiresAt
+        +Date? startsAt
+
+        +editExam(exam: Exam) ~Promise~*
+        +getMaxGrade() Number*
+        +isExpired() boolean
+    }
+    Exam "1" --> "1" ExamInvite : contains
+    Exam "1" --> "1..*" Question : contains
+    Exam "1" --> "0..*" Submit : allows
+
+    class ExamInvite {
+        +string id
+        +string token
+        +Exam exam
+        +Date createdAt
+    }
+
+    class Question {
+        +string id
+        +string type
+        +string text
+        +boolean isRequired
+		+string? feedback
+        +QuestionOption[]? options
+        +string? correctAnswer
+    }
+    Question "1" --> "0..*" QuestionOption : contains
+    Question "1" --> "1" Answer : allows
+
+    class QuestionOption {
+        +string id
+        +string text
+    }
+
+    class Answer {
+        +string id
+        +string type
+        +Submit submit
+        +Question question
+        +QuestionOption? option
+        +string? content
+        +boolean? isCorrect
+		+string? feedback
+        +Date createdAt
+        +Date? updatedAt
+    }
+    Answer "1" --> "0..1" QuestionOption : contains
+    Answer "0..*" <-- "1" Submit : contains
+
+    class Submit {
+        +string id
+        +User user
+        +Exam exam
+        +Date createdAt
+        +Date publishedAt
+
+        +getAnswers() Promise~Answer[]~
+        +getGrade() Promise~Number~*
+        +isPendingCorrection() Promise~boolean~
+    }

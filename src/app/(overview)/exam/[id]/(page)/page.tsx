@@ -51,7 +51,7 @@ export default async function EditExamPage({ params }: PageProps){
 
 	if(user.accountType !== "professor" || !exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const { hasSubmit, hasStartedBySomeone } = await exam.submitInfo()
+	const { hasSubmit, hasStartedBySomeone } = await exam.getSubmitInfo()
 	const questions = exam.questions as Types.DocumentArray<MixedExamQuestion, Types.Subdocument<MixedExamQuestion, any, MixedExamQuestion> & MixedExamQuestion>
 
 	return (
