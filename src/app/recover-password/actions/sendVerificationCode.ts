@@ -94,5 +94,5 @@ export default async function sendVerificationCode(email: string){
 
 			return { errors: ["Falha ao enviar o e-mail de verificação"] }
 		}
-	}else console.log("user does not exist")
+	}
 }

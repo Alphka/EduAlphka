@@ -4,23 +4,30 @@ import type { ISession } from "@models/typings/Session"
 import { Session, User } from "@models"
 import { TOKEN_KEY } from "@constants"
 import { cookies } from "next/headers"
+import { omit } from "lodash"
 import connectDatabase from "@lib/connectDatabase"
 
-export type UserByToken = Omit<IUser, "_id"> & { id: string }
+export interface UserByTokenLean extends Omit<IUser, "_id"> {
+	id: string
+	session: Omit<ISession, "_id" | "user"> & {
+		id: string
+	}
+}
 
-function getUserByToken(token: string, hydrated: true): Promise<(HydratedDocument<IUser> & IUserMethods) | null>
-function getUserByToken(token: string, hydrated?: false): Promise<UserByToken | null>
-function getUserByToken(token: string, hydrated: boolean): Promise<UserByToken | (HydratedDocument<IUser> & IUserMethods) | null>
+export interface UserByTokenHydrated extends HydratedDocument<IUser>, IUserMethods {
+	session: HydratedDocument<Omit<ISession, "user">>
+}
+
+function getUserByToken(token: string, hydrated: true): Promise<UserByTokenHydrated | null>
+function getUserByToken(token: string, hydrated?: false): Promise<UserByTokenLean | null>
+function getUserByToken(token: string, hydrated: boolean): Promise<UserByTokenLean | UserByTokenHydrated | null>
 async function getUserByToken(token: string, hydrated = false){
-	const [cookiesStore] = await Promise.all([
-		cookies(),
-		connectDatabase()
-	])
+	await connectDatabase()
 
 	const session = await Session
-		.findOne({ token }, { user: 1 })
+		.findOne({ token })
 		.populate("user")
-		.lean<Pick<ISession, "_id"> & { user: IUser | null }>()
+		.lean<Omit<ISession, "user"> & { user: IUser | null }>()
 
 	if(!session?.user){
 		if(session && !session.user){
@@ -34,28 +41,33 @@ async function getUserByToken(token: string, hydrated = false){
 				`\n\tUser ID: ${user}`
 			)
 
-			cookiesStore.delete(TOKEN_KEY)
-
-			await Session.deleteMany({
-				$or: [
-					{ _id: session._id },
-					{ user: { _id: user } }
-				]
-			})
+			await Promise.all([
+				cookies().then(cookiesStore => cookiesStore.delete(TOKEN_KEY)),
+				Session.deleteMany({
+					$or: [
+						{ _id: session._id },
+						{ user: user }
+					]
+				})
+			])
 		}
 
 		return null
 	}
 
 	if(hydrated){
-		return User.hydrate(session.user)
+		return User.hydrate(Object.assign(session.user, {
+			session: Session.hydrate(omit(session, ["user"] as const))
+		}))
 	}
 
-	const { _id, ...rest } = session.user
-
 	return {
-		id: _id.toString(),
-		...rest
+		id: session.user._id.toString(),
+		...omit(session.user, ["_id", "__v"] as const),
+		session: {
+			id: session._id.toString(),
+			...omit(session, ["_id", "user"] as const)
+		}
 	}
 }
 

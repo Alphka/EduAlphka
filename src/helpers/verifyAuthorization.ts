@@ -1,5 +1,8 @@
 import type { AccountType } from "@typings/api"
 import { redirect, RedirectType } from "next/navigation"
+import { TOKEN_KEY } from "@constants/index"
+import { cookies } from "next/headers"
+import { Session } from "@models"
 import getSessionUserData from "./getSessionUserData"
 import getRequestURL from "./getRequestURL"
 import routes from "@app/routes"
@@ -9,10 +12,23 @@ interface AuthorizationOptions {
 }
 
 export default async function verifyAuthorization(options: AuthorizationOptions = {}){
+	const cookiesStore = await cookies()
 	const user = await getSessionUserData()
 
+	const unauthorize = () => {
+		cookiesStore.delete(TOKEN_KEY)
+		return redirectToLogin()
+	}
+
 	if(!user){
-		return await redirectToLogin()
+		return unauthorize()
+	}
+
+	const { session } = user
+
+	if(Date.now() > session.expiresAt.getTime()){
+		await Session.hydrate(session).deleteOne()
+		return unauthorize()
 	}
 
 	if(options.accountType){

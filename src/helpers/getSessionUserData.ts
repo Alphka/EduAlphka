@@ -1,11 +1,9 @@
-import type { IUser, IUserMethods } from "@models/typings/User"
-import type { HydratedDocument } from "mongoose"
-import getUserByToken, { type UserByToken } from "./getUserByToken"
+import getUserByToken, { type UserByTokenHydrated, type UserByTokenLean } from "./getUserByToken"
 import getToken from "./getToken"
 
-function getSessionUserData(hydrated: true): Promise<(HydratedDocument<IUser> & IUserMethods) | null>
-function getSessionUserData(hydrated?: false): Promise<UserByToken>
-function getSessionUserData(hydrated: boolean): Promise<UserByToken | (HydratedDocument<IUser> & IUserMethods) | null>
+function getSessionUserData(hydrated: true): Promise<UserByTokenHydrated | null>
+function getSessionUserData(hydrated?: false): Promise<UserByTokenLean | null>
+function getSessionUserData(hydrated: boolean): Promise<UserByTokenLean | UserByTokenHydrated | null>
 async function getSessionUserData(hydrated = false){
 	const token = await getToken()
 	const user = token && await getUserByToken(token, hydrated)
