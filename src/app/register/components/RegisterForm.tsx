@@ -29,7 +29,7 @@ export default function RegisterForm({ redirectURL }: RegisterFormProps){
 		<form
 			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ name, email, username, password, keep_logged_in }) => {
-				handleServerAction(signInAction({
+				await handleServerAction(signInAction({
 					name,
 					email,
 					username,

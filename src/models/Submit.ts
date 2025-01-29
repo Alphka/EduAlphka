@@ -22,7 +22,7 @@ const submitSchema = new Schema<ISubmit, SubmitModel, ISubmitMethods>({
 
 submitSchema.method("getAnswers", async function getAnswers(){
 	const { default: Answer } = await import("./Answer")
-	return await Answer.find({ submit: this })
+	return Answer.find({ submit: this })
 })
 
 submitSchema.method("isPendingCorrection", async function isPendingCorrection(){

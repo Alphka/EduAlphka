@@ -1,5 +1,5 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
-import type { PageProps } from "@typings/index"
+import type { PageProps } from "@typings"
 import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"

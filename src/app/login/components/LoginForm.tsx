@@ -47,7 +47,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 		<form
 			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
-				handleServerAction(loginAction({
+				await handleServerAction(loginAction({
 					username,
 					password,
 					keep_logged_in

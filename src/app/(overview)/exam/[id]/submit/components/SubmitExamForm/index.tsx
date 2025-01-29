@@ -69,8 +69,8 @@ export default function SubmitExamForm({
 	return (
 		<form
 			className="flex flex-col gap-lg"
-			onSubmit={handleSubmit(({ question: questions }) => {
-				handleServerAction(submitExam(exam._id, {
+			onSubmit={handleSubmit(async ({ question: questions }) => {
+				await handleServerAction(submitExam(exam._id, {
 					questions: questions.map((data, index) => ({
 						id: exam.questions[index]._id,
 						...data

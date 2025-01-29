@@ -1,5 +1,5 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
-import type { PageProps } from "@typings/index"
+import type { PageProps } from "@typings"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
@@ -99,7 +99,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
-	const pendingCorrection = !!submitData.pendingCorrection
+	const pendingCorrection = submitData.pendingCorrection
 
 	const answers = submitData.submit?.answers.map(({ _id, type, question, feedback, option, content, isCorrect }) => ({
 		_id: _id.toString(),

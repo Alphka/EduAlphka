@@ -58,7 +58,7 @@ export default function PasswordRecoveryForm(){
 		<form
 			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ newPassword, email, code }) => {
-				handleRecoverPasswordServerAction(recoverPassword({
+				await handleRecoverPasswordServerAction(recoverPassword({
 					newPassword,
 					email,
 					code

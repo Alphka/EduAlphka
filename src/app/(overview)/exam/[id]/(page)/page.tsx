@@ -1,5 +1,5 @@
 import type { MixedExamQuestion } from "@models/typings/Exam"
-import type { PageProps } from "@typings/index"
+import type { PageProps } from "@typings"
 import type { Metadata } from "next"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types } from "mongoose"

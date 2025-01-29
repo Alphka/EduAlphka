@@ -1,7 +1,7 @@
 "use server"
 
 import { Answer, Exam, ExamInvite, Session, StartedExam, Submit, VerificationCode } from "@models"
-import { TOKEN_KEY } from "@constants/index"
+import { TOKEN_KEY } from "@constants"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
 import connectDatabase from "@lib/connectDatabase"

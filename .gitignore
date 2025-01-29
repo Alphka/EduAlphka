@@ -37,6 +37,9 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 
+# IDE
+.idea
+
 package-lock.json
 yarn.lock
 /test*.*

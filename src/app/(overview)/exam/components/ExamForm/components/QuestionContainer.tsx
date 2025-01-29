@@ -27,7 +27,7 @@ export interface QuestionContainerProps {
 	disabled?: boolean
 	register: UseFormRegister<ExamFormData>
 	setValue: UseFormSetValue<ExamFormData>
-	control: Control<ExamFormData, any>
+	control: Control<ExamFormData>
 	errors: FieldErrors<ExamFormData>
 	watch: UseFormWatch<ExamFormData>
 	index: number

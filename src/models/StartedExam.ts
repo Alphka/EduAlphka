@@ -29,6 +29,7 @@ startedExamSchema.method("isExpired", async function isExpired({
 
 	if(!exam || !exam.expiresAt || !exam.duration){
 		if(
+			this.exam &&
 			"expiresAt" in this.exam && this.exam.expiresAt instanceof Date &&
 			"duration" in this.exam && typeof this.exam.duration === "number"
 		){
