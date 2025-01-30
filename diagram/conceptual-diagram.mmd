@@ -1,0 +1,43 @@
+---
+config:
+    class:
+        hideEmptyMembersBox: true
+    theme: default
+    look: classic
+    layout: dagre
+---
+erDiagram
+    Session
+    Session 0+--1 User : creates
+
+    VerificationCode
+    VerificationCode 1+--1 User : requests
+
+    User
+    User 1--0+ Exam : creates
+    User 0+--0+ Exam : participates
+    User 1--0+ StartedExam : starts
+    User 1--0+ Submit : performs
+
+    StartedExam
+    StartedExam 1--1 Exam : refers
+
+    Exam
+    Exam 1--0+ StartedExam : allows
+    Exam 1--1+ ExamInvite : contains
+    Exam 1--1+ Question : contains
+    Exam 1--0+ Submit : allows
+
+    ExamInvite
+
+    Question
+    Question 1--0+ Answer : allows
+    Question 1--0+ QuestionOption : contains
+
+    QuestionOption
+
+    Answer
+    Answer 1--zero or one QuestionOption : contains
+
+    Submit
+    Submit 0+--1 Exam : refers
