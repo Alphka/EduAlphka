@@ -14,9 +14,14 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 
 	await connectDatabase()
 
-	const exam = await Exam.findById(examId, { candidates: 1 })
+	const exam = await Exam.findById(examId, {
+		candidates: 1,
+		disallowedCandidates: 1
+	})
 
-	if(!exam) return { errors: ["Teste não encontrado"] }
+	if(!exam){
+		return { errors: ["Teste não encontrado"] }
+	}
 
 	const candidate = await User
 		.findOne({
@@ -33,8 +38,12 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	if(!candidate) return { errors: ["Usuário não encontrado"] }
 	if(candidate.accountType !== "candidate") return { errors: ["Este usuário não é um candidato"] }
 
-	if(exam.candidates.some(id => id._id.equals(candidate._id))){
+	if(exam.candidates.includes(candidate._id)){
 		return { errors: ["Candidato já adicionado ao teste"] }
+	}
+
+	if(exam.disallowedCandidates.includes(candidate._id)){
+		return { errors: ["Esse candidato está desativado do teste"] }
 	}
 
 	exam.candidates.unshift(candidate._id)
