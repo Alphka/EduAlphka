@@ -3,6 +3,7 @@
 import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
 import { Paper, Table, Text, TextInput } from "@mantine/core"
+import { useMediaQuery } from "@mantine/hooks"
 import { MdSearch } from "react-icons/md"
 import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
@@ -87,6 +88,8 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 	const [sortBy, setSortBy] = useState<FilterTypes | null>(null)
 	const [search, setSearch] = useState("")
 
+	const isMobile = useMediaQuery("(max-width: 500px)")
+
 	const setSorting = (field: FilterTypes) => {
 		const reversed = field === sortBy ? !reverseSortDirection : false
 
@@ -125,11 +128,15 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 					disabled={!data.length}
 				/>
 
-				<Table.ScrollContainer minWidth={250}>
+				<Table.ScrollContainer minWidth={300}>
 					<Table
 						className="bg-dark-600 rounded"
-						horizontalSpacing="sm"
-						verticalSpacing="sm"
+						horizontalSpacing={isMobile ? "sm" : "md"}
+						verticalSpacing={isMobile ? "sm" : "md"}
+						classNames={{
+							th: isMobile ? "p-xs" : "p-md",
+							td: isMobile ? "p-xs" : "p-md"
+						}}
 					>
 						<Table.Thead>
 							<Table.Tr>
@@ -163,8 +170,8 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 								</Th>
 
 								<Table.Th
-									ta="center"
 									w="4%"
+									ta="center"
 								/>
 							</Table.Tr>
 						</Table.Thead>

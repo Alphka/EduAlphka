@@ -35,7 +35,7 @@ export default function Tr({
 		}
 	})
 
-	const isMobile = useMediaQuery("(max-width: 400px)")
+	const isMobile = useMediaQuery("(max-width: 500px)")
 
 	return <>
 		<Table.Tr>
@@ -206,5 +206,4 @@ export default function Tr({
 	</>
 }
 
-//? TODO: Show badge for feedbacks
 //? TODO: Include remaining time for exam expiration

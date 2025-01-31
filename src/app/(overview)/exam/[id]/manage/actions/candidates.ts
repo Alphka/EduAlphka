@@ -1,7 +1,7 @@
 "use server"
 
+import { Exam, StartedExam, User } from "@models"
 import { revalidatePath } from "next/cache"
-import { Exam, User } from "@models"
 import { Types } from "mongoose"
 import connectDatabase from "@lib/connectDatabase"
 import normalizeEmail from "normalize-email"
@@ -64,7 +64,7 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 
 	const exam = await Exam.findById(examId, {
 		candidates: 1,
-		disallowedCandidates: 1
+		disallowedCandidates: disable ? 1 : 0
 	})
 
 	if(!exam){
@@ -72,6 +72,12 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 	}
 
 	if(disable){
+		const startedExam = await StartedExam.exists({ exam: examId, user: userId })
+
+		if(startedExam){
+			return { errors: ["Não é possível desativar um candidato que já iniciou o teste"] }
+		}
+
 		exam.disallowedCandidates.addToSet(userId)
 	}
 

@@ -68,10 +68,6 @@ export interface StartedExamWithSubmit extends IStartedExam {
 
 export interface IExamMethods {
 	isExpired(): boolean
-	getSubmitInfo(): Promise<{
-		hasSubmit: boolean
-		hasStartedBySomeone: boolean
-	}>
 	getSubmitData(candidate: Types.ObjectId | string): Promise<StartedExamWithSubmit | null>
 	getSubmitData(candidates: (Types.ObjectId | string)[]): Promise<StartedExamWithSubmit[]>
 }

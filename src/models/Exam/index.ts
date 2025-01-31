@@ -52,47 +52,6 @@ examSchema.method("isExpired", function isExpired(){
 	return !!this.expiresAt && Date.now() > this.expiresAt.getTime()
 })
 
-examSchema.method("getSubmitInfo", async function getSubmitInfo(){
-	const [{ hasStartedBySomeone, hasSubmit }] = await Exam.aggregate<{
-		_id: Types.ObjectId
-		hasSubmit: boolean
-		hasStartedBySomeone: boolean
-	}>([
-		{
-			$match: {
-				_id: this._id
-			}
-		},
-		{
-			$lookup: {
-				from: "submits",
-				localField: "_id",
-				foreignField: "exam",
-				as: "submits"
-			}
-		},
-		{
-			$lookup: {
-				from: "startedexams",
-				localField: "_id",
-				foreignField: "exam",
-				as: "startedExams"
-			}
-		},
-		{
-			$project: {
-				hasSubmit: { $gt: [{ $size: "$submits" }, 0] },
-				hasStartedBySomeone: { $gt: [{ $size: "$startedExams" }, 0] }
-			}
-		}
-	])
-
-	return {
-		hasSubmit,
-		hasStartedBySomeone
-	}
-})
-
 examSchema.method("getSubmitData", async function getSubmitData(candidates: (Types.ObjectId | string) | (Types.ObjectId | string)[]){
 	const { default: StartedExam } = await import("../StartedExam")
 
