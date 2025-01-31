@@ -30,6 +30,7 @@ export default async function startExam(id: string){
 	})
 
 	revalidatePath(routes.homepage.pathname)
+	revalidatePath(routes.exam.children.list.pathname)
 	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", id))
 	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", id))
 }

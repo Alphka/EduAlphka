@@ -100,7 +100,6 @@ export default async function editPersonalInformation(
 		return { errors: ["Falha ao editar os dados do usuário"] }
 	}
 
-	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.account.pathname)
 	revalidatePath(routes.exam.children.template.pathname, "page")
 	revalidatePath(routes.exam.children.template.children.manage.pathname, "page")

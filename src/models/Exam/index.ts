@@ -35,6 +35,10 @@ const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 		type: Schema.ObjectId,
 		ref: "User"
 	}],
+	disallowedCandidates: [{
+		type: Schema.ObjectId,
+		ref: "User"
+	}],
 	createdAt: {
 		type: Date,
 		default: Date.now,

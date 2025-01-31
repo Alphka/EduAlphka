@@ -43,8 +43,7 @@ export interface IExam {
 	duration: number
 	questions: Types.DocumentArray<ExamQuestion, Types.Subdocument<ExamQuestion, any, ExamQuestion> & ExamQuestion>
 	candidates: Types.Array<NonNullable<PopulatedDoc<IUser>>>
-	// TODO: Add disallowedCandidates: Types.Array<NonNullable<PopulatedDoc<IUser>>>
-	// TODO: Asks if the candidate must be added to the disallowed list before removing them
+	disallowedCandidates: Types.Array<NonNullable<PopulatedDoc<IUser>>>
 	createdAt: Date
 	updatedAt?: Date
 	expiresAt?: Date

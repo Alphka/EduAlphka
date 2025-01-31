@@ -41,25 +41,39 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	await exam.save()
 
 	revalidatePath(routes.homepage.pathname)
+	revalidatePath(routes.exam.children.list.pathname)
 	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", examId))
 	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", examId))
 }
 
-export async function removeCandidate(examId: string, userId: string){
+export async function removeCandidate(examId: string, userId: string, disable = false){
 	if(!Types.ObjectId.isValid(examId)){
 		return { errors: ["ID do teste inválido"] }
 	}
 
 	await connectDatabase()
 
-	const exam = await Exam.findById(examId, { candidates: 1 })
+	const exam = await Exam.findById(examId, {
+		candidates: 1,
+		disallowedCandidates: 1
+	})
 
-	if(!exam) return { errors: ["Teste não encontrado"] }
+	if(!exam){
+		return { errors: ["Teste não encontrado"] }
+	}
+
+	if(disable){
+		exam.disallowedCandidates.addToSet(userId)
+	}
 
 	exam.candidates.pull(userId)
-	await exam.save()
+
+	if(exam.isModified()){
+		await exam.save()
+	}
 
 	revalidatePath(routes.homepage.pathname)
+	revalidatePath(routes.exam.children.list.pathname)
 	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", examId))
 	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", examId))
 }
