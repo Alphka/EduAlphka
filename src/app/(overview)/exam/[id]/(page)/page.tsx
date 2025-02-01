@@ -42,16 +42,12 @@ export default async function EditExamPage({ params }: PageProps){
 		verifyAuthorization()
 	])
 
-	const candidates = exam.candidates.map(({ _id }) => _id.toString())
-
 	if(user.accountType === "candidate"){
-		if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+		if(!exam.candidates.includes(new Types.ObjectId(user.id))) redirect(routes.accessDenied.pathname, RedirectType.replace)
 		redirect(routes.exam.children.template.children.submit.pathname.replace("[id]", id), RedirectType.replace)
 	}
 
 	if(user.accountType !== "professor" || !exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
-
-	const hasStartedBySomeone = await StartedExam.exists({ exam })
 
 	const questions = exam.questions as Types.DocumentArray<
 		MixedExamQuestion,
@@ -62,7 +58,7 @@ export default async function EditExamPage({ params }: PageProps){
 		<ExamForm
 			type="edit"
 			examId={id}
-			canEdit={!!hasStartedBySomeone}
+			canEdit={!(await StartedExam.exists({ exam }))}
 			defaultValues={{
 				exam: {
 					title: exam.title,

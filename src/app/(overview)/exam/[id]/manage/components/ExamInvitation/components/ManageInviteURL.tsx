@@ -4,7 +4,6 @@ import type { ExamInvitationProps } from ".."
 import { ActionIcon, Button, CopyButton, Paper, Tooltip } from "@mantine/core"
 import { generateExamInviteURL } from "../../../actions/invites"
 import { MdCheck, MdCopyAll } from "react-icons/md"
-import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 
 interface InviteURLProps extends Pick<ExamInvitationProps, "examId"> {

@@ -44,9 +44,9 @@ export default async function SubmitExamPage({ params }: PageProps){
 		})
 		.orFail(notFound)
 
-	const candidates = exam.candidates.map(candidate => candidate.toString())
-
-	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	if(!exam.candidates.includes(new Types.ObjectId(user.id))){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
 
 	const submitData = await exam.getSubmitData(user.id)
 
