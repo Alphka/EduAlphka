@@ -1,8 +1,8 @@
 import type { IExamInvite } from "@models/typings/ExamInvite"
 import type { IExam } from "@models/typings/Exam"
-import { notFound, redirect, RedirectType } from "next/navigation"
 import { NextResponse, type NextRequest } from "next/server"
 import { Types, type HydratedDocument } from "mongoose"
+import { redirect, RedirectType } from "next/navigation"
 import { ExamInvite } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
@@ -29,28 +29,29 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 			candidates: 1,
 			disallowedCandidates: 1
 		})
-		.orFail(notFound)
 
-	if(!examInvite.exam){
-		console.error(
-			"Exam from exam invite not found." +
-			`\n\tToken: ${token}` +
-			`\n\tUser: ${user.name} (${user.id}) - ${user.username}` +
-			`\n\tExam invite ID: ${examInvite.id}`
-		)
+	if(!examInvite?.exam){
+		if(examInvite && !examInvite.exam){
+			console.error(
+				"Exam from exam invite not found." +
+				`\n\tToken: ${token}` +
+				`\n\tUser: ${user.name} (${user.id}) - ${user.username}` +
+				`\n\tExam invite ID: ${examInvite.id}`
+			)
 
-		await examInvite.deleteOne()
-		notFound()
+			await examInvite.deleteOne()
+		}
+
+		redirect("/not-found", RedirectType.replace)
 	}
 
 	const isCandidate = user.accountType === "candidate"
 	const userId = new Types.ObjectId(user.id)
 
-	if(!isCandidate && !examInvite.exam.owner.equals(userId)){
-		redirect(routes.accessDenied.pathname, RedirectType.replace)
-	}
-
-	if(examInvite.exam.disallowedCandidates.includes(userId)){
+	if(isCandidate
+		? examInvite.exam.disallowedCandidates.includes(userId)
+		: !examInvite.exam.owner._id.equals(userId)
+	){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 

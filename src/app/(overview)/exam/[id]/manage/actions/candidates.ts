@@ -71,13 +71,16 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 		return { errors: ["Teste não encontrado"] }
 	}
 
+	const startedExam = await StartedExam.exists({
+		exam: examId,
+		user: userId
+	})
+
+	if(startedExam){
+		return { errors: [`Não é possível ${disable ? "desativar" : "remover"} um candidato que já iniciou o teste`] }
+	}
+
 	if(disable){
-		const startedExam = await StartedExam.exists({ exam: examId, user: userId })
-
-		if(startedExam){
-			return { errors: ["Não é possível desativar um candidato que já iniciou o teste"] }
-		}
-
 		exam.disallowedCandidates.addToSet(userId)
 	}
 
