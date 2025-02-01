@@ -4,6 +4,7 @@ import type { ExamInvitationProps } from ".."
 import { ActionIcon, Button, CopyButton, Paper, Tooltip } from "@mantine/core"
 import { generateExamInviteURL } from "../../../actions/invites"
 import { MdCheck, MdCopyAll } from "react-icons/md"
+import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 
 interface InviteURLProps extends Pick<ExamInvitationProps, "examId"> {
@@ -27,7 +28,10 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 				<div className="flex items-stretch justify-center flex-wrap gap-sm">
 					<Paper
 						dir="rtl"
-						className="[@media(width>290px)]:basis-3/4 block font-semibold whitespace-nowrap text-ellipsis px-sm overflow-hidden shadow-none"
+						className={twJoin([
+							"[@media(min-width:290px)]:basis-3/4 [@media(min-width:768px)]:basis-auto",
+							"w-min block font-semibold whitespace-nowrap text-ellipsis px-sm overflow-hidden shadow-none"
+						])}
 						component="p"
 						withBorder
 					>
