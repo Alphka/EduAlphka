@@ -2,9 +2,10 @@
 
 import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
-import { Paper, Table, Text, TextInput } from "@mantine/core"
+import { Divider, Paper, Table, Text, TextInput } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
 import { MdSearch } from "react-icons/md"
+import DisabledCandidatesTable from "./components/DisabledCandidatesTable"
 import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
 import Tr from "./Tr"
@@ -16,7 +17,6 @@ type FilterTypes = typeof filters[number]
 export interface CandidatesRowData {
 	id: string
 	name: string
-	email: string
 	submitId?: string
 	username: string
 	/** Started exam date */
@@ -70,9 +70,10 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 export interface CandidatesTableProps {
 	examId: string
 	data: CandidatesRowData[]
+	disallowedCandidates: Pick<CandidatesRowData, "id" | "name" | "username">[]
 }
 
-export default function CandidatesTable({ examId, data }: CandidatesTableProps){
+export default function CandidatesTable({ examId, data, disallowedCandidates }: CandidatesTableProps){
 	const rowsData = useMemo(() => data.map(data => ({
 		status: getSubmitStatus({
 			pendingCorrection: data.pendingCorrection,
@@ -217,6 +218,25 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 			</section>
 
 			<AddCandidate examId={examId} />
+
+			<Divider />
+
+			{!!disallowedCandidates.length && (
+				<section className="flex flex-col gap-md">
+					<header>
+						<h3 className="text-h6 font-semibold">
+							Candidatos desativados do teste
+						</h3>
+					</header>
+
+					<DisabledCandidatesTable
+						{...{
+							examId,
+							disallowedCandidates
+						}}
+					/>
+				</section>
+			)}
 		</Paper>
 	)
 }

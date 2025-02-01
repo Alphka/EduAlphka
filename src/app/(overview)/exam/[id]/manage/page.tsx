@@ -1,4 +1,4 @@
-import type { HydratedDocument } from "mongoose"
+import type { HydratedDocument, Types } from "mongoose"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
@@ -35,17 +35,22 @@ export default async function ManageExamPage({ params }: PageProps){
 				duration: 1,
 				expiresAt: 1,
 				candidates: 1,
+				disallowedCandidates: 1,
 				__v: 1
 			})
 			.populate<{
-				candidates: HydratedDocument<Pick<IUser, "_id" | "name" | "email" | "username">>[]
+				candidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">>>
 			}>("candidates", {
 				name: 1,
-				email: 1,
 				username: 1
 			})
-			.orFail()
-			.catch(notFound),
+			.populate<{
+				disallowedCandidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">>>
+			}>("disallowedCandidates", {
+				name: 1,
+				username: 1
+			})
+			.orFail(notFound),
 		verifyAuthorization({ accountType: "professor" })
 	])
 
@@ -85,7 +90,7 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<CandidatesTable
 				examId={id}
-				data={await Promise.all(exam.candidates.map(async ({ _id, name, email, username }) => {
+				data={await Promise.all(exam.candidates.map(async ({ _id, name, username }) => {
 					const id = _id.toString()
 					const startedExam = candidatesStartedExams.get(id)
 					const submitId = startedExam?.submit?._id.toString() as string | undefined
@@ -94,13 +99,17 @@ export default async function ManageExamPage({ params }: PageProps){
 					return {
 						id,
 						name,
-						email,
 						submitId,
 						username,
 						createdAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
 						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
 						pendingCorrection
 					}
+				}))}
+				disallowedCandidates={exam.disallowedCandidates.map(({ _id, name, username }) => ({
+					id: _id.toString(),
+					name,
+					username
 				}))}
 				key={`${exam.__v}.${exam.candidates.length}`}
 			/>

@@ -42,7 +42,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 		>
 			<AppShell.Header>
 				<div className="h-full flex items-center justify-between p-md gap-md">
-					<div>
+					<div className="flex items-center justify-center">
 						<Burger
 							opened={burgerOpened}
 							onClick={toggleBurger}
@@ -51,11 +51,13 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						/>
 					</div>
 
-					<div className="flex gap-md">
-						<div className="flex items-center gap-md">
-							<div className="text-right">
-								<p className="text-sm font-medium">{user.name}</p>
-								<p className="text-dark-100 text-xs">
+					<div className="flex gap-md overflow-hidden">
+						<div className="w-full flex items-center gap-md">
+							<div className="text-right overflow-hidden">
+								<p className="text-sm font-medium whitespace-nowrap text-ellipsis overflow-hidden">
+									{user.name}
+								</p>
+								<p className="text-dark-100 text-xs whitespace-nowrap text-ellipsis overflow-hidden">
 									{user.accountType === "professor" ? "Aplicador de testes" : "Candidato"}
 								</p>
 							</div>

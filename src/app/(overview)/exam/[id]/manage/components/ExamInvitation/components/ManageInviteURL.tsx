@@ -28,11 +28,8 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 				<div className="flex items-stretch justify-center flex-wrap gap-sm">
 					<Paper
 						dir="rtl"
-						className={twJoin(
-							"flex items-center px-sm shadow-none",
-							"font-semibold text-ellipsis whitespace-nowrap overflow-hidden"
-						)}
-						component="span"
+						className="[@media(width>290px)]:basis-3/4 block font-semibold whitespace-nowrap text-ellipsis px-sm overflow-hidden shadow-none"
+						component="p"
 						withBorder
 					>
 						{inviteURL.href}
@@ -42,22 +39,28 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 						value={inviteURL.href}
 						timeout={2000}
 					>
-						{({ copied, copy }) => (
-							<Tooltip
-								label={copied ? "Link copiado" : "Clique para copiar o link"}
-								position="top"
-								withArrow
-							>
-								<ActionIcon
-									color={copied ? "teal" : "gray"}
-									variant="default"
-									onClick={copy}
-									aria-label={copied ? "Link copiado" : "Clique para copiar o link"}
+						{({ copied, copy }) => {
+							const iconColor = copied ? "teal" : "gray"
+							const message = copied ? "Link copiado" : "Clique para copiar o link"
+							const Icon = copied ? MdCheck : MdCopyAll
+
+							return (
+								<Tooltip
+									label={message}
+									position="top"
+									withArrow
 								>
-									{copied ? <MdCheck className="text-base" /> : <MdCopyAll className="text-base" />}
-								</ActionIcon>
-							</Tooltip>
-						)}
+									<ActionIcon
+										color={iconColor}
+										variant="default"
+										aria-label={message}
+										onClick={copy}
+									>
+										<Icon className="text-base" />
+									</ActionIcon>
+								</Tooltip>
+							)
+						}}
 					</CopyButton>
 				</div>
 			) : (

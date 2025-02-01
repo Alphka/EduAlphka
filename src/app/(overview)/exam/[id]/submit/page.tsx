@@ -42,8 +42,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 			_id: 0,
 			name: 1
 		})
-		.orFail()
-		.catch(notFound)
+		.orFail(notFound)
 
 	const candidates = exam.candidates.map(candidate => candidate.toString())
 
