@@ -14,17 +14,17 @@ const criticalMinutesRemaining = 5
 
 interface RemainingTimeProps {
 	examId: string
-	startedAt: Date
+	createdAt: Date
 	examDuration: number
 }
 
-export default function RemainingTime({ examId, examDuration, startedAt }: RemainingTimeProps){
+export default function RemainingTime({ examId, examDuration, createdAt }: RemainingTimeProps){
 	const router = useRouter()
 
 	const getRemainingMinutes = useCallback(() => {
-		const remainingMinutes = examDuration - (Date.now() - startedAt.getTime()) / 1000 / 60
+		const remainingMinutes = examDuration - (Date.now() - createdAt.getTime()) / 1000 / 60
 		return remainingMinutes < 0 ? 0 : remainingMinutes
-	}, [examDuration, startedAt.getTime()])
+	}, [examDuration, createdAt.getTime()])
 
 	const getRemainingTime = useCallback((remainingMinutes: number) => ({
 		hours: Math.floor(remainingMinutes / 60),

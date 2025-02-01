@@ -33,28 +33,30 @@ export default function useServerActionHandler({ successOptions = {}, errorOptio
 		async handleServerAction(promise: ServerActionPromise){
 			setIsPending(true)
 
-			const result = await promise
+			try{
+				const result = await promise
 
-			if(result){
-				if("errors" in result && result.errors.length){
-					for(const error of result.errors){
-						toast.error(error, options(true))
+				if(result){
+					if("errors" in result && result.errors.length){
+						for(const error of result.errors){
+							toast.error(error, options(true))
+						}
+					}else{
+						console.error("Server action failed:", result)
+						toast.error("Algo deu errado", options(true))
 					}
+
+					errorOptions.action?.()
 				}else{
-					console.error("Server action failed:", result)
-					toast.error("Algo deu errado", options(true))
-				}
+					if(successOptions.message){
+						toast.success(successOptions.message, options(false))
+					}
 
-				errorOptions.action?.()
-			}else{
-				if(successOptions.message){
-					toast.success(successOptions.message, options(false))
+					successOptions.action?.()
 				}
-
-				successOptions.action?.()
+			}finally{
+				setIsPending(false)
 			}
-
-			setIsPending(false)
 		},
 		isPending
 	}

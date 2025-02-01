@@ -1,10 +1,10 @@
 "use server"
 
 import type { z } from "zod"
+import { Exam, StartedExam } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { Types } from "mongoose"
-import { Exam } from "@models"
 import getSessionUserData from "@helpers/getSessionUserData"
 import connectDatabase from "@lib/connectDatabase"
 import examSchema from "@schemas/exam"
@@ -29,10 +29,7 @@ export default async function editExamAction(id: string, examData: z.infer<typeo
 		if(!exam) return { errors: ["Teste não encontrado"] }
 		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem permissão para editar esse teste"] }
 
-		const { hasSubmit, hasStartedBySomeone } = await exam.getSubmitInfo()
-
-		if(hasSubmit) return { errors: ["Não é possível editar um teste que possui respostas"] }
-		if(hasStartedBySomeone) return { errors: ["Não é possível editar um teste que já foi iniciado por um candidato"] }
+		if(await StartedExam.exists({ exam: id })) return { errors: ["Não é possível editar um teste que já foi iniciado por um candidato"] }
 
 		editExam(user, exam, examData)
 
@@ -47,6 +44,7 @@ export default async function editExamAction(id: string, examData: z.infer<typeo
 	}
 
 	revalidatePath(routes.homepage.pathname)
+	revalidatePath(routes.exam.children.list.pathname)
 	revalidatePath(routes.exam.children.template.pathname.replace("[id]", id))
 	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", id))
 	revalidatePath(routes.exam.children.template.children.submit.pathname.replace("[id]", id))

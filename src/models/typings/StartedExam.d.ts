@@ -6,7 +6,7 @@ export interface IStartedExam {
 	_id: Types.ObjectId
 	user: NonNullable<PopulatedDoc<IUser>>
 	exam: NonNullable<PopulatedDoc<IExam>>
-	startedAt: Date
+	createdAt: Date
 }
 
 export interface IStartedExamMethods {

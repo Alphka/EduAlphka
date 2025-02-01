@@ -11,8 +11,8 @@
 		"dev:test": "node --no-warnings -r ts-node/register test.ts"
 	},
 	"devDependencies": {
-		"@types/lodash": "~4.17.14",
-		"@types/node": "^22.10.10",
+		"@types/lodash": "~4.17.15",
+		"@types/node": "^22.13.0",
 		"@types/nodemailer": "^6.4.17",
 		"@types/react": "^19.0.8",
 		"@types/react-dom": "^19.0.3",
@@ -22,15 +22,15 @@
 		"tsconfig-paths": "~4.2.0"
 	},
 	"dependencies": {
-		"@mantine/core": "^7.16.1",
-		"@mantine/dates": "^7.16.1",
-		"@mantine/hooks": "^7.16.1",
+		"@mantine/core": "^7.16.2",
+		"@mantine/dates": "^7.16.2",
+		"@mantine/hooks": "^7.16.2",
 		"@radix-ui/react-dialog": "^1.1.5",
 		"@radix-ui/react-visually-hidden": "^1.1.1",
 		"autoprefixer": "~10.4.20",
 		"dayjs": "^1.11.13",
 		"lodash": "~4.17.21",
-		"mongoose": "~8.9.5",
+		"mongoose": "~8.9.6",
 		"next": "15.1.6",
 		"nodemailer": "^6.10.0",
 		"normalize-email": "^1.1.1",

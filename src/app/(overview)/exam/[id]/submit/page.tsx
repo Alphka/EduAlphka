@@ -42,12 +42,11 @@ export default async function SubmitExamPage({ params }: PageProps){
 			_id: 0,
 			name: 1
 		})
-		.orFail()
-		.catch(notFound)
+		.orFail(notFound)
 
-	const candidates = exam.candidates.map(candidate => candidate.toString())
-
-	if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	if(!exam.candidates.includes(new Types.ObjectId(user.id))){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
 
 	const submitData = await exam.getSubmitData(user.id)
 
@@ -145,7 +144,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 				) : (
 					<RemainingTime
 						examId={exam.id}
-						startedAt={submitData.startedAt}
+						createdAt={submitData.createdAt}
 						examDuration={exam.duration}
 					/>
 				)}

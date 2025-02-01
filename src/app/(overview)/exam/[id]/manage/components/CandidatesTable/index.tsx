@@ -2,29 +2,30 @@
 
 import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
-import { Paper, Table, Text, TextInput } from "@mantine/core"
+import { Divider, Paper, Table, Text, TextInput } from "@mantine/core"
+import { useMediaQuery } from "@mantine/hooks"
 import { MdSearch } from "react-icons/md"
+import DisabledCandidatesTable from "./components/DisabledCandidatesTable"
 import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
 import Tr from "./Tr"
 
-const filters = ["name", "status", "startedAt"] as const
+const filters = ["name", "status", "createdAt"] as const
 
 type FilterTypes = typeof filters[number]
 
 export interface CandidatesRowData {
 	id: string
 	name: string
-	email: string
 	submitId?: string
 	username: string
 	/** Started exam date */
-	startedAt?: string
+	createdAt?: string
 	isExpired: boolean
 	pendingCorrection: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "submitId" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "createdAt" | "isExpired" | "submitId" | "pendingCorrection"> {
 	status: SubmitStatus
 }
 
@@ -44,9 +45,9 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 		.toSorted((a, b) => {
 			if(!sortBy) return 0
 
-			if(sortBy === "startedAt"){
-				const dateA = a.startedAt ? parseDate(a.startedAt) : 0
-				const dateB = b.startedAt ? parseDate(b.startedAt) : 0
+			if(sortBy === "createdAt"){
+				const dateA = a.createdAt ? parseDate(a.createdAt) : 0
+				const dateB = b.createdAt ? parseDate(b.createdAt) : 0
 
 				return reversed ? dateB - dateA : dateA - dateB
 			}
@@ -69,13 +70,14 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 export interface CandidatesTableProps {
 	examId: string
 	data: CandidatesRowData[]
+	disallowedCandidates: Pick<CandidatesRowData, "id" | "name" | "username">[]
 }
 
-export default function CandidatesTable({ examId, data }: CandidatesTableProps){
+export default function CandidatesTable({ examId, data, disallowedCandidates }: CandidatesTableProps){
 	const rowsData = useMemo(() => data.map(data => ({
 		status: getSubmitStatus({
 			pendingCorrection: data.pendingCorrection,
-			hasStartedExam: !!data.startedAt,
+			hasStartedExam: !!data.createdAt,
 			hasSubmit: !!data.submitId,
 			isExpired: data.isExpired
 		}),
@@ -86,6 +88,8 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 	const [sortedData, setSortedData] = useState(rowsData)
 	const [sortBy, setSortBy] = useState<FilterTypes | null>(null)
 	const [search, setSearch] = useState("")
+
+	const isMobile = useMediaQuery("(max-width: 500px)")
 
 	const setSorting = (field: FilterTypes) => {
 		const reversed = field === sortBy ? !reverseSortDirection : false
@@ -125,11 +129,15 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 					disabled={!data.length}
 				/>
 
-				<Table.ScrollContainer minWidth={250}>
+				<Table.ScrollContainer minWidth={300}>
 					<Table
 						className="bg-dark-600 rounded"
-						horizontalSpacing="sm"
-						verticalSpacing="sm"
+						horizontalSpacing={isMobile ? "sm" : "md"}
+						verticalSpacing={isMobile ? "sm" : "md"}
+						classNames={{
+							th: isMobile ? "p-xs" : "p-md",
+							td: isMobile ? "p-xs" : "p-md"
+						}}
 					>
 						<Table.Thead>
 							<Table.Tr>
@@ -143,9 +151,9 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 
 								<Th
 									className="w-16 xs:w-36"
-									sorted={sortBy === "startedAt"}
+									sorted={sortBy === "createdAt"}
 									reversed={reverseSortDirection}
-									onSort={() => setSorting("startedAt")}
+									onSort={() => setSorting("createdAt")}
 									ta="center"
 								>
 									<span className="hidden xs:block">Data de início</span>
@@ -163,8 +171,8 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 								</Th>
 
 								<Table.Th
-									ta="center"
 									w="4%"
+									ta="center"
 								/>
 							</Table.Tr>
 						</Table.Thead>
@@ -175,7 +183,7 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 								name,
 								status,
 								username,
-								startedAt,
+								createdAt,
 								isExpired,
 								submitId,
 								pendingCorrection
@@ -188,7 +196,7 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 										status,
 										submitId,
 										username,
-										startedAt,
+										createdAt,
 										isExpired,
 										pendingCorrection
 									}}
@@ -210,6 +218,25 @@ export default function CandidatesTable({ examId, data }: CandidatesTableProps){
 			</section>
 
 			<AddCandidate examId={examId} />
+
+			<Divider />
+
+			{!!disallowedCandidates.length && (
+				<section className="flex flex-col gap-md">
+					<header>
+						<h3 className="text-h6 font-semibold">
+							Candidatos desativados do teste
+						</h3>
+					</header>
+
+					<DisabledCandidatesTable
+						{...{
+							examId,
+							disallowedCandidates
+						}}
+					/>
+				</section>
+			)}
 		</Paper>
 	)
 }

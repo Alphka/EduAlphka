@@ -38,6 +38,7 @@ export default async function sendCorrection(submitId: string){
 	await submit.save()
 
 	revalidatePath(routes.homepage.pathname)
+	// revalidatePath(routes.exam.children.list.pathname)
 	revalidatePath(routes.exam.children.template.children.manage.pathname.replace("[id]", submit.exam.id))
 	revalidatePath(routes.submit.children.template.pathname.replace("[id]", submit.id))
 	redirect(routes.exam.children.template.children.manage.pathname.replace("[id]", submit.exam.id))

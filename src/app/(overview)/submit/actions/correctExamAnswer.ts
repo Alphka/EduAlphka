@@ -69,6 +69,7 @@ export default async function correctExamAnswer(answerId: string, isCorrect: boo
 	if(answer.isModified()){
 		answer.updatedAt = new Date
 		answer.markModified("updatedAt")
+
 		await answer.save()
 	}
 

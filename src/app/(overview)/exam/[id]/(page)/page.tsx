@@ -2,8 +2,8 @@ import type { MixedExamQuestion } from "@models/typings/Exam"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
 import { notFound, redirect, RedirectType } from "next/navigation"
+import { Exam, StartedExam } from "@models"
 import { Types } from "mongoose"
-import { Exam } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
@@ -42,23 +42,23 @@ export default async function EditExamPage({ params }: PageProps){
 		verifyAuthorization()
 	])
 
-	const candidates = exam.candidates.map(({ _id }) => _id.toString())
-
 	if(user.accountType === "candidate"){
-		if(!candidates.includes(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+		if(!exam.candidates.includes(new Types.ObjectId(user.id))) redirect(routes.accessDenied.pathname, RedirectType.replace)
 		redirect(routes.exam.children.template.children.submit.pathname.replace("[id]", id), RedirectType.replace)
 	}
 
 	if(user.accountType !== "professor" || !exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
-	const { hasSubmit, hasStartedBySomeone } = await exam.getSubmitInfo()
-	const questions = exam.questions as Types.DocumentArray<MixedExamQuestion, Types.Subdocument<MixedExamQuestion, any, MixedExamQuestion> & MixedExamQuestion>
+	const questions = exam.questions as Types.DocumentArray<
+		MixedExamQuestion,
+		Types.Subdocument<MixedExamQuestion, any, MixedExamQuestion> & MixedExamQuestion
+	>
 
 	return (
 		<ExamForm
 			type="edit"
 			examId={id}
-			canEdit={!hasSubmit && !hasStartedBySomeone}
+			canEdit={!(await StartedExam.exists({ exam }))}
 			defaultValues={{
 				exam: {
 					title: exam.title,
