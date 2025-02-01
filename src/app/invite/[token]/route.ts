@@ -1,8 +1,9 @@
 import type { IExamInvite } from "@models/typings/ExamInvite"
+import type { IExam } from "@models/typings/Exam"
+import { notFound, redirect, RedirectType } from "next/navigation"
 import { NextResponse, type NextRequest } from "next/server"
 import { Types, type HydratedDocument } from "mongoose"
-import { Exam, ExamInvite } from "@models"
-import { notFound } from "next/navigation"
+import { ExamInvite } from "@models"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
@@ -17,20 +18,24 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 	const examInvite = await ExamInvite
 		.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & {
-			exam: Types.ObjectId
+			exam: HydratedDocument<Pick<IExam, "_id"> & {
+				owner: Types.ObjectId
+				candidates: Types.Array<Types.ObjectId>
+				disallowedCandidates: Types.Array<Types.ObjectId>
+			}>
 		}>>({ token }, { exam: 1 })
+		.populate("exam", {
+			owner: 1,
+			candidates: 1,
+			disallowedCandidates: 1
+		})
 		.orFail(notFound)
 
-	const exam = await Exam.findById(examInvite.exam, {
-		candidates: 1
-	})
-
-	if(!exam){
+	if(!examInvite.exam){
 		console.error(
 			"Exam from exam invite not found." +
 			`\n\tToken: ${token}` +
 			`\n\tUser: ${user.name} (${user.id}) - ${user.username}` +
-			`\n\tExam ID: ${examInvite.exam}` +
 			`\n\tExam invite ID: ${examInvite.id}`
 		)
 
@@ -39,18 +44,25 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 	}
 
 	const isCandidate = user.accountType === "candidate"
+	const userId = new Types.ObjectId(user.id)
+
+	if(!isCandidate && !examInvite.exam.owner.equals(userId)){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
+
+	if(examInvite.exam.disallowedCandidates.includes(userId)){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
+
+	if(isCandidate && !examInvite.exam.candidates.includes(userId)){
+		examInvite.exam.candidates.unshift(userId)
+		await examInvite.exam.save()
+	}
 
 	const examURL = (isCandidate
 		? routes.exam.children.template.children.submit.pathname
 		: routes.exam.children.template.pathname
-	).replace("[id]", examInvite.exam.toString())
-
-	const candidates = exam.candidates.map(candidate => candidate.toString())
-
-	if(isCandidate && !candidates.includes(user.id)){
-		exam.candidates.unshift(new Types.ObjectId(user.id))
-		await exam.save()
-	}
+	).replace("[id]", examInvite.exam.id)
 
 	return new NextResponse(examURL, {
 		status: 302,
