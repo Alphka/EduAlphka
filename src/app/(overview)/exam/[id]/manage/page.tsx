@@ -97,7 +97,7 @@ export default async function ManageExamPage({ params }: PageProps){
 						email,
 						submitId,
 						username,
-						startedAt: startedExam?.startedAt.toLocaleDateString("pt-BR"),
+						createdAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
 						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
 						pendingCorrection
 					}

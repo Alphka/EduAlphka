@@ -11,7 +11,7 @@ const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExa
 		type: Schema.ObjectId,
 		ref: "Exam"
 	},
-	startedAt: {
+	createdAt: {
 		type: Date,
 		default: Date.now,
 		required: true
@@ -57,7 +57,7 @@ startedExamSchema.method("isExpired", async function isExpired({
 		}
 	}
 
-	const submitExpirationDate = this.startedAt.getTime() + exam.duration * 60 * 1000
+	const submitExpirationDate = this.createdAt.getTime() + exam.duration * 60 * 1000
 
 	return Date.now() > submitExpirationDate || exam.isExpired()
 })

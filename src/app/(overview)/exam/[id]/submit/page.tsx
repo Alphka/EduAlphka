@@ -145,7 +145,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 				) : (
 					<RemainingTime
 						examId={exam.id}
-						startedAt={submitData.startedAt}
+						createdAt={submitData.createdAt}
 						examDuration={exam.duration}
 					/>
 				)}

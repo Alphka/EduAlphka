@@ -129,8 +129,6 @@ examSchema.method("getSubmitData", async function getSubmitData(candidates: (Typ
 			grade = null
 		}
 
-		submitData.startedAt
-
 		return {
 			...submitData,
 			grade,

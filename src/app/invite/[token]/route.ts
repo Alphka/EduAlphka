@@ -15,13 +15,11 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 
 	const user = await verifyAuthorization()
 
-	const examInvite = await ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & {
-		exam: Types.ObjectId
-	}>>({ token }, {
-		exam: 1
-	})
-
-	if(!examInvite) notFound()
+	const examInvite = await ExamInvite
+		.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & {
+			exam: Types.ObjectId
+		}>>({ token }, { exam: 1 })
+		.orFail(notFound)
 
 	const exam = await Exam.findById(examInvite.exam, {
 		candidates: 1
@@ -59,7 +57,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 		statusText: "Found",
 		headers: {
 			Location: examURL,
-			"Cache-Control": "no-store, max-age=0"
+			"Cache-Control": "private, no-store, max-age=0"
 		}
 	})
 }
