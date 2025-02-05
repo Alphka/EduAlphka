@@ -8,10 +8,10 @@ import type examSchema from "@schemas/exam"
 import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@mantine/core"
 import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
+import { DateTimePicker, TimeInput, type DateValue } from "@mantine/dates"
 import { useCallback, useRef, type ChangeEvent } from "react"
 import { MdAccessTime, MdSettings } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
-import { TimeInput } from "@mantine/dates"
 import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
@@ -121,6 +121,26 @@ export default function ExamForm({
 		})
 	}, [clearErrors, setError, setValue])
 
+	const handleStartsAtChange = useCallback((value: DateValue) => {
+		if(value){
+			clearErrors("exam.startsAt")
+		}
+
+		setValue("exam.startsAt", value ? new Date(value) : undefined, {
+			shouldValidate: true
+		})
+	}, [clearErrors, setValue])
+
+	const handleExpiresAtChange = useCallback((value: DateValue) => {
+		if(value){
+			clearErrors("exam.expiresAt")
+		}
+
+		setValue("exam.expiresAt", value ? new Date(value) : undefined, {
+			shouldValidate: true
+		})
+	}, [clearErrors, setValue])
+
 	const examDuration = register("exam.duration", {
 		onBlur: handleDurationChange,
 		onChange: handleDurationChange,
@@ -153,48 +173,34 @@ export default function ExamForm({
 
 			<form
 				className="flex flex-col gap-3xl"
-				onSubmit={handleSubmit(({
-					exam: {
-						title,
-						description,
-						subject,
-						duration
-					},
+				onSubmit={handleSubmit(async ({
+					exam,
 					question
 				}) => {
-					const questions = question.map(({
-						question_type: type,
-						option: options,
-						correct_answer,
-						...questionData
-					}) => ({
-						type,
-						...(type === "multiple_choice" ? {
-							options,
-							correct_answer
-						} : undefined),
-						...questionData
-					}))
+					const examData = {
+						...exam,
+						subject: exam.subject || undefined,
+						startsAt: exam.startsAt || undefined,
+						expiresAt: exam.expiresAt || undefined,
+						questions: question.map(({
+							question_type: type,
+							option: options,
+							correct_answer,
+							...questionData
+						}) => ({
+							type,
+							...(type === "multiple_choice" ? {
+								options,
+								correct_answer
+							} : undefined),
+							...questionData
+						}))
+					}
 
-					subject ||= undefined
-
-					const promise = type === "create"
-						? createExamAction({
-							title,
-							subject,
-							duration,
-							questions,
-							description
-						})
-						: editExamAction(examId as string, {
-							title,
-							subject,
-							duration,
-							questions,
-							description
-						})
-
-					handleServerAction(promise)
+					await handleServerAction(type === "create"
+						? createExamAction(examData)
+						: editExamAction(examId as string, examData)
+					)
 				})}
 			>
 				<Fieldset
@@ -265,9 +271,9 @@ export default function ExamForm({
 							)}
 						>
 							<TextInput
+								className="flex-grow"
 								size="md"
 								type="text"
-								flex={1}
 								label="Disciplina"
 								placeholder="Disciplina do teste"
 								aria-label="Disciplina do teste"
@@ -297,6 +303,9 @@ export default function ExamForm({
 								size="md"
 								label="Duração"
 								aria-label="Duração do teste"
+								classNames={{
+									input: "[&::-webkit-calendar-picker-indicator]:hidden"
+								}}
 								rightSection={(
 									<ActionIcon
 										color={errors.exam?.duration ? "currentColor" : "gray"}
@@ -319,6 +328,45 @@ export default function ExamForm({
 								error={errors.exam?.duration?.message}
 								ref={durationInputRef}
 								withAsterisk
+							/>
+						</div>
+
+						<div
+							className={twJoin(
+								"flex items-start gap-md",
+								isMobile && "flex-col items-stretch"
+							)}
+						>
+							<DateTimePicker
+								className={twJoin(!isMobile && "flex-grow")}
+								size="md"
+								label="Data de início"
+								placeholder="Data de início do teste"
+								aria-label="Data de início do teste"
+								{...register("exam.startsAt", {
+									onChange: undefined,
+									onBlur: undefined
+								})}
+								onChange={handleStartsAtChange}
+								minDate={new Date}
+								defaultValue={watch("exam.startsAt")}
+								error={errors.exam?.startsAt?.message}
+							/>
+
+							<DateTimePicker
+								className={twJoin(!isMobile && "flex-grow")}
+								size="md"
+								label="Data de expiração"
+								placeholder="Data de expiração do teste"
+								aria-label="Data de expiração do teste"
+								{...register("exam.expiresAt", {
+									onChange: undefined,
+									onBlur: undefined
+								})}
+								onChange={handleExpiresAtChange}
+								minDate={watch("exam.startsAt") || new Date}
+								defaultValue={watch("exam.expiresAt")}
+								error={errors.exam?.expiresAt?.message}
 							/>
 						</div>
 					</div>

@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, StartedExam } from "@models"
 import { Types } from "mongoose"
+import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import connectDatabase from "@lib/connectDatabase"
@@ -25,7 +26,9 @@ export default async function EditExamPage({ params }: PageProps){
 		connectDatabase()
 	])
 
-	if(!Types.ObjectId.isValid(id)) notFound()
+	if(!Types.ObjectId.isValid(id)){
+		notFound()
+	}
 
 	const [exam, user] = await Promise.all([
 		Exam
@@ -61,10 +64,8 @@ export default async function EditExamPage({ params }: PageProps){
 			canEdit={!(await StartedExam.exists({ exam }))}
 			defaultValues={{
 				exam: {
-					title: exam.title,
-					subject: exam.subject,
-					duration: formatTimeDuration(exam.duration),
-					description: exam.description
+					...pick(exam, ["title", "subject", "description", "startsAt", "expiresAt"] as const),
+					duration: formatTimeDuration(exam.duration)
 				},
 				question: questions.map(({ type, text, options, correctAnswer, isRequired }) => ({
 					text: text,

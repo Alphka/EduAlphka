@@ -47,7 +47,7 @@ export interface IExam {
 	createdAt: Date
 	updatedAt?: Date
 	expiresAt?: Date
-	// TODO: Add startsAt?: Date
+	startsAt?: Date
 }
 
 interface SubmitWithAnswers extends ISubmit {

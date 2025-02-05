@@ -34,7 +34,19 @@ const examSchema = z.object({
 		invalid_type_error: "Duração do teste inválida",
 		required_error: "A duração do teste é obrigatória"
 	})
-		.regex(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/, "A duração do teste deve estar no formato HH:MM")
+		.regex(/^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$/, "A duração do teste deve estar no formato HH:MM"),
+	startsAt: z.coerce
+		.date({
+			invalid_type_error: "Data de início do teste inválida",
+			required_error: "A data de início do teste é obrigatória"
+		})
+		.optional(),
+	expiresAt: z.coerce
+		.date({
+			invalid_type_error: "Data de expiração do teste inválida",
+			required_error: "A data de expiração do teste é obrigatória"
+		})
+		.optional()
 })
 
 export default examSchema

@@ -29,16 +29,16 @@ export default function AddCandidate({ examId }: AddCandidateProps){
 					aria-label="Digite o nome de usuário ou email do candidato a ser adicionado"
 					leftSection={<MdSearch className="text-base" />}
 					onKeyDown={event => {
-						if(event.key === "Enter"){
-							event.preventDefault()
+						if(event.key !== "Enter") return
 
-							const { currentTarget: input } = event
-							const value = input?.value?.trim()
+						event.preventDefault()
 
-							if(!value) return
+						const { currentTarget: input } = event
+						const value = input?.value?.trim()
 
-							handleServerAction(addCandidate(examId, value))
-						}
+						if(!value) return
+
+						handleServerAction(addCandidate(examId, value))
 					}}
 					enterKeyHint="send"
 					ref={inputRef}
