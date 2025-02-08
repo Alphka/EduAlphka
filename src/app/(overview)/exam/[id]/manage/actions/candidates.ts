@@ -81,7 +81,7 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 	const exam = await Exam.findById(examId, {
 		owner: 1,
 		candidates: 1,
-		disallowedCandidates: disable ? 1 : 0
+		...(disable ? { disallowedCandidates: 1 } : undefined)
 	})
 
 	if(!exam){
