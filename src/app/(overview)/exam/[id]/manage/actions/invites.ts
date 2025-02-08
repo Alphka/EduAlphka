@@ -2,53 +2,66 @@
 
 import { Exam, ExamInvite } from "@models"
 import { revalidatePath } from "next/cache"
+import { IExamInvite } from "@models/typings/ExamInvite"
 import { randomBytes } from "crypto"
 import { Types } from "mongoose"
+import getSessionUserData from "@helpers/getSessionUserData"
 import connectDatabase from "@lib/connectDatabase"
 import routes from "@app/routes"
-
-async function saveInviteURL(examId: string, inviteId?: Types.ObjectId){
-	const token = randomBytes(4).toString("hex")
-
-	try{
-		const inviteInfo = {
-			token,
-			exam: examId
-		}
-
-		return inviteId
-			? await ExamInvite.updateOne({
-				_id: inviteId,
-				createdAt: new Date
-			}, inviteInfo)
-			: await ExamInvite.create(inviteInfo)
-	}catch(error){
-		if(error instanceof Error && error.name === "MongoServerError"){
-			// If URL token already exists
-			if("code" in error && error.code === 11000){
-				return await saveInviteURL(examId, inviteId)
-			}
-		}
-
-		throw error
-	}
-}
 
 export async function generateExamInviteURL(id: string){
 	if(!Types.ObjectId.isValid(id)){
 		return { errors: ["ID do teste inválido"] }
 	}
 
+	const examId = new Types.ObjectId(id)
+
 	await connectDatabase()
 
-	if(!(await Exam.exists({ _id: id }))) {
+	const user = await getSessionUserData()
+
+	if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
+	if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
+
+	const exam = await Exam.findById(examId, { owner: 1 })
+
+	if(!exam){
 		return { errors: ["Teste não encontrado"] }
 	}
 
-	const oldInvite = await ExamInvite.exists({ exam: id })
+	if(!exam.owner._id.equals(user.id)){
+		return { errors: ["Você não tem permissão para executar essa ação"] }
+	}
+
+	const oldInvite = await ExamInvite.findOne({ exam: examId }, { _id: 1 })
 
 	try{
-		await saveInviteURL(id, oldInvite?._id)
+		const inviteInfo = {
+			get token(){
+				return randomBytes(4).toString("hex")
+			},
+			exam: examId,
+			createdAt: new Date
+		} satisfies Omit<IExamInvite, "_id">
+
+		while(true){
+			try{
+				if(oldInvite) await oldInvite.updateOne(inviteInfo).orFail()
+				else await ExamInvite.create(inviteInfo)
+
+				break
+			}catch(error){
+				if(error instanceof Error && error.name === "MongoServerError"){
+					// If exam invite token already exists
+					if("code" in error && error.code === 11000){
+						console.error(`Failed to ${oldInvite ? "update" : "generate"} exam invite URL`)
+						continue
+					}
+				}
+
+				throw error
+			}
+		}
 	}catch(error){
 		console.error(error)
 		return { errors: ["Falha ao gerar o link de convite para o teste"] }
