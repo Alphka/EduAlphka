@@ -30,41 +30,45 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		connectDatabase()
 	])
 
-	if(!Types.ObjectId.isValid(id)) notFound()
+	if(!Types.ObjectId.isValid(id)){
+		notFound()
+	}
 
-	const submit = await Submit
-		.findById(id, {
-			exam: 1,
-			user: 1,
-			publishedAt: 1
-		})
-		.populate<{
-			user: HydratedDocument<Pick<IUser, "_id" | "name">>
-		}>("user", {
-			name: 1
-		})
-		.orFail(notFound)
-
-	const [exam, user] = await Promise.all([
-		Exam
-			.findById(submit.exam, {
-				owner: 1,
-				title: 1,
-				subject: 1,
-				duration: 1,
-				questions: 1,
-				candidates: 1,
-				description: 1,
-				expiresAt: 1
+	const [user, submit] = await Promise.all([
+		verifyAuthorization({ accountType: "professor" }),
+		Submit
+			.findById(id, {
+				exam: 1,
+				user: 1,
+				publishedAt: 1
 			})
-			.orFail(() => {
-				console.error("Submit exam not found")
-				notFound()
-			}),
-		verifyAuthorization({ accountType: "professor" })
+			.populate<{
+				user: HydratedDocument<Pick<IUser, "_id" | "name">>
+			}>("user", {
+				name: 1
+			})
+			.orFail(notFound)
 	])
 
-	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	const exam = await Exam
+		.findById(submit.exam, {
+			owner: 1,
+			title: 1,
+			subject: 1,
+			duration: 1,
+			questions: 1,
+			candidates: 1,
+			description: 1,
+			expiresAt: 1
+		})
+		.orFail(() => {
+			console.error("Submit exam not found")
+			notFound()
+		})
+
+	if(!exam.owner._id.equals(user.id)){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
 
 	const submitData = await exam.getSubmitData(submit.user._id)
 

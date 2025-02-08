@@ -22,7 +22,9 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	const user = await verifyAuthorization({ accountType: "candidate" })
 
-	if(!Types.ObjectId.isValid(id)) notFound()
+	if(!Types.ObjectId.isValid(id)){
+		notFound()
+	}
 
 	const exam = await Exam
 		.findById(id, {
@@ -34,7 +36,8 @@ export default async function SubmitExamPage({ params }: PageProps){
 			candidates: 1,
 			description: 1,
 			createdAt: 1,
-			expiresAt: 1
+			expiresAt: 1,
+			startsAt: 1
 		})
 		.populate<{
 			owner: HydratedDocument<Pick<IUser, "name">>
@@ -57,6 +60,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 		"subject",
 		"duration",
 		"description",
+		"startsAt",
 		"expiresAt",
 		"createdAt",
 		"questions"
@@ -65,6 +69,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 		| "subject"
 		| "duration"
 		| "description"
+		| "startsAt"
 		| "expiresAt"
 		| "createdAt"
 	> & {
@@ -119,7 +124,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 					{exam.title}
 				</h1>
 
-				{!!submitData && !!submitData.submit ? (
+				{submitData.submit ? (
 					<Tooltip
 						py="sm"
 						px="md"
@@ -133,7 +138,9 @@ export default async function SubmitExamPage({ params }: PageProps){
 						<Paper
 							className={twJoin(
 								"leading-none px-sm py-xs shadow-xs",
-								pendingCorrection ? "bg-yellow-light text-yellow-light-color border-yellow-light-hover" : "bg-green-light text-green-light-color border-green-light-hover"
+								pendingCorrection
+									? "bg-yellow-light text-yellow-light-color border-yellow-light-hover"
+									: "bg-green-light text-green-light-color border-green-light-hover"
 							)}
 							aria-label={`${submitData.grade} ${submitData.grade === 1 ? "acerto" : "acertos"} de ${maxGrade} ${maxGrade === 1 ? "questão" : "questões"}${pendingCorrection ? " (Nota final pendente de correção)" : ""}`}
 							withBorder

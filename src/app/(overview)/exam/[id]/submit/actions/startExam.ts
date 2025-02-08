@@ -1,6 +1,5 @@
 "use server"
 
-import type { IExam } from "@models/typings/Exam"
 import { Exam, StartedExam } from "@models"
 import { revalidatePath } from "next/cache"
 import { Types } from "mongoose"
@@ -18,14 +17,20 @@ export default async function startExam(id: string){
 	if(user.accountType !== "candidate") return { errors: ["Você não tem permissão para executar essa ação"] }
 
 	const exam = await Exam
-		.findById(id)
-		.lean<Pick<IExam, "_id"> & { candidates: Types.ObjectId[] }>()
+		.findById(id, {
+			candidates: 1,
+			startsAt: 1
+		})
+		.lean()
+
+	console.log(exam)
 
 	if(!exam) return { errors: ["Teste não encontrado"] }
 	if(!exam.candidates.some(candidate => candidate._id.equals(user.id))) return { errors: ["Você não está inscrito nesse teste"] }
+	if(exam.startsAt && Date.now() < exam.startsAt.getTime()) return { errors: ["Esse teste não iniciou ainda"]}
 
 	await StartedExam.create({
-		exam: id,
+		exam,
 		user: user.id
 	})
 
