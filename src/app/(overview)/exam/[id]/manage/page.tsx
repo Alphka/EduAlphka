@@ -69,7 +69,7 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header className="flex justify-end flex-wrap gap-md">
+			<header className="flex justify-end flex-wrap-reverse gap-md">
 				<h1 className="flex-grow text-h4 xs:text-h3">
 					{exam.title}
 				</h1>

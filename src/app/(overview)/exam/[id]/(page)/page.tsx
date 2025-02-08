@@ -39,7 +39,9 @@ export default async function EditExamPage({ params }: PageProps){
 				duration: 1,
 				questions: 1,
 				candidates: 1,
-				description: 1
+				description: 1,
+				expiresAt: 1,
+				startsAt: 1
 			})
 			.orFail(notFound),
 		verifyAuthorization()

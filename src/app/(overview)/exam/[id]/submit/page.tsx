@@ -177,7 +177,13 @@ export default async function SubmitExamPage({ params }: PageProps){
 				{exam.expiresAt && (
 					<li>
 						<span className="font-semibold">Data final para entrega: </span>
-						{exam.expiresAt.toLocaleString("pt-BR")}
+						{exam.expiresAt.toLocaleString("pt-BR", {
+							day: "2-digit",
+							month: "2-digit",
+							year: "numeric",
+							hour: "2-digit",
+							minute: "2-digit"
+						})}
 					</li>
 				)}
 

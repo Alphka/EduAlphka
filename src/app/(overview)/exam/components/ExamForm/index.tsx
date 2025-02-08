@@ -151,7 +151,7 @@ export default function ExamForm({
 
 	return (
 		<div className="flex flex-col gap-2xl">
-			<header className="flex justify-end flex-wrap gap-md">
+			<header className="flex justify-end flex-wrap-reverse gap-md">
 				<h1 className="flex-grow text-4xl font-bold">
 					{type === "edit" ? defaultValues?.exam?.title : "Criar teste"}
 				</h1>
@@ -349,6 +349,7 @@ export default function ExamForm({
 								})}
 								onChange={handleStartsAtChange}
 								minDate={new Date}
+								maxDate={watch("exam.expiresAt")}
 								defaultValue={watch("exam.startsAt")}
 								error={errors.exam?.startsAt?.message}
 							/>

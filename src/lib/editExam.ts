@@ -23,13 +23,29 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 	if(!examData.questions.length) throw "O teste deve possuir pelo menos uma questão"
 	if(!examData.questions.filter(({ required }) => required).length) throw "O teste deve possuir pelo menos uma questão obrigatória"
 
-	const {
-		title,
-		subject,
-		duration,
-		questions,
-		description
-	} = validatedFields.data
+	if(examData.startsAt && examData.startsAt.getTime() < Date.now()){
+		throw "A data de início do teste deve ser maior que a data atual"
+	}
+
+	if(examData.expiresAt){
+		const expirationDate = examData.expiresAt.getTime()
+
+		if(expirationDate < Date.now()){
+			throw "A data de término do teste deve ser maior que a data atual"
+		}
+
+		if(examData.startsAt){
+			const startDate = examData.startsAt.getTime()
+
+			if(expirationDate <= startDate){
+				throw "A data de término do teste deve ser maior que a data de início do teste"
+			}
+
+			if(expirationDate < startDate + getDurationMinutes(examData.duration) * 60 * 1000){
+				throw `A data de término deve ser suficiente para a realização do teste (${examData.duration})`
+			}
+		}
+	}
 
 	if(exam){
 		exam.updatedAt = new Date
@@ -41,11 +57,9 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 	}
 
 	Object.assign(exam, {
-		title,
-		subject,
-		description,
-		duration: getDurationMinutes(duration),
-		questions: questions.map(({ type, text, options, correct_answer, required }, questionIndex) => {
+		...validatedFields.data,
+		duration: getDurationMinutes(validatedFields.data.duration),
+		questions: validatedFields.data.questions.map(({ type, text, options, correct_answer, required }, questionIndex) => {
 			switch(type){
 				case "dissertative":
 					return {
@@ -69,7 +83,7 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 		})
 	})
 
-	questions.forEach((question, index) => {
+	validatedFields.data.questions.forEach((question, index) => {
 		const examQuestion = exam.questions[index]
 
 		if(examQuestion.type !== "multiple_choice") return
