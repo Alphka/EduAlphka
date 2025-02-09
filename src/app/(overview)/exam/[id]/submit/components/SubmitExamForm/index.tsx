@@ -124,5 +124,3 @@ export default function SubmitExamForm({
 		</form>
 	)
 }
-
-// TODO: Display correct and wrong answers to the candidate

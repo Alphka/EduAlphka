@@ -171,6 +171,27 @@ export default function SubmitExamFormQuestion({
 						)}
 					</ul>
 				)}
+
+				{isAnswered && isRequired && !!answer.feedback && <>
+					<Divider />
+
+					<Textarea
+						size="md"
+						label="Feedback do aplicador do teste"
+						variant="filled"
+						className={twJoin(formDisabled && "cursor-not-allowed")}
+						placeholder="Feedback do aplicador do teste"
+						value={answer.feedback}
+						withAsterisk={false}
+						classNames={{
+							input: "cursor-default overflow-hidden"
+						}}
+						spellCheck
+						autosize
+						readOnly
+						inert
+					/>
+				</>}
 			</div>
 		</Paper>
 	)

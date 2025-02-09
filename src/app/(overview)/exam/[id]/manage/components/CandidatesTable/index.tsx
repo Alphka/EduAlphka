@@ -219,9 +219,9 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 
 			<AddCandidate examId={examId} />
 
-			<Divider />
+			{!!disallowedCandidates.length && <>
+				<Divider />
 
-			{!!disallowedCandidates.length && (
 				<section className="flex flex-col gap-md">
 					<header>
 						<h3 className="text-h6 font-semibold">
@@ -236,7 +236,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 						}}
 					/>
 				</section>
-			)}
+			</>}
 		</Paper>
 	)
 }

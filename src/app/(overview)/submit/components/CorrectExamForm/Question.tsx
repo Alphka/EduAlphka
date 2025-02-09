@@ -84,7 +84,7 @@ export default function CorrectExamFormQuestion({
 							size="md"
 							label="Resposta"
 							variant="filled"
-							aria-label="Resposta"
+							aria-label={`Resposta da questão ${questionNumber}`}
 							value={answer?.content || ""}
 							withAsterisk={false}
 							classNames={{

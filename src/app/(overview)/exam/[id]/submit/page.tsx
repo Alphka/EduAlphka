@@ -13,6 +13,7 @@ import SubmitExamForm from "./components/SubmitExamForm"
 import StartExamModal from "./components/StartExamModal"
 import RemainingTime from "./components/RemainingTime"
 import routes from "@app/routes"
+import { omit } from "lodash"
 
 export default async function SubmitExamPage({ params }: PageProps){
 	const [{ id }] = await Promise.all([
@@ -189,7 +190,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 			<SubmitExamForm
 				exam={pick(examClient, ["_id", "questions"] as const)}
-				answers={answers}
+				answers={answers && pendingCorrection ? answers.map(answer => omit(answer, "feedback")) : answers}
 				defaultValues={submitData.submit ? {
 					question: submitData.submit.answers.map(({ option, content }) => ({
 						option: option?.toString(),
