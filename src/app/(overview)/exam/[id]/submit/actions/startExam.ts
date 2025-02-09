@@ -23,8 +23,6 @@ export default async function startExam(id: string){
 		})
 		.lean()
 
-	console.log(exam)
-
 	if(!exam) return { errors: ["Teste não encontrado"] }
 	if(!exam.candidates.some(candidate => candidate._id.equals(user.id))) return { errors: ["Você não está inscrito nesse teste"] }
 	if(exam.startsAt && Date.now() < exam.startsAt.getTime()) return { errors: ["Esse teste não iniciou ainda"]}

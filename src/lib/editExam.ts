@@ -23,14 +23,18 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 	if(!examData.questions.length) throw "O teste deve possuir pelo menos uma questão"
 	if(!examData.questions.filter(({ required }) => required).length) throw "O teste deve possuir pelo menos uma questão obrigatória"
 
-	if(examData.startsAt && examData.startsAt.getTime() < Date.now()){
+	const currentDate = new Date()
+
+	currentDate.setHours(currentDate.getHours(), currentDate.getMinutes(), 0, 0)
+
+	if(examData.startsAt && examData.startsAt < currentDate){
 		throw "A data de início do teste deve ser maior que a data atual"
 	}
 
 	if(examData.expiresAt){
 		const expirationDate = examData.expiresAt.getTime()
 
-		if(expirationDate < Date.now()){
+		if(expirationDate < currentDate.getTime()){
 			throw "A data de término do teste deve ser maior que a data atual"
 		}
 

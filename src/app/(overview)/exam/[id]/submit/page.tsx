@@ -150,9 +150,12 @@ export default async function SubmitExamPage({ params }: PageProps){
 					</Tooltip>
 				) : (
 					<RemainingTime
-						examId={exam.id}
-						createdAt={submitData.createdAt}
-						examDuration={exam.duration}
+						exam={{
+							id: exam._id.toString(),
+							...pick(exam, ["duration", "expiresAt"] as const),
+							duration: 26,
+							startedAt: submitData.createdAt
+						}}
 					/>
 				)}
 			</header>

@@ -57,8 +57,8 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 		if(!exam.startsAt || canStartExam) return
 
 		const startsAtDateString = exam.startsAt.toLocaleDateString("pt-BR") === new Date().toLocaleDateString("pt-BR")
-			? exam.startsAt.toLocaleTimeString("pt-BR")
-			: exam.startsAt.toLocaleString("pt-BR", {
+			? " às " + exam.startsAt.toLocaleTimeString("pt-BR")
+			: " em " + exam.startsAt.toLocaleString("pt-BR", {
 				day: "2-digit",
 				month: "2-digit",
 				year: "numeric",
@@ -66,7 +66,7 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 				minute: "2-digit"
 			}).replace(", ", " às ")
 
-		const id = toast.warn(`O teste só poderá ser inciado em ${startsAtDateString}`, {
+		const id = toast.warn("O teste só poderá ser inciado" + startsAtDateString, {
 			toastId,
 			pauseOnHover: false,
 			closeOnClick: false,
