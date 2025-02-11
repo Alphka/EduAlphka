@@ -140,6 +140,62 @@ examSchema.method("getSubmitData", async function getSubmitData(candidates: (Typ
 	return isMultipleCandidates ? Promise.all(results) : results[0]
 })
 
+examSchema.method("getAverageGrade", async function getAverageGrade(){
+	const { default: Submit } = await import("../Submit")
+
+	const result = await Submit.aggregate<{ averageGrade: number }>([
+		{
+			$match: {
+				exam: this._id
+			}
+		},
+		{
+			$lookup: {
+				from: "answers",
+				localField: "_id",
+				foreignField: "submit",
+				as: "answers"
+			}
+		},
+		{
+			$unwind: "$answers"
+		},
+		{
+			$group: {
+				_id: "$_id",
+				totalCorrect: {
+					$sum: {
+						$cond: ["$answers.isCorrect", 1, 0]
+					}
+				},
+				totalQuestions: {
+					$sum: 1
+				}
+			}
+		},
+		{
+			$project: {
+				grade: {
+					$divide: [
+						"$totalCorrect",
+						"$totalQuestions"
+					]
+				}
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				averageGrade: {
+					$avg: "$grade"
+				}
+			}
+		}
+	])
+
+	return result.length ? result[0].averageGrade : 0
+})
+
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)
 
 export default Exam

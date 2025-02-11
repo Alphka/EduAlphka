@@ -70,6 +70,7 @@ export interface IExamMethods {
 	isExpired(): boolean
 	getSubmitData(candidate: Types.ObjectId | string): Promise<StartedExamWithSubmit | null>
 	getSubmitData(candidates: (Types.ObjectId | string)[]): Promise<StartedExamWithSubmit[]>
+	getAverageGrade(): Promise<number>
 }
 
 export type QuestionModel = Model<ExamQuestion>

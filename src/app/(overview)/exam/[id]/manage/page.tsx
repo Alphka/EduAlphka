@@ -4,7 +4,7 @@ import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, ExamInvite, StartedExam } from "@models"
-import { Divider } from "@mantine/core"
+import { Divider, Paper } from "@mantine/core"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
@@ -67,6 +67,8 @@ export default async function ManageExamPage({ params }: PageProps){
 		candidatesStartedExams.set(startedExam.user.toString(), startedExam)
 	}
 
+	const [averageGrade] = await Promise.all([exam.getAverageGrade()])
+
 	return (
 		<div className="flex flex-col gap-3xl">
 			<header className="flex justify-end flex-wrap gap-md">
@@ -113,6 +115,39 @@ export default async function ManageExamPage({ params }: PageProps){
 				}))}
 				key={`${exam.__v}.${exam.candidates.length}`}
 			/>
+
+			<Paper
+				className="flex flex-col p-xl gap-lg"
+				withBorder
+			>
+				<section className="flex flex-col gap-md">
+					<header>
+						<h2 className="text-h5">
+							Relatório das respostas do teste
+						</h2>
+					</header>
+
+					<Paper
+						className="bg-dark-800 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 p-xs sm:p-md shadow-none"
+						component="ul"
+						withBorder
+					>
+						{Object.entries({
+							"Nota média": averageGrade
+						}).map(([key, value]) => (
+							<Paper
+								className="flex flex-col p-md shadow-xs"
+								component="ul"
+								withBorder
+								key={key}
+							>
+								<h3 className="font-medium">{key}</h3>
+								<p>{value}</p>
+							</Paper>
+						))}
+					</Paper>
+				</section>
+			</Paper>
 		</div>
 	)
 }
