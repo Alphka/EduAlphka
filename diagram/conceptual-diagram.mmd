@@ -20,10 +20,9 @@ erDiagram
     User 1--0+ Submit : performs
 
     StartedExam
-    StartedExam 1--1 Exam : refers
 
     Exam
-    Exam 1--0+ StartedExam : allows
+    Exam 1--1 StartedExam : allows
     Exam 1--1+ ExamInvite : contains
     Exam 1--1+ Question : contains
     Exam 1--0+ Submit : allows
@@ -40,4 +39,3 @@ erDiagram
     Answer 1--zero or one QuestionOption : contains
 
     Submit
-    Submit 0+--1 Exam : refers
