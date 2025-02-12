@@ -16,9 +16,10 @@ export default async function CreatedExamList({ userId }: CreatedExamListProps){
 			createdAt: 1,
 			updatedAt: 1,
 			candidates: 1,
-			description: 1
+			description: 1,
+			expiresAt: 1
 		})
-		.sort({ createdAt: -1 })
+		.sort({ createdAt: "descending" })
 
 	return exams.length ? (
 		<ExamList exams={exams} />

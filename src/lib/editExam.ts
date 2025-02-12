@@ -27,14 +27,20 @@ function createOrEditExam(user: TUser, examData: TExamData, exam?: TExam){
 
 	currentDate.setHours(currentDate.getHours(), currentDate.getMinutes(), 0, 0)
 
-	if(examData.startsAt && examData.startsAt < currentDate){
+	if(exam
+		? exam.startsAt?.getTime() !== examData.startsAt?.getTime() && examData.startsAt && examData.startsAt < currentDate
+		: examData.startsAt && examData.startsAt < currentDate
+	){
 		throw "A data de início do teste deve ser maior que a data atual"
 	}
 
 	if(examData.expiresAt){
 		const expirationDate = examData.expiresAt.getTime()
 
-		if(expirationDate < currentDate.getTime()){
+		if(exam
+			? exam.expiresAt?.getTime() !== expirationDate && expirationDate < currentDate.getTime()
+			: expirationDate < currentDate.getTime()
+		){
 			throw "A data de término do teste deve ser maior que a data atual"
 		}
 

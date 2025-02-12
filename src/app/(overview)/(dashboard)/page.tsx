@@ -21,11 +21,12 @@ export default async function Homepage(){
 			{user.accountType === "professor" ? (
 				<ProfessorDashboard
 					userId={user.id}
-					recentExamsLimit={6}
+					recentExamsLimit={12}
 				/>
 			) : (
 				<CandidateDashboard
 					userId={user.id}
+					recentExamsLimit={12}
 				/>
 			)}
 		</div>

@@ -9,8 +9,8 @@ import { ActionIcon, Button, Divider, Fieldset, Textarea, TextInput } from "@man
 import { useFieldArray, useForm, type DefaultValues } from "react-hook-form"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { DateTimePicker, TimeInput, type DateValue } from "@mantine/dates"
+import { MdAccessTime, MdChevronLeft, MdSettings } from "react-icons/md"
 import { useCallback, useRef, type ChangeEvent } from "react"
-import { MdAccessTime, MdSettings } from "react-icons/md"
 import { useMediaQuery } from "@mantine/hooks"
 import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
@@ -151,22 +151,40 @@ export default function ExamForm({
 
 	return (
 		<div className="flex flex-col gap-2xl">
-			<header className="flex justify-end flex-wrap-reverse gap-md">
+			<header className="flex flex-col gap-y-xl">
+				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
+					<Button
+						href={routes.homepage.pathname}
+						size="sm"
+						radius="xl"
+						color="gray"
+						variant="light"
+						component={Link}
+						aria-label="Voltar para a página inicial"
+						prefetch
+					>
+						<div className="flex items-center gap-sm">
+							<MdChevronLeft className="text-lg" />
+							<span className="max-xs:hidden">Voltar</span>
+						</div>
+					</Button>
+
+					{!loading && type === "edit" && (
+						<Button
+							className="flex-shrink-0"
+							href={routes.exam.children.template.children.manage.pathname.replace("[id]", examId as string)}
+							variant="filled"
+							component={Link}
+							leftSection={<MdSettings className="text-lg" />}
+						>
+							Gerenciar teste
+						</Button>
+					)}
+				</div>
+
 				<h1 className="flex-grow text-4xl font-bold">
 					{type === "edit" ? defaultValues?.exam?.title : "Criar teste"}
 				</h1>
-
-				{!loading && type === "edit" && (
-					<Button
-						className="flex-shrink-0"
-						href={routes.exam.children.template.children.manage.pathname.replace("[id]", examId as string)}
-						variant="filled"
-						component={Link}
-						leftSection={<MdSettings className="text-lg" />}
-					>
-						Gerenciar teste
-					</Button>
-				)}
 			</header>
 
 			<Divider />

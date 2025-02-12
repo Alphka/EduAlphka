@@ -4,16 +4,15 @@ import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
 import { Divider, Paper, Tooltip } from "@mantine/core"
-import { twJoin } from "tailwind-merge"
 import { Exam, StartedExam } from "@models"
-import { pick } from "lodash"
+import { pick, omit } from "lodash"
+import { twJoin } from "tailwind-merge"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import SubmitExamForm from "./components/SubmitExamForm"
 import StartExamModal from "./components/StartExamModal"
 import RemainingTime from "./components/RemainingTime"
 import routes from "@app/routes"
-import { omit } from "lodash"
 
 export default async function SubmitExamPage({ params }: PageProps){
 	const [{ id }] = await Promise.all([
@@ -50,6 +49,14 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!exam.candidates.includes(new Types.ObjectId(user.id))){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
+
+	let expiringExamDuration = exam.duration
+
+	// TODO: Validate this on the back-end
+	if(exam.expiresAt){
+		expiringExamDuration = Math.min(exam.duration, (exam.expiresAt.getTime() - Date.now()) / 1000 / 60)
+		if(expiringExamDuration < 0) expiringExamDuration = 0
 	}
 
 	const submitData = await exam.getSubmitData(user.id)
@@ -96,11 +103,14 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	if(!submitData){
 		return (
-			<StartExamModal exam={examClient} />
+			<StartExamModal
+				exam={examClient}
+				expiringDuration={expiringExamDuration}
+			/>
 		)
 	}
 
-	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired({ exam })){
+	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired()){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
@@ -153,8 +163,8 @@ export default async function SubmitExamPage({ params }: PageProps){
 					<RemainingTime
 						exam={{
 							id: exam._id.toString(),
-							...pick(exam, ["duration", "expiresAt"] as const),
-							duration: 26,
+							duration: expiringExamDuration,
+							expiresAt: exam.expiresAt,
 							startedAt: submitData.createdAt
 						}}
 					/>

@@ -2,7 +2,8 @@
 
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
 import type { IUser } from "@models/typings/User"
-import { Button, Paper } from "@mantine/core"
+import { Button, Paper, Tooltip } from "@mantine/core"
+import { useInterval } from "@mantine/hooks"
 import { useEffect } from "react"
 import { isFinite } from "lodash"
 import { useState } from "react"
@@ -13,19 +14,6 @@ import useServerActionHandler from "@hooks/useServerActionHandler"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import startExam from "../actions/startExam"
 import * as Dialog from "@radix-ui/react-dialog"
-
-interface StartExamModalProps {
-	exam: Pick<IExam, "createdAt" | "title" | "description" | "subject" | "duration" | "startsAt" | "expiresAt"> & {
-		_id: string
-		owner: Pick<IUser, "name">
-		questions: (Pick<ExamQuestion, "type" | "text" | "isRequired"> & {
-			_id: string
-			options: (Pick<ExamMultipleChoiceQuestion["options"][number], "text"> & {
-				_id: string
-			})[]
-		})[]
-	}
-}
 
 function getDurationString(duration: number | ReturnType<typeof formatTimeDuration>){
 	if(typeof duration === "number") duration = formatTimeDuration(duration)
@@ -43,15 +31,49 @@ function getDurationString(duration: number | ReturnType<typeof formatTimeDurati
 	return `${hoursText} e ${minutesText}` as const
 }
 
-export default function StartExamModal({ exam }: StartExamModalProps){
+interface StartExamModalProps {
+	exam: Pick<IExam, "createdAt" | "title" | "description" | "subject" | "duration" | "startsAt" | "expiresAt"> & {
+		_id: string
+		owner: Pick<IUser, "name">
+		questions: (Pick<ExamQuestion, "type" | "text" | "isRequired"> & {
+			_id: string
+			options: (Pick<ExamMultipleChoiceQuestion["options"][number], "text"> & {
+				_id: string
+			})[]
+		})[]
+	}
+	expiringDuration: number
+}
+
+export default function StartExamModal({ exam, ...props }: StartExamModalProps){
+	const [expiringDuration, setExpiringDuration] = useState(props.expiringDuration)
 	const [canStartExam, setCanStartExam] = useState(() => !exam.startsAt || Date.now() > exam.startsAt.getTime())
 	const { handleServerAction, isPending } = useServerActionHandler()
 	const durationId = useId()
 	const toastId = useId()
 
+	const isExpiring = props.expiringDuration < exam.duration
+	const durationString = getDurationString(expiringDuration)
 	const totalQuestions = exam.questions.length
 	const requiredQuestions = exam.questions.filter(({ isRequired }) => isRequired)
 	const maxGrade = requiredQuestions.length
+
+	const { active, start: startTimer } = useInterval(() => {
+		let expiringExamDuration = exam.duration
+
+		if(exam.expiresAt){
+			expiringExamDuration = Math.min(exam.duration, (exam.expiresAt.getTime() - Date.now()) / 1000 / 60)
+			if(expiringExamDuration < 0) expiringExamDuration = 0
+		}
+
+		setExpiringDuration(expiringExamDuration)
+	}, 1000, { autoInvoke: isExpiring })
+
+	useEffect(() => {
+		if(!exam.expiresAt || active) return
+
+		setTimeout(startTimer, exam.expiresAt.getTime() - Date.now())
+	}, [active, exam.expiresAt?.getTime()])
 
 	useEffect(() => {
 		if(!exam.startsAt || canStartExam) return
@@ -152,7 +174,27 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 
 									<li>
 										<span className="text-blue-300">Tempo de duração: </span>
-										<span className="font-normal" aria-labelledby={durationId}>{formatTimeDuration(exam.duration)}</span>
+										{isExpiring ? (
+											<span className="font-normal">
+												<Tooltip
+													py="sm"
+													px="md"
+													fz="xs"
+													label="O teste está prestes a expirar!"
+													events={{ hover: true, focus: false, touch: true }}
+													position="top"
+													withArrow
+												>
+													<span className="text-red-500" aria-labelledby={durationId}>
+														{formatTimeDuration(expiringDuration)}
+													</span>
+												</Tooltip> (-{formatTimeDuration(exam.duration - Math.floor(expiringDuration))})
+											</span>
+										) : (
+											<span className="font-normal" aria-labelledby={durationId}>
+												{formatTimeDuration(expiringDuration)}
+											</span>
+										)}
 									</li>
 
 									{exam.expiresAt && (
@@ -180,7 +222,7 @@ export default function StartExamModal({ exam }: StartExamModalProps){
 							<Dialog.Description asChild>
 								<p className="text-justify text-h6 font-normal">
 									Após iniciar o teste,
-									você terá <span id={durationId} className="text-blue-500">{getDurationString(exam.duration)}</span> para completá-lo.<br />
+									você terá <span id={durationId} className="text-blue-500">{durationString}</span> para completá-lo.<br />
 									Certifique-se de estar preparado antes de começar.
 								</p>
 							</Dialog.Description>

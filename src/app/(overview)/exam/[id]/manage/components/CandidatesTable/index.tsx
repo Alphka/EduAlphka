@@ -1,6 +1,6 @@
 "use client"
 
-import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
+import { getSubmitStatus, submitStatusColors, SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
 import { Divider, Paper, Table, Text, TextInput } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
@@ -53,8 +53,8 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 			}
 
 			if(sortBy === "status"){
-				const statusA = submitStatusPriority[a.status as SubmitStatus]
-				const statusB = submitStatusPriority[b.status as SubmitStatus]
+				const statusA = a.status
+				const statusB = b.status
 
 				return reversed ? statusB - statusA : statusA - statusB
 			}
@@ -63,7 +63,18 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 		})
 		.filter(item => {
 			const keys = Object.keys(item).filter(key => filters.includes(key as FilterTypes)) as FilterTypes[]
-			return keys.some(key => (item[key] || "").toLocaleLowerCase().includes(query))
+
+			return keys.some(key => {
+				const rowData = item[key as Exclude<typeof key, "status">]
+
+				if(!rowData) return false
+
+				if(key === "status"){
+					return SubmitStatus[rowData as unknown as SubmitStatus].toLocaleLowerCase().includes(query)
+				}
+
+				return rowData.toLocaleLowerCase().includes(query)
+			})
 		})
 }
 
