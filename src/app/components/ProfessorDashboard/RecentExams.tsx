@@ -28,7 +28,8 @@ export default async function RecentExams({ userId, limit }: RecentExamsProps){
 			createdAt: 1,
 			updatedAt: 1,
 			candidates: 1,
-			description: 1
+			description: 1,
+			expiresAt: 1
 		})
 		.sort({ createdAt: "descending" })
 		.limit(limit)

@@ -14,22 +14,18 @@ export interface ExamListProps {
 export default async function ExamList({ userId, exams }: ExamListProps){
 	return (
 		<Grid gutter="md">
-			{exams.map(async exam => {
-				const startedExam = await exam.getSubmitData(userId)
-
-				return (
-					<GridCol
-						span={{
-							base: 12,
-							lg: 6,
-							xl: 4
-						}}
-						key={exam.id}
-					>
-						<ExamCard {...{ exam, startedExam }} />
-					</GridCol>
-				)
-			})}
+			{exams.map(async exam => (
+				<GridCol
+					span={{
+						base: 12,
+						lg: 6,
+						xl: 4
+					}}
+					key={exam.id}
+				>
+					<ExamCard {...{ exam, userId }} />
+				</GridCol>
+			))}
 		</Grid>
 	)
 }

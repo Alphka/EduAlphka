@@ -45,7 +45,8 @@ const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 		required: true
 	},
 	updatedAt: Date,
-	expiresAt: Date
+	expiresAt: Date,
+	startsAt: Date
 })
 
 examSchema.method("isExpired", function isExpired(){

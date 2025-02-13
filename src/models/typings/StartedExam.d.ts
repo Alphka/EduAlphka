@@ -1,4 +1,4 @@
-import type { HydratedDocument, Model, PopulatedDoc, Types } from "mongoose"
+import type { Document, HydratedDocument, Model, PopulatedDoc, Types } from "mongoose"
 import type { IExam, IExamMethods } from "./Exam"
 import type { IUser } from "./User"
 
@@ -10,9 +10,7 @@ export interface IStartedExam {
 }
 
 export interface IStartedExamMethods {
-	isExpired({ exam }?: {
-		exam?: HydratedDocument<Pick<IExam, "expiresAt" | "duration">> & IExamMethods
-	}): Promise<boolean>
+	isExpired(): Promise<boolean>
 }
 
 export type StartedExamModel = Model<IStartedExam, {}, IStartedExamMethods>

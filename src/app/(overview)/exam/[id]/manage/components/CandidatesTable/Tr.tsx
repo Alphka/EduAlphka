@@ -3,6 +3,7 @@ import { ActionIcon, Avatar, Badge, Button, Menu, MenuDropdown, MenuItem, MenuTa
 import { MdMenu, MdEdit, MdChecklist, MdWarningAmber, MdDeleteOutline, MdOutlineDoNotDisturbOn } from "react-icons/md"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { removeCandidate } from "../../actions/candidates"
+import { SubmitStatus } from "@helpers/getSubmitStatus"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
@@ -71,7 +72,7 @@ export default function Tr({
 					size={isMobile ? "xs" : "sm"}
 					fullWidth
 				>
-					{status}
+					{SubmitStatus[status]}
 				</Badge>
 			</Table.Td>
 

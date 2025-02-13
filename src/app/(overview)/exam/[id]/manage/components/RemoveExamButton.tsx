@@ -17,7 +17,6 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 
 	return <>
 		<Button
-			className="flex-shrink-0"
 			color="red.9"
 			variant="filled"
 			leftSection={<MdDeleteForever className="text-lg" />}

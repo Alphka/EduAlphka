@@ -1,8 +1,7 @@
-import type { StartedExamWithSubmit } from "@models/typings/Exam"
 import type { HTMLAttributes } from "react"
 import type { ExamListProps } from "./ExamList"
 import { Avatar, Badge, Box, Card, Divider, Text, Title, Tooltip } from "@mantine/core"
-import { getSubmitStatus, submitStatusColors } from "@helpers/getSubmitStatus"
+import { getSubmitStatus, SubmitStatus, submitStatusColors } from "@helpers/getSubmitStatus"
 import { MdOutlineQuiz, MdOutlineTimer } from "react-icons/md"
 import { StartedExam } from "@models"
 import { FaAsterisk } from "react-icons/fa"
@@ -15,20 +14,19 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface ExamCardProps {
-	startedExam: StartedExamWithSubmit | null
+	userId: string
 	exam: ExamListProps["exams"][number]
 }
 
-export default async function ExamCard({ exam, startedExam }: ExamCardProps){
-	const history = getHistoryMessage({
-		createdAt: exam.createdAt,
-		updatedAt: exam.updatedAt
-	})
+export default async function ExamCard({ exam, userId }: ExamCardProps){
+	const startedExam = await exam.getSubmitData(userId)
+
+	const history = getHistoryMessage(exam)
 
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!startedExam?.submit
 	const isExamExpired = isExamStarted
-		? !isExamSubmitted && await StartedExam.hydrate(startedExam).isExpired({ exam })
+		? !isExamSubmitted && await StartedExam.hydrate(startedExam).isExpired()
 		: exam.isExpired()
 	const pendingCorrection = !!startedExam?.pendingCorrection
 
@@ -103,7 +101,7 @@ export default async function ExamCard({ exam, startedExam }: ExamCardProps){
 								className="shrink-0"
 								color={submitStatusColors[submitStatus]}
 							>
-								{submitStatus}
+								{SubmitStatus[submitStatus]}
 							</Badge>
 
 							{pendingCorrection && (

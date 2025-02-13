@@ -4,13 +4,15 @@ import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, ExamInvite, StartedExam } from "@models"
-import { Divider } from "@mantine/core"
+import { Button, Divider } from "@mantine/core"
+import { MdChevronLeft } from "react-icons/md"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import ExamInvitation from "./components/ExamInvitation"
 import routes from "@app/routes"
+import Link from "next/link"
 
 const title = routes.exam.children.template.children.manage.title
 
@@ -69,15 +71,33 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header className="flex justify-end flex-wrap gap-md">
+			<header className="flex flex-col gap-y-xl">
+				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
+					<Button
+						href={routes.exam.children.template.pathname.replace("[id]", id)}
+						size="sm"
+						radius="xl"
+						color="gray"
+						variant="light"
+						component={Link}
+						aria-label="Voltar para a página do teste"
+						prefetch
+					>
+						<div className="flex items-center gap-sm">
+							<MdChevronLeft className="text-lg" />
+							<span className="max-xs:hidden">Voltar</span>
+						</div>
+					</Button>
+
+					<RemoveExamButton
+						examId={id}
+						examName={exam.title}
+					/>
+				</div>
+
 				<h1 className="flex-grow text-h4 xs:text-h3">
 					{exam.title}
 				</h1>
-
-				<RemoveExamButton
-					examId={id}
-					examName={exam.title}
-				/>
 			</header>
 
 			<Divider />
@@ -102,7 +122,7 @@ export default async function ManageExamPage({ params }: PageProps){
 						submitId,
 						username,
 						createdAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
-						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
+						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired() : false,
 						pendingCorrection
 					}
 				}))}

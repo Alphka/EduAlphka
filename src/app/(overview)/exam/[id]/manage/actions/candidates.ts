@@ -92,12 +92,12 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 		return { errors: ["Você não tem permissão para executar essa ação"] }
 	}
 
-	const startedExam = await StartedExam.exists({
+	const startedExam = await StartedExam.findOne({
 		exam: examId,
 		user: userId
-	})
+	}, { _id: 1 })
 
-	if(startedExam){
+	if(startedExam && !startedExam.isExpired()){
 		return { errors: [`Não é possível ${disable ? "desativar" : "remover"} um candidato que já iniciou o teste`] }
 	}
 

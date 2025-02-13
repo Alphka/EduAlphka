@@ -24,22 +24,25 @@ export default async function deleteExamAction(id: string){
 		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
 
 		if(!exam.isExpired()){
-			const startedExams = await StartedExam.find({ exam: id }, "user").lean()
-			const startedUsers = startedExams.map(startedExam => startedExam.user)
+			const startedExams = (await StartedExam.find({ exam: id }, { user: 1 }))
+				.filter(startedExam => !startedExam.isExpired())
 
-			const validUsers = await User.find({ _id: { $in: startedUsers } }, { _id: 1 }).lean()
-			const validUserIds = validUsers.map(user => user._id.toString())
+			const existingUsers = await User
+				.find({
+					_id: {
+						$in: startedExams.map(startedExam => startedExam.user as Types.ObjectId)
+					}
+				}, { _id: 1 })
+				.lean()
 
-			const submits = await Submit.find({
+			const submits = await Submit.exists({
 				exam: id,
 				user: {
-					$in: validUserIds
+					$in: existingUsers.map(user => user._id)
 				}
-			}, { user: 1 }).lean()
+			})
 
-			const usersWithSubmits = new Set(submits.map(submit => submit.user.toString()))
-
-			if(validUserIds.filter(id => !usersWithSubmits.has(id)).length){
+			if(submits){
 				return { errors: ["Não é possível excluir esse teste pois há candidatos que iniciaram o teste, mas ainda não o responderam"] }
 			}
 		}

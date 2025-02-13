@@ -1,30 +1,30 @@
 "use client"
 
-import { useCallback, useState } from "react"
+import type { IStartedExam } from "@models/typings/StartedExam"
+import { useCallback, useId, useState } from "react"
 import { useInterval } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
 import { twJoin } from "tailwind-merge"
+import { IExam } from "@models/typings/Exam"
 import { toast } from "react-toastify"
 import { Paper } from "@mantine/core"
-import revalidateSubmitCache from "../actions/revalidateSubmitCache"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import routes from "@app/routes"
 
 const criticalMinutesRemaining = 5
 
 interface RemainingTimeProps {
-	examId: string
-	createdAt: Date
-	examDuration: number
+	exam: Pick<IExam, "duration" | "expiresAt"> & {
+		id: string
+		startedAt: IStartedExam["createdAt"]
+	}
 }
 
-export default function RemainingTime({ examId, examDuration, createdAt }: RemainingTimeProps){
-	const router = useRouter()
-
+export default function RemainingTime({ exam }: RemainingTimeProps){
 	const getRemainingMinutes = useCallback(() => {
-		const remainingMinutes = examDuration - (Date.now() - createdAt.getTime()) / 1000 / 60
+		const remainingMinutes = exam.duration - (Date.now() - exam.startedAt.getTime()) / 1000 / 60
 		return remainingMinutes < 0 ? 0 : remainingMinutes
-	}, [examDuration, createdAt.getTime()])
+	}, [exam.duration, exam.startedAt.getTime()])
 
 	const getRemainingTime = useCallback((remainingMinutes: number) => ({
 		hours: Math.floor(remainingMinutes / 60),
@@ -33,21 +33,39 @@ export default function RemainingTime({ examId, examDuration, createdAt }: Remai
 		string: formatTimeDuration(remainingMinutes, true)
 	}), [])
 
-	const [remainingTime, setRemainingTime] = useState(() => {
-		const remainingMinutes = getRemainingMinutes()
-		return getRemainingTime(remainingMinutes)
-	})
+	const [remainingTime, setRemainingTime] = useState(() => getRemainingTime(getRemainingMinutes()))
+	const [isCriticalTimeRemaining, setIsCriticalTimeRemaining] = useState(() => (
+		(remainingTime.minutes === criticalMinutesRemaining && remainingTime.seconds === 0) ||
+		remainingTime.minutes < criticalMinutesRemaining
+	))
+	const remainingTimeToastId = useId()
+	const router = useRouter()
 
 	const { stop: stopTimer } = useInterval(() => {
 		const remainingMinutes = getRemainingMinutes()
 		const remainingTime = getRemainingTime(remainingMinutes)
 
+		if(
+			!isCriticalTimeRemaining &&
+			remainingTime.hours === 0 &&
+			((remainingTime.minutes === criticalMinutesRemaining && remainingTime.seconds === 0) || remainingTime.minutes < criticalMinutesRemaining)
+		){
+			toast.warn(`Faltam ${remainingTime.minutes === criticalMinutesRemaining ? criticalMinutesRemaining : `menos de ${criticalMinutesRemaining}`} minutos para o fim do teste!`, {
+				toastId: remainingTimeToastId,
+				position: "bottom-right"
+			})
+
+			setIsCriticalTimeRemaining(true)
+		}
+
 		setRemainingTime(remainingTime)
 
 		if(remainingTime.hours === 0 && remainingTime.minutes === 0 && remainingTime.seconds === 0){
 			stopTimer()
+
+			toast.dismiss(remainingTimeToastId)
 			toast.warn("O seu teste expirou!")
-			revalidateSubmitCache(examId)
+
 			router.push(routes.homepage.pathname)
 		}
 	}, 1000, { autoInvoke: true })
@@ -56,10 +74,7 @@ export default function RemainingTime({ examId, examDuration, createdAt }: Remai
 		<Paper
 			className={twJoin(
 				"leading-none px-sm py-xs shadow-xs",
-				remainingTime.hours === 0 && (
-					remainingTime.minutes === criticalMinutesRemaining && remainingTime.seconds === 0 ||
-					remainingTime.minutes <= criticalMinutesRemaining - 1
-				) && "bg-red-light text-red-light-color border-red-light-hover"
+				isCriticalTimeRemaining && "bg-red-light text-red-light-color border-red-light-hover"
 			)}
 			withBorder
 		>

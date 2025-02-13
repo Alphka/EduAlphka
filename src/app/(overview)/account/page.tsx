@@ -22,7 +22,7 @@ export default async function AccountPage(){
 	return (
 		<div className="flex flex-col gap-2xl">
 			<div className="flex flex-col gap-lg">
-				<header className="flex justify-end flex-wrap gap-md">
+				<header className="flex justify-end flex-wrap-reverse gap-md">
 					<h1 className="flex-grow text-h4 xs:text-h3 font-bold">
 						Minha conta
 					</h1>
