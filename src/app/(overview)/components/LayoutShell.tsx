@@ -9,11 +9,12 @@ import { useEffect } from "react"
 import { twJoin } from "tailwind-merge"
 import { omit } from "lodash"
 import getNameInitials from "@helpers/getNameInitials"
+import Notifications from "./Notifications"
 import routes from "@app/routes"
 import Link from "next/link"
 
 interface LayoutShellProps {
-	user: Pick<IUser, "name" | "accountType">
+	user: Pick<IUser, "name" | "accountType"> & { id: string }
 	children: ReactNode
 }
 
@@ -44,14 +45,18 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 				<div className="h-full flex items-center justify-between p-md gap-md">
 					<div className="flex items-center justify-center">
 						<Burger
+							size="md"
+							hiddenFrom="sm"
 							opened={burgerOpened}
 							onClick={toggleBurger}
-							hiddenFrom="sm"
-							size="md"
 						/>
 					</div>
 
-					<div className="flex gap-md overflow-hidden">
+					<div className="flex items-center gap-lg overflow-hidden">
+						<div className="flex items-center pl-sm gap-md *:flex-shrink-0">
+							<Notifications userId={user.id} />
+						</div>
+
 						<div className="w-full flex items-center gap-md">
 							<div className="text-right overflow-hidden">
 								<p className="text-sm font-medium whitespace-nowrap text-ellipsis overflow-hidden">

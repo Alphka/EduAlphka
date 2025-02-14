@@ -10,7 +10,7 @@ export default async function Layout({ children }: LayoutProps){
 
 	return (
 		<LayoutShell
-			user={pick(user, ["name", "accountType"] as const)}
+			user={pick(user, ["id", "name", "accountType"] as const)}
 		>
 			{children}
 		</LayoutShell>

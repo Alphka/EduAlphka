@@ -66,15 +66,13 @@ export default async function authenticateUser({
 			user: user.id,
 			userAgent: headersStore.get("user-agent")?.trim().substring(0, 255) || "",
 			expiresAt: tokenExpirationDate
-		}).then(() => {
-			cookiesStore.set({
-				name: TOKEN_KEY,
-				value: token,
-				path: "/",
-				expires: keepLoggedIn ? tokenExpirationDate : undefined,
-				sameSite: "lax"
-			})
-		}),
+		}).then(() => cookiesStore.set({
+			name: TOKEN_KEY,
+			value: token,
+			path: "/",
+			expires: keepLoggedIn ? tokenExpirationDate : undefined,
+			sameSite: "lax"
+		})),
 		oldToken && Session.deleteOne({ token: oldToken })
 	])
 }

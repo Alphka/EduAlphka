@@ -56,9 +56,7 @@ export default async function sendVerificationCode(email: string){
 
 	sentEmailCache.add(email)
 
-	setTimeout(() => {
-		sentEmailCache.delete(email)
-	}, EMAIL_VERIFICATION_TIMEOUT)
+	setTimeout(() => sentEmailCache.delete(email), EMAIL_VERIFICATION_TIMEOUT)
 
 	if(user){
 		try{

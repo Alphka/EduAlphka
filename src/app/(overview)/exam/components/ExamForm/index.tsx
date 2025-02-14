@@ -399,7 +399,7 @@ export default function ExamForm({
 				>
 					<ul className="flex flex-col gap-3xl">
 						{questionFields.map(({ id }, index, { length }) => (
-							<div
+							<li
 								className={twJoin(
 									"relative flex flex-col gap-md",
 									index !== length - 1 && [
@@ -424,7 +424,7 @@ export default function ExamForm({
 									}}
 									disabled={formDisabled}
 								/>
-							</div>
+							</li>
 						))}
 					</ul>
 

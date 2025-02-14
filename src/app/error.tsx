@@ -9,9 +9,7 @@ interface ServerErrorPageProps {
 }
 
 export default function ServerErrorPage({ error, reset }: ServerErrorPageProps){
-	useEffect(() => {
-		console.error(error)
-	}, [error])
+	useEffect(() => console.error(error), [error])
 
 	return (
 		<div className="min-h-dvh bg-blue-800 flex flex-col items-center justify-center px-xs py-20 pt-20 pb-32 gap-3xl">

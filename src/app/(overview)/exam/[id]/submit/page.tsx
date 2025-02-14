@@ -53,7 +53,6 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	let expiringExamDuration = exam.duration
 
-	// TODO: Validate this on the back-end
 	if(exam.expiresAt){
 		expiringExamDuration = Math.min(exam.duration, (exam.expiresAt.getTime() - Date.now()) / 1000 / 60)
 		if(expiringExamDuration < 0) expiringExamDuration = 0

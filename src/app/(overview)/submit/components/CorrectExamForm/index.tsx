@@ -34,10 +34,10 @@ export default function CorrectExamForm({ submitId, exam, answers, canEdit }: Co
 	const answersByQuestion = new Map(answers.map(({ question, ...answer }) => [question, answer]))
 
 	return (
-		<form className="flex flex-col gap-lg">
-			<h2 id={titleId} className="text-h3">
+		<section className="flex flex-col gap-lg">
+			<h1 id={titleId} className="text-h3">
 				Questões
-			</h2>
+			</h1>
 
 			<ul
 				className="flex flex-col gap-md"
@@ -73,19 +73,14 @@ export default function CorrectExamForm({ submitId, exam, answers, canEdit }: Co
 				</div>
 
 				<Button
-					type="submit"
 					variant="filled"
 					loading={isPending}
-					onClick={event => {
-						event.preventDefault()
-
-						handleServerAction(sendCorrection(submitId))
-					}}
+					onClick={() => handleServerAction(sendCorrection(submitId))}
 					disabled={canEdit}
 				>
 					Enviar correção
 				</Button>
 			</div>
-		</form>
+		</section>
 	)
 }

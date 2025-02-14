@@ -57,10 +57,10 @@ export default function QuestionContainer({
 	})
 
 	return <>
-		<div className="flex items-start gap-xs">
-			<div className="flex-grow flex flex-col gap-md">
+		<section className="flex items-start gap-xs">
+			<header className="flex-grow flex flex-col gap-md">
 				<Title
-					order={3}
+					order={1}
 					flex={1}
 					fz="lg"
 					fw={500}
@@ -77,7 +77,7 @@ export default function QuestionContainer({
 					{...register(`question.${index}.required`)}
 					defaultChecked={watch(`question.${index}.required`)}
 				/>
-			</div>
+			</header>
 
 			<ActionIcon
 				size="md"
@@ -87,14 +87,12 @@ export default function QuestionContainer({
 				className="shrink-0"
 				aria-label={`Remover ${index + 1}ª questão`}
 				title="Remover questão"
-				onClick={() => {
-					removeQuestion(index)
-				}}
+				onClick={() => removeQuestion(index)}
 				disabled={disabled || !canDelete}
 			>
 				<MdOutlineDeleteForever className="text-[1.25rem]" />
 			</ActionIcon>
-		</div>
+		</section>
 
 		<Textarea
 			size="md"
@@ -202,9 +200,7 @@ export default function QuestionContainer({
 					<Button
 						size="sm"
 						variant="subtle"
-						onClick={() => {
-							appendOption(defaultQuestionOption)
-						}}
+						onClick={() => appendOption(defaultQuestionOption)}
 						aria-label={`Adicionar opção de múltipla escolha à ${index}ª questão`}
 						disabled={disabled || optionFields.length === ExamFormValidation.maxOptionsNumber}
 					>

@@ -104,9 +104,9 @@ export default async function ExamCard({ exam, userId }: ExamCardProps){
 								{SubmitStatus[submitStatus]}
 							</Badge>
 
-							{pendingCorrection && (
+							{(pendingCorrection || isExamSubmitted) && (
 								<p className="text-dark-100 text-sm">
-									Nota parcial: <b className="font-medium">{startedExam.grade} de {maxGrade}</b>
+									Nota{pendingCorrection && " parcial"}: <b className="font-medium">{startedExam.grade} de {maxGrade}</b>
 								</p>
 							)}
 						</div>
