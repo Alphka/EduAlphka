@@ -46,13 +46,6 @@ export default function Notifications({ userId }: NotificationsProps){
 			}}
 			position="bottom"
 			zIndex={5}
-			classNames={{
-				dropdown: twJoin(
-					"w-11/12 max-w-screen-xs shadow-md",
-					"max-h-[calc(100%-var(--app-shell-header-height)-theme('spacing.lg'))] overflow-auto [scrollbar-color:rgba(255,255,255,.3)_transparent]",
-					"supports-[width:clamp(0px,0vw,0px)]:!w-[clamp(200px,70vw,theme('screens.xs'))] supports-[width:clamp(0px,0vw,0px)]:!max-w-unset"
-				)
-			}}
 			onChange={opened => {
 				if(opened) mutate()
 			}}
@@ -68,8 +61,14 @@ export default function Notifications({ userId }: NotificationsProps){
 				</ActionIcon>
 			</Popover.Target>
 
-			<Popover.Dropdown component="section">
-				<div className="flex flex-col p-md gap-2xl">
+			<Popover.Dropdown
+				className={twJoin(
+					"w-11/12 max-w-screen-xs p-lg shadow-md",
+					"supports-[width:clamp(0px,0vw,0px)]:!w-[clamp(200px,70vw,theme('screens.xs'))] supports-[width:clamp(0px,0vw,0px)]:!max-w-unset"
+				)}
+				component="section"
+			>
+				<div className="flex flex-col gap-2xl">
 					<header>
 						<Title
 							order={1}
@@ -87,7 +86,15 @@ export default function Notifications({ userId }: NotificationsProps){
 							}
 						</p>
 					) : (
-						<ul className="flex flex-col gap-xl">
+						<ul
+							className={twJoin(
+								"flex flex-col gap-xl",
+								"max-h-[calc(85vh-var(--app-shell-header-height,3.75rem))] overflow-auto",
+								"[&::-webkit-scrollbar]:w-3.5",
+								"[&::-webkit-scrollbar-thumb]:bg-clip-padding [&::-webkit-scrollbar-thumb]:bg-dark-400 [&::-webkit-scrollbar-thumb]:rounded-full",
+								"[&::-webkit-scrollbar-thumb]:border-solid [&::-webkit-scrollbar-thumb]:border-4 [&::-webkit-scrollbar-thumb]:border-transparent"
+							)}
+						>
 							{(isLoading ? new Array(3).fill(null) as null[] : notifications!).map((notification, index) => (
 								<Paper
 									bg="dark.5"
