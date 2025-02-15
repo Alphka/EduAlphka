@@ -152,13 +152,13 @@ export default function StartExamModal({ exam, ...props }: StartExamModalProps){
 								>
 									<li>
 										<span className="text-blue-300">Aplicador do teste: </span>
-										<span className="font-normal">{exam.owner.name}</span>
+										<span className="font-normal break-words">{exam.owner.name}</span>
 									</li>
 
 									{exam.subject && (
 										<li>
 											<span className="text-blue-300">Disciplina: </span>
-											<span className="font-normal">{exam.subject}</span>
+											<span className="font-normal break-words">{exam.subject}</span>
 										</li>
 									)}
 
@@ -214,7 +214,7 @@ export default function StartExamModal({ exam, ...props }: StartExamModalProps){
 
 									<li>
 										<span className="text-blue-300">Descrição: </span>
-										<span className="font-normal whitespace-pre-wrap">{exam.description}</span>
+										<span className="font-normal whitespace-pre-wrap break-words">{exam.description}</span>
 									</li>
 								</Paper>
 							</div>
@@ -231,9 +231,7 @@ export default function StartExamModal({ exam, ...props }: StartExamModalProps){
 								size="sm"
 								variant="filled"
 								className="self-center"
-								onClick={() => {
-									handleServerAction(startExam(exam._id.toString()))
-								}}
+								onClick={() => handleServerAction(startExam(exam._id.toString()))}
 								aria-label="Iniciar teste"
 								loading={isPending}
 								disabled={!canStartExam}

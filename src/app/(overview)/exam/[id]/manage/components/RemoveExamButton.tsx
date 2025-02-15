@@ -19,7 +19,7 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 		<Button
 			color="red.9"
 			variant="filled"
-			leftSection={<MdDeleteForever className="text-lg" />}
+			leftSection={<MdDeleteForever className="max-xs:hidden text-lg" />}
 			aria-label="Excluir teste"
 			onClick={open}
 		>

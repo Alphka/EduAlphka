@@ -61,11 +61,11 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 
 				<Button
 					size="compact-sm"
+					type="button"
 					variant="light"
-					leftSection={<MdEdit className="text-base" />}
-					aria-label={`${enabled ? "Des" : "H"}abilitar formulário para editar informações pessoais`}
-					onClick={event => {
-						event.preventDefault()
+					leftSection={<MdEdit className="max-xs:hidden text-base" />}
+					aria-label={`${enabled ? "Desabilitar" : "Habilitar"} formulário para editar informações pessoais`}
+					onClick={() => {
 						setEnabled(!enabled)
 						setTimeout(() => setFocus("name"))
 					}}

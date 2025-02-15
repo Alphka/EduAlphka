@@ -10,7 +10,7 @@ import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
 import Tr from "./Tr"
 
-const filters = ["name", "status", "createdAt"] as const
+const filters = ["name", "status", "startedAt"] as const
 
 type FilterTypes = typeof filters[number]
 
@@ -20,12 +20,12 @@ export interface CandidatesRowData {
 	submitId?: string
 	username: string
 	/** Started exam date */
-	createdAt?: string
+	startedAt?: string
 	isExpired: boolean
 	pendingCorrection: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "createdAt" | "isExpired" | "submitId" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "submitId" | "pendingCorrection"> {
 	status: SubmitStatus
 }
 
@@ -45,9 +45,9 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 		.toSorted((a, b) => {
 			if(!sortBy) return 0
 
-			if(sortBy === "createdAt"){
-				const dateA = a.createdAt ? parseDate(a.createdAt) : 0
-				const dateB = b.createdAt ? parseDate(b.createdAt) : 0
+			if(sortBy === "startedAt"){
+				const dateA = a.startedAt ? parseDate(a.startedAt) : 0
+				const dateB = b.startedAt ? parseDate(b.startedAt) : 0
 
 				return reversed ? dateB - dateA : dateA - dateB
 			}
@@ -88,7 +88,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 	const rowsData = useMemo(() => data.map(data => ({
 		status: getSubmitStatus({
 			pendingCorrection: data.pendingCorrection,
-			hasStartedExam: !!data.createdAt,
+			hasStartedExam: !!data.startedAt,
 			hasSubmit: !!data.submitId,
 			isExpired: data.isExpired
 		}),
@@ -162,9 +162,9 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 
 								<Th
 									className="w-16 xs:w-36"
-									sorted={sortBy === "createdAt"}
+									sorted={sortBy === "startedAt"}
 									reversed={reverseSortDirection}
-									onSort={() => setSorting("createdAt")}
+									onSort={() => setSorting("startedAt")}
 									ta="center"
 								>
 									<span className="hidden xs:block">Data de início</span>
@@ -194,7 +194,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 								name,
 								status,
 								username,
-								createdAt,
+								startedAt,
 								isExpired,
 								submitId,
 								pendingCorrection
@@ -207,7 +207,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 										status,
 										submitId,
 										username,
-										createdAt,
+										startedAt,
 										isExpired,
 										pendingCorrection
 									}}

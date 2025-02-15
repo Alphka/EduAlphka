@@ -20,7 +20,7 @@ export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 			size="md"
 			color="red"
 			className="self-start"
-			leftSection={<MdDeleteForever className="text-lg" />}
+			leftSection={<MdDeleteForever className="max-xs:hidden text-lg" />}
 			aria-label="Excluir conta"
 			onClick={open}
 		>
