@@ -3,6 +3,7 @@
 import { ActionIcon, Avatar, Divider, Paper, Popover, Skeleton, Title } from "@mantine/core"
 import { getNotifications } from "./actions/getNotifications"
 import { MdNotifications } from "react-icons/md"
+import { twJoin } from "tailwind-merge"
 import getNameInitials from "@helpers/getNameInitials"
 import parseString from "@helpers/parseString"
 import useSWR from "swr"
@@ -26,19 +27,32 @@ export default function Notifications({ userId }: NotificationsProps){
 
 		return notifications
 	}, {
-		dedupingInterval: 1000,
+		dedupingInterval: 5000,
 		revalidateIfStale: false,
 		revalidateOnMount: false,
 		revalidateOnFocus: false,
 		revalidateOnReconnect: false,
+		refreshWhenOffline: false,
+		refreshWhenHidden: false,
 		keepPreviousData: true
 	})
 
 	return (
 		<Popover
-			width={450}
+			styles={{
+				dropdown: {
+					width: undefined
+				}
+			}}
 			position="bottom"
-			shadow="md"
+			zIndex={5}
+			classNames={{
+				dropdown: twJoin(
+					"w-11/12 max-w-screen-xs shadow-md",
+					"max-h-[calc(100%-var(--app-shell-header-height)-theme('spacing.lg'))] overflow-auto [scrollbar-color:rgba(255,255,255,.3)_transparent]",
+					"supports-[width:clamp(0px,0vw,0px)]:!w-[clamp(200px,70vw,theme('screens.xs'))] supports-[width:clamp(0px,0vw,0px)]:!max-w-unset"
+				)
+			}}
 			onChange={opened => {
 				if(opened) mutate()
 			}}
@@ -74,7 +88,7 @@ export default function Notifications({ userId }: NotificationsProps){
 						</p>
 					) : (
 						<ul className="flex flex-col gap-xl">
-							{(isLoading ? new Array(5).fill(null) as null[] : notifications!).map((notification, index) => (
+							{(isLoading ? new Array(3).fill(null) as null[] : notifications!).map((notification, index) => (
 								<Paper
 									bg="dark.5"
 									className="p-md rounded shadow-sm"

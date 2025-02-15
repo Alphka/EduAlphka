@@ -43,8 +43,8 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 			zIndex={5}
 		>
 			<AppShell.Header>
-				<div className="h-full flex items-center justify-between p-md gap-md">
-					<div className="h-full flex max-sm:flex-row-reverse items-center justify-center gap-md">
+				<div className="h-full flex items-center justify-between p-md">
+					<div className="h-full flex max-sm:flex-row-reverse items-center justify-center gap-md xs:gap-lg">
 						<svg
 							fill="currentColor"
 							version="1.1"
@@ -69,7 +69,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						/>
 					</div>
 
-					<div className="flex items-center gap-lg overflow-hidden">
+					<div className="flex items-center gap-md xs:gap-lg overflow-hidden">
 						{user.accountType === "candidate" && (
 							<div className="flex items-center pl-sm gap-md *:flex-shrink-0">
 								<Notifications userId={user.id} />

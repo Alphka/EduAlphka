@@ -29,5 +29,9 @@ export async function getNotifications(){
 			owner?: Pick<IUser, "_id" | "name" | "username">
 		})[]>()
 
+	for(const notification of notifications){
+		notification.content = notification.content.replace("%owner.name%", notification.owner?.name ?? "Conta apagada")
+	}
+
 	return JSON.parse(JSON.stringify(notifications)) as ObjectIdToString<typeof notifications[number]>[]
 }

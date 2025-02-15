@@ -1,6 +1,15 @@
 "use server"
 
-import { Answer, Exam, ExamInvite, Session, StartedExam, Submit, VerificationCode } from "@models"
+import {
+	Answer,
+	Exam,
+	ExamInvite,
+	Notification,
+	Session,
+	StartedExam,
+	Submit,
+	VerificationCode
+} from "@models"
 import { TOKEN_KEY } from "@constants"
 import { redirect } from "next/navigation"
 import { cookies } from "next/headers"
@@ -22,7 +31,7 @@ export default async function deleteUser(){
 			return { errors: ["Você precisa estar logado para executar essa ação"] }
 		}
 
-		await user.deleteOne()
+		await user.deleteOne().orFail()
 
 		await Promise.all([
 			user.accountType === "professor" && Exam.find({
@@ -32,6 +41,7 @@ export default async function deleteUser(){
 					exam.deleteOne(),
 					ExamInvite.deleteMany({ exam }),
 					StartedExam.deleteMany({ exam }),
+					Notification.deleteMany({ owner: user._id }),
 					Submit.find({ exam }, { _id: 1 }).lean().then(submits => {
 						const submitIds = submits.map(submit => submit._id)
 
@@ -43,6 +53,7 @@ export default async function deleteUser(){
 				]))
 			}),
 			VerificationCode.deleteMany({ user }),
+			Notification.deleteMany({ user }),
 			Session.deleteMany({
 				$or: [
 					{ token },
