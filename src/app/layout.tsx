@@ -38,13 +38,12 @@ export const metadata: Metadata = {
 		canonical: "/"
 	},
 	other: {
-		"darkreader-lock": ""
+		"apple-mobile-web-app-title": APPLICATION_NAME,
+		"darkreader-lock": "true"
 	},
 	robots: {
 		index: true,
-		follow: true,
-		nocache: false,
-		noimageindex: false
+		follow: true
 	},
 	openGraph: {
 		url: "/",

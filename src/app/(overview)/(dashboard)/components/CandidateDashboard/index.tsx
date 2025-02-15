@@ -1,6 +1,6 @@
 import { Suspense } from "react"
 import ParticipatingExams from "./ParticipatingExams"
-import ExamListSkeleton from "../ExamListSkeleton"
+import ExamListSkeleton from "@components/ExamListSkeleton"
 
 export interface CandidateDashboardProps {
 	userId: string

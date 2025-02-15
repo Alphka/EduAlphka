@@ -1,7 +1,7 @@
 import { MdAddCircleOutline } from "react-icons/md"
 import { Suspense } from "react"
 import { Button } from "@mantine/core"
-import ExamListSkeleton from "../ExamListSkeleton"
+import ExamListSkeleton from "@components/ExamListSkeleton"
 import SeeAllButton from "./SeeAllButton"
 import RecentExams from "./RecentExams"
 import routes from "@app/routes"

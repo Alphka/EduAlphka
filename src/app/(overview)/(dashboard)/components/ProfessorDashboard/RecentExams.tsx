@@ -1,5 +1,5 @@
 import { Exam } from "@models"
-import ExamList from "../../(overview)/components/Professor/ExamList"
+import ExamList from "@components/Professor/ExamList"
 
 interface RecentExamsProps {
 	userId: string
