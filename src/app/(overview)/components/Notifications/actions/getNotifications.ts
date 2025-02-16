@@ -14,33 +14,44 @@ type NotificationObject = Omit<INotification, "exam" | "user" | "owner"> & {
 }
 
 export async function getNotifications(){
-	await connectDatabase()
+	try{
+		await connectDatabase()
 
-	const user = await getSessionUserData()
+		const user = await getSessionUserData()
 
-	if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
+		if(!user){
+			return { errors: ["Você precisa estar logado para executar essa ação"] }
+		}
 
-	const notifications = await Notification
-		.find({ user: user.id }, {
-			user: 0,
-			__v: 0
-		})
-		.populate("exam", {
-			title: 1
-		})
-		.populate("owner", {
-			name: 1,
-			username: 1
-		})
-		.sort({ createdAt: -1 })
-		.limit(15)
-		.lean<NotificationObject[]>()
+		const notifications = await Notification
+			.find({ user: user.id }, {
+				user: 0,
+				__v: 0
+			})
+			.populate("exam", {
+				title: 1
+			})
+			.populate("owner", {
+				name: 1,
+				username: 1
+			})
+			.sort({ createdAt: -1 })
+			.limit(15)
+			.lean<NotificationObject[]>()
 
-	for(const notification of notifications){
-		notification.content = notification.content
-			.replace("%owner.name%", notification.owner?.name ?? "Conta apagada")
-			.replace("%exam.title%", notification.exam?.title ?? "Teste sem título")
+		for(const notification of notifications){
+			notification.content = notification.content
+				.replace("%owner.name%", notification.owner?.name ?? "Conta apagada")
+				.replace("%exam.title%", notification.exam?.title ?? "Teste sem título")
+		}
+
+		return JSON.parse(JSON.stringify(notifications)) as ObjectIdToString<typeof notifications[number]>[]
+	}catch(error){
+		if(typeof error === "string") return { errors: [error] }
+		if(Array.isArray(error)) return { errors: error as string[] }
+
+		console.error(error)
+
+		return { errors: ["Falha ao buscar as notificações"] }
 	}
-
-	return JSON.parse(JSON.stringify(notifications)) as ObjectIdToString<typeof notifications[number]>[]
 }

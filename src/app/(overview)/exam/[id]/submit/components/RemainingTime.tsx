@@ -1,11 +1,11 @@
 "use client"
 
 import type { IStartedExam } from "@models/typings/StartedExam"
+import type { IExam } from "@models/typings/Exam"
 import { useCallback, useId, useState } from "react"
 import { useInterval } from "@mantine/hooks"
 import { useRouter } from "next/navigation"
 import { twJoin } from "tailwind-merge"
-import { IExam } from "@models/typings/Exam"
 import { toast } from "react-toastify"
 import { Paper } from "@mantine/core"
 import formatTimeDuration from "@helpers/formatTimeDuration"

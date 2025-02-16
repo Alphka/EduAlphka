@@ -3,8 +3,10 @@
 import { ActionIcon, Avatar, Divider, Paper, Popover, Skeleton, Title } from "@mantine/core"
 import { getNotifications } from "./actions/getNotifications"
 import { MdNotifications } from "react-icons/md"
+import { useDisclosure } from "@mantine/hooks"
 import { twJoin } from "tailwind-merge"
 import getNameInitials from "@helpers/getNameInitials"
+import Notification from "./Notification"
 import parseString from "@helpers/parseString"
 import useSWR from "swr"
 
@@ -13,6 +15,8 @@ interface NotificationsProps {
 }
 
 export default function Notifications({ userId }: NotificationsProps){
+	const [opened, { toggle, open, close }] = useDisclosure()
+
 	const {
 		data: notifications,
 		error,
@@ -44,18 +48,23 @@ export default function Notifications({ userId }: NotificationsProps){
 					width: undefined
 				}
 			}}
+			opened={opened}
+			onChange={opened => opened ? open() : close()}
 			position="bottom"
-			zIndex={5}
-			onChange={opened => {
-				if(opened) mutate()
-			}}
+			closeOnClickOutside
+			closeOnEscape
 			returnFocus
 			withArrow
+			zIndex={5}
 		>
 			<Popover.Target>
 				<ActionIcon
 					size="lg"
 					variant="default"
+					onClick={() => {
+						toggle()
+						mutate()
+					}}
 				>
 					<MdNotifications className="text-[1.25rem]" />
 				</ActionIcon>
@@ -102,7 +111,11 @@ export default function Notifications({ userId }: NotificationsProps){
 									component="li"
 									key={notification?._id || index}
 								>
-									<div className="flex flex-col gap-md">
+									<Notification
+										className="flex flex-col gap-md"
+										handleClose={close}
+										exam={notification?.exam?._id.toString()}
+									>
 										{!!notification?.owner && <>
 											<div className="flex items-center gap-md">
 												<Avatar
@@ -137,7 +150,7 @@ export default function Notifications({ userId }: NotificationsProps){
 												</div>
 											</>}
 										</div>
-									</div>
+									</Notification>
 								</Paper>
 							))}
 						</ul>
