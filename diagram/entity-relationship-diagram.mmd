@@ -23,7 +23,17 @@ erDiagram
         Date createdAt
         Date expiresAt
     }
-    User 1--1+ VerificationCode : requests
+
+    Notification {
+        ObjectId id
+        string title
+        string content
+        User user
+        Exam exam
+        User owner
+        Date createdAt
+        Date readAt
+    }
 
     User {
         ObjectId id PK
@@ -36,9 +46,12 @@ erDiagram
         Date createdAt
         Date updatedAt
     }
+    User 1--0+ Session : creates
+    User 1--1+ VerificationCode : requests
+    User 1+--0+ Notification : receives
+    User 1--1+ Notification : sends
     User 1--0+ Exam : creates
     User 0+--0+ Exam : participates
-    User 1--0+ Session : creates
     User 1--0+ StartedExam : starts
     User 1--0+ Submit : performs
 
@@ -48,6 +61,7 @@ erDiagram
         ObjectId user FK
         Date createdAt
     }
+    StartedExam 1--0+ Exam : refers
 
     Exam {
         ObjectId id PK
@@ -63,7 +77,6 @@ erDiagram
         Date expiresAt
         Date startsAt
     }
-    Exam 1--0+ StartedExam : allows
     Exam 1--1+ ExamInvite : contains
     Exam 1--1+ Question : contains
     Exam 1--0+ Submit : allows

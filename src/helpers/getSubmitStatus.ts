@@ -11,10 +11,10 @@ export function getSubmitStatus({
 	hasSubmit,
 	isExpired
 }: SubmitStatusProps){
-	if(isExpired) return SubmitStatus.Expirado
-	if(!hasStartedExam) return SubmitStatus["Não iniciado"]
 	if(pendingCorrection) return SubmitStatus.Pendente
 	if(hasSubmit) return SubmitStatus.Finalizado
+	if(isExpired) return SubmitStatus.Expirado
+	if(!hasStartedExam) return SubmitStatus["Não iniciado"]
 	return SubmitStatus.Ativo
 }
 

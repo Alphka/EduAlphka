@@ -20,6 +20,10 @@ const notificationSchema = new Schema<INotification, NotificationModel, INotific
 		minlength: NotificationFormValidation.contentMinLength,
 		maxlength: NotificationFormValidation.contentMaxLength
 	},
+	exam: {
+		type: Schema.ObjectId,
+		ref: "Exam"
+	},
 	owner: {
 		type: Schema.ObjectId,
 		ref: "User"
@@ -33,7 +37,9 @@ const notificationSchema = new Schema<INotification, NotificationModel, INotific
 })
 
 notificationSchema.method("markAsRead", async function markAsRead(){
-
+	this.readAt = new Date
+	this.markModified("readAt")
+	await this.save()
 })
 
 const Notification = models?.Notification as NotificationModel || model<INotification, NotificationModel>("Notification", notificationSchema)

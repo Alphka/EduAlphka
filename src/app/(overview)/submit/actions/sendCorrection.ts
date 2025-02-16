@@ -2,9 +2,9 @@
 
 import type { HydratedDocument, Types } from "mongoose"
 import type { IExam } from "@models/typings/Exam"
+import { Notification, Submit } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import { Submit } from "@models"
 import getSessionUserData from "@helpers/getSessionUserData"
 import routes from "@app/routes"
 
@@ -21,13 +21,14 @@ export default async function sendCorrection(submitId: string){
 	const submit = await Submit
 		.findById(submitId, {
 			exam: 1,
+			user: 1,
 			publishedAt: 1
 		})
 		.populate<{
 			exam: HydratedDocument<Pick<IExam, "_id">> & {
 				owner: Types.ObjectId
 			}
-		}>("exam", "owner")
+		}>("exam", { owner: 1 })
 
 	if(!submit) return { errors: ["Submissão não encontrada"] }
 	if(submit.publishedAt) return { errors: ["Essa submissão já foi publicada"] }
@@ -35,7 +36,23 @@ export default async function sendCorrection(submitId: string){
 
 	submit.publishedAt = new Date
 	submit.markModified("publishedAt")
-	await submit.save()
+
+	const notification = new Notification({
+		user: submit.user,
+		exam: submit.exam,
+		title: "Correção finalizada",
+		content: `<b>%owner.name%</b> corrigiu as suas respostas no teste “%exam.title%”.`,
+		owner: user.id
+	})
+
+	await Promise.all([
+		submit.save(),
+		notification.save()
+	]).catch(async error => {
+		console.error(error)
+		await notification.deleteOne()
+		throw error
+	})
 
 	revalidatePath(routes.homepage.pathname)
 	// revalidatePath(routes.exam.children.list.pathname)

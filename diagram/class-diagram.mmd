@@ -10,7 +10,7 @@ classDiagram
     direction LR
 
     class Session {
-        +string id
+        +ObjectId id
         +string token
         +User user
         +string userAgent
@@ -22,16 +22,32 @@ classDiagram
     Session "0..*" <-- "1" User : creates
 
     class VerificationCode {
-        +string id
+        +ObjectId id
         +User user
         +string code
         +Date createdAt
         +Date expiresAt
+
+        +sendEmail() Promise~void~$
+        +validateCode()$ boolean
     }
     VerificationCode "1..*" --> "1" User : contains
 
+    class Notification {
+        +ObjectId id
+        +string title
+        +string content
+        +User user
+        +Exam? exam
+        +User? owner
+        +Date createdAt
+        +Date? readAt
+
+        +markAsRead() Promise~void~
+    }
+
     class User {
-        +string id
+        +ObjectId id
         +string name
         +string email
         +string normalizedEmail
@@ -54,23 +70,26 @@ classDiagram
 
         +sendAnswerFeedback(answer: Answer, isCorrect: Boolean, feedback?: String) Promise~void~*
     }
+    User "1..*" --> "0..*" Notification : receives
+    User "1" --> "1..*" Notification : sends
     User "1" --> "0..*" StartedExam : contains
     User "1" --> "0..*" Exam : creates
     User "0..*" --> "0..*" Exam : participates
     User "1" --> "0..*" Submit : performs
 
     class StartedExam {
+        +ObjectId id
         +Exam exam
         +User user
         +Date createdAt
 
-        +isExpired() Promise~Boolean~
+        +isExpired() Promise~boolean~
         +getSubmitData() Promise~object~*
     }
     StartedExam "1" --> "1" Exam : refers
 
     class Exam {
-        +string id
+        +ObjectId id
         +User owner
         +string title
         +string description
@@ -84,7 +103,7 @@ classDiagram
         +Date? expiresAt
         +Date? startsAt
 
-        +editExam(exam: Exam) ~Promise~*
+        +editExam(exam: Exam) Promise~void~*
         +getMaxGrade() Number*
         +isExpired() boolean
     }
@@ -93,14 +112,14 @@ classDiagram
     Exam "1" --> "0..*" Submit : allows
 
     class ExamInvite {
-        +string id
+        +ObjectId id
         +string token
         +Exam exam
         +Date createdAt
     }
 
     class Question {
-        +string id
+        +ObjectId id
         +string type
         +string text
         +boolean isRequired
@@ -112,12 +131,12 @@ classDiagram
     Question "1" --> "1" Answer : allows
 
     class QuestionOption {
-        +string id
+        +ObjectId id
         +string text
     }
 
     class Answer {
-        +string id
+        +ObjectId id
         +string type
         +Submit submit
         +Question question
@@ -132,7 +151,7 @@ classDiagram
     Answer "0..*" <-- "1" Submit : contains
 
     class Submit {
-        +string id
+        +ObjectId id
         +User user
         +Exam exam
         +Date createdAt
@@ -141,4 +160,5 @@ classDiagram
         +getAnswers() Promise~Answer[]~
         +getGrade() Promise~Number~*
         +isPendingCorrection() Promise~boolean~
+        +sendNotification(exam: Exam, user: User) Promise~void~$
     }
