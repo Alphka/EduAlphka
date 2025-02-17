@@ -35,6 +35,7 @@ export default function RemainingTime({ exam }: RemainingTimeProps){
 
 	const [remainingTime, setRemainingTime] = useState(() => getRemainingTime(getRemainingMinutes()))
 	const [isCriticalTimeRemaining, setIsCriticalTimeRemaining] = useState(() => (
+		remainingTime.hours === 0 &&
 		(remainingTime.minutes === criticalMinutesRemaining && remainingTime.seconds === 0) ||
 		remainingTime.minutes < criticalMinutesRemaining
 	))

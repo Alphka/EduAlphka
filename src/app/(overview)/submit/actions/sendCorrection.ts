@@ -31,7 +31,7 @@ export default async function sendCorrection(submitId: string){
 		}>("exam", { owner: 1 })
 
 	if(!submit) return { errors: ["Submissão não encontrada"] }
-	if(submit.publishedAt) return { errors: ["Essa submissão já foi publicada"] }
+	if(submit.publishedAt) return { errors: ["Essa correção já foi publicada"] }
 	if(!submit.exam.owner._id.equals(user.id)) return { errors: ["Você não tem permissão para executar essa ação"] }
 
 	submit.publishedAt = new Date

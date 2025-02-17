@@ -2,6 +2,7 @@
 
 import type { CorrectExamFormProps } from "."
 import type { ExamQuestion } from "@models/typings/Exam"
+import type { RefObject } from "react"
 import { Button, Divider, LoadingOverlay, Paper, Radio, Textarea } from "@mantine/core"
 import { twJoin } from "tailwind-merge"
 import { useRef } from "react"
@@ -11,6 +12,7 @@ import correctExamAnswer from "../../actions/correctExamAnswer"
 interface CorrectExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" | "text" | "type"> {
 	questionNumber: number
 	formDisabled: boolean
+	questionRef: RefObject<HTMLLIElement | null>
 	options: {
 		_id: string
 		text: string
@@ -21,6 +23,7 @@ interface CorrectExamFormQuestionProps extends Pick<ExamQuestion, "isRequired" |
 export default function CorrectExamFormQuestion({
 	questionNumber,
 	formDisabled,
+	questionRef,
 	isRequired,
 	options,
 	answer,
@@ -41,8 +44,10 @@ export default function CorrectExamFormQuestion({
 				"p-xl border shadow-xs",
 				isPending && "border-yellow-900"
 			)}
+			data-pending={isPending}
 			component="li"
 			withBorder
+			ref={questionRef}
 		>
 			<section>
 				<header className="flex flex-row-reverse flex-wrap-reverse gap-x-md gap-y-xs">
