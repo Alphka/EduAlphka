@@ -1,10 +1,12 @@
 "use client"
 
 import type { IUser } from "@models/typings/User"
-import { ActionIcon, Avatar, Divider, Paper, Popover, Skeleton, Title } from "@mantine/core"
+import { ActionIcon, Avatar, Divider, Indicator, Paper, Popover, Skeleton, Title } from "@mantine/core"
+import { readNotifications } from "./actions/readNotifications"
 import { getNotifications } from "./actions/getNotifications"
 import { MdNotifications } from "react-icons/md"
 import { useDisclosure } from "@mantine/hooks"
+import { useState } from "react"
 import { twJoin } from "tailwind-merge"
 import getNameInitials from "@helpers/getNameInitials"
 import Notification from "./Notification"
@@ -12,12 +14,14 @@ import parseString from "@helpers/parseString"
 import useSWR from "swr"
 
 interface NotificationsProps {
+	hasUnread: boolean
 	user: Pick<IUser, "accountType"> & {
 		id: string
 	}
 }
 
-export default function Notifications({ user }: NotificationsProps){
+export default function Notifications({ user, hasUnread: _hasUnread }: NotificationsProps){
+	const [hasUnread, setHasUnread] = useState(_hasUnread)
 	const [opened, { toggle, open, close }] = useDisclosure()
 
 	const {
@@ -34,6 +38,17 @@ export default function Notifications({ user }: NotificationsProps){
 
 		return notifications
 	}, {
+		onSuccess(){
+			if(opened){
+				if(notifications?.some(notification => !notification.readAt)){
+					readNotifications()
+				}
+
+				setHasUnread(false)
+			}else{
+				setHasUnread(!!notifications?.some(notification => !notification.readAt))
+			}
+		},
 		dedupingInterval: 5000,
 		revalidateIfStale: false,
 		revalidateOnMount: false,
@@ -61,16 +76,23 @@ export default function Notifications({ user }: NotificationsProps){
 			zIndex={5}
 		>
 			<Popover.Target>
-				<ActionIcon
-					size="lg"
-					variant="default"
-					onClick={() => {
-						toggle()
-						mutate()
-					}}
+				<Indicator
+					size={12}
+					inline
+					processing
+					disabled={!hasUnread}
 				>
-					<MdNotifications className="text-[1.25rem]" />
-				</ActionIcon>
+					<ActionIcon
+						size="lg"
+						variant="default"
+						onClick={() => {
+							toggle()
+							mutate()
+						}}
+					>
+						<MdNotifications className="text-[1.25rem]" />
+					</ActionIcon>
+				</Indicator>
 			</Popover.Target>
 
 			<Popover.Dropdown

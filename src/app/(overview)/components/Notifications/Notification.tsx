@@ -14,26 +14,26 @@ type NotificationProps =
 }
 
 const _Notification = memo(function Notification({ accountType, exam, handleClose, ...props }: NotificationProps){
-	if(exam){
-		const examUrl = accountType === "professor"
-			? routes.exam.children.template.pathname.replace("[id]", exam)
-			: routes.exam.children.template.children.submit.pathname.replace("[id]", exam)
-
-		return (
-			<Link
-				href={examUrl}
-				aria-label="Ir para a página do teste"
-				prefetch={false}
-				{...props}
-				onClick={event => {
-					handleClose()
-					props.onClick?.(event)
-				}}
-			/>
-		)
+	if(!exam){
+		return <div {...props} />
 	}
 
-	return <div {...props} />
+	const examUrl = accountType === "professor"
+		? routes.exam.children.template.pathname.replace("[id]", exam)
+		: routes.exam.children.template.children.submit.pathname.replace("[id]", exam)
+
+	return (
+		<Link
+			href={examUrl}
+			aria-label="Ir para a página do teste"
+			prefetch={false}
+			{...props}
+			onClick={event => {
+				handleClose()
+				props.onClick?.(event)
+			}}
+		/>
+	)
 })
 
 export default _Notification

@@ -17,9 +17,10 @@ import Link from "next/link"
 interface LayoutShellProps {
 	user: Pick<IUser, "name" | "accountType"> & { id: string }
 	children: ReactNode
+	hasUnreadNotifications: boolean
 }
 
-export default function LayoutShell({ user, children }: LayoutShellProps){
+export default function LayoutShell({ user, children, hasUnreadNotifications }: LayoutShellProps){
 	const [burgerOpened, { close, toggle: toggleBurger }] = useDisclosure()
 	const pathname = usePathname()
 
@@ -75,15 +76,18 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 						/>
 					</div>
 
-					<div className="flex items-center gap-md xs:gap-lg overflow-hidden">
+					<div className="flex items-center gap-md xs:gap-lg">
 						{user.accountType === "candidate" && (
-							<div className="flex items-center pl-sm gap-md *:flex-shrink-0">
-								<Notifications user={pick(user, ["id", "accountType"] as const)} />
+							<div className="flex items-center gap-md *:flex-shrink-0">
+								<Notifications
+									user={pick(user, ["id", "accountType"] as const)}
+									hasUnread={hasUnreadNotifications}
+								/>
 							</div>
 						)}
 
 						<div className="w-full flex items-center gap-md">
-							<div className="max-xs:hidden text-right overflow-hidden">
+							<div className="max-w-32 max-xs:hidden text-right overflow-hidden">
 								<p className="text-sm font-medium whitespace-nowrap text-ellipsis overflow-hidden">
 									{user.name}
 								</p>
