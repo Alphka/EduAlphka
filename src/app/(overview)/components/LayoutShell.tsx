@@ -77,14 +77,17 @@ export default function LayoutShell({ user, children, hasUnreadNotifications }: 
 					</div>
 
 					<div className="flex items-center gap-md xs:gap-lg">
-						{user.accountType === "candidate" && (
-							<div className="flex items-center gap-md *:flex-shrink-0">
-								<Notifications
-									user={pick(user, ["id", "accountType"] as const)}
-									hasUnread={hasUnreadNotifications}
-								/>
-							</div>
-						)}
+						{
+							// TODO: Remove this when professors also receive notifications
+							user.accountType === "candidate" && (
+								<div className="flex items-center gap-md *:flex-shrink-0">
+									<Notifications
+										user={pick(user, ["id", "accountType"] as const)}
+										hasUnread={hasUnreadNotifications}
+									/>
+								</div>
+							)
+						}
 
 						<div className="w-full flex items-center gap-md">
 							<div className="max-xs:hidden w-full max-w-32 xs:max-w-48 text-right overflow-hidden">

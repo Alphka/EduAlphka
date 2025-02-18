@@ -11,7 +11,7 @@ import sendEmail, { type GmailError } from "@lib/sendEmail"
 import getSessionUserData from "@helpers/getSessionUserData"
 import routes from "@app/routes"
 
-const isDevelopment = process.env.NODE_ENV === "development"
+const isProduction = process.env.NODE_ENV === "production"
 
 export default async function sendCorrection(submitId: string){
 	if(!submitId){
@@ -38,10 +38,11 @@ export default async function sendCorrection(submitId: string){
 			title: 1
 		})
 		.populate<{
-			user: HydratedDocument<Pick<IUser, "_id" | "name" | "email">> | null
+			user: HydratedDocument<Pick<IUser, "_id" | "name" | "email" | "settings">> | null
 		}>("user", {
 			name: 1,
-			email: 1
+			email: 1,
+			settings: 1
 		})
 
 	if(!submit) return { errors: ["Submissão não encontrada"] }
@@ -69,7 +70,7 @@ export default async function sendCorrection(submitId: string){
 			throw error
 		})
 
-		if(isDevelopment){
+		if(isProduction && submit.user.settings?.notifyExamCorrection){
 			after(async () => {
 				try{
 					const examUrl = new URL(routes.exam.children.template.children.submit.pathname.replace("[id]", submit.exam.id), global.baseURL).href
