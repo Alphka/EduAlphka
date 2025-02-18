@@ -1,26 +1,25 @@
 import type { MetadataRoute } from "next"
 import { APPLICATION_NAME } from "./constants"
-import manifest512 from "@images/manifest-512x512.png"
-import manifest192 from "@images/manifest-192x192.png"
+
+const BASE_URL = "https://edu-alphka.vercel.app"
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
 		name: APPLICATION_NAME,
 		short_name: APPLICATION_NAME,
 		display: "standalone",
-		start_url: "/",
-		theme_color: "#ffffff",
+		theme_color: "#242424",
 		background_color: "#242424",
 		icons: [
 			{
-				src: manifest192.src,
-				sizes: `${manifest192.width}x${manifest192.height}`,
+				src: BASE_URL + "/images/manifest-192x192.png",
+				sizes: "192x192",
 				type: "image/png",
 				purpose: "maskable"
 			},
 			{
-				src: manifest512.src,
-				sizes: `${manifest512.width}x${manifest512.height}`,
+				src: BASE_URL + "/images/manifest-512x512.png",
+				sizes: "512x512",
 				type: "image/png",
 				purpose: "maskable"
 			}

@@ -126,8 +126,8 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		isCorrect
 	}))
 
-	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id))
-	const pendingAnswers = answers.filter(({ isCorrect }) => isCorrect === undefined).length
+	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id as string))
+	const pendingAnswers = answers.filter(({ question, isCorrect }) => isCorrect === undefined && requiredQuestions.has(question)).length
 	const maxGrade = requiredQuestions.size
 	const grade = answers.filter(({ isCorrect }) => isCorrect).length
 

@@ -1,5 +1,6 @@
 "use client"
 
+import type { IUser } from "@models/typings/User"
 import { ActionIcon, Avatar, Divider, Paper, Popover, Skeleton, Title } from "@mantine/core"
 import { getNotifications } from "./actions/getNotifications"
 import { MdNotifications } from "react-icons/md"
@@ -11,10 +12,12 @@ import parseString from "@helpers/parseString"
 import useSWR from "swr"
 
 interface NotificationsProps {
-	userId: string
+	user: Pick<IUser, "accountType"> & {
+		id: string
+	}
 }
 
-export default function Notifications({ userId }: NotificationsProps){
+export default function Notifications({ user }: NotificationsProps){
 	const [opened, { toggle, open, close }] = useDisclosure()
 
 	const {
@@ -22,7 +25,7 @@ export default function Notifications({ userId }: NotificationsProps){
 		error,
 		mutate,
 		isLoading
-	} = useSWR(`notifications-${userId}`, async () => {
+	} = useSWR(`notifications-${user.id}`, async () => {
 		const notifications = await getNotifications()
 
 		if("errors" in notifications){
@@ -98,7 +101,7 @@ export default function Notifications({ userId }: NotificationsProps){
 						<ul
 							className={twJoin(
 								"flex flex-col gap-xl",
-								"max-h-[calc(85vh-var(--app-shell-header-height,3.75rem))] overflow-auto",
+								"max-h-[calc(85vh-var(--app-shell-header-height,3.75rem))] overflow-auto overscroll-contain",
 								"[&::-webkit-scrollbar]:w-3.5",
 								"[&::-webkit-scrollbar-thumb]:bg-clip-padding [&::-webkit-scrollbar-thumb]:bg-dark-400 [&::-webkit-scrollbar-thumb]:rounded-full",
 								"[&::-webkit-scrollbar-thumb]:border-solid [&::-webkit-scrollbar-thumb]:border-4 [&::-webkit-scrollbar-thumb]:border-transparent"
@@ -114,6 +117,7 @@ export default function Notifications({ userId }: NotificationsProps){
 									<Notification
 										className="flex flex-col gap-md"
 										handleClose={close}
+										accountType={user.accountType}
 										exam={notification?.exam?._id.toString()}
 									>
 										{!!notification?.owner && <>

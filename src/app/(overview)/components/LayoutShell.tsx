@@ -6,9 +6,9 @@ import { AppShell, Burger, Avatar, NavLink } from "@mantine/core"
 import { APPLICATION_NAME } from "@constants/index"
 import { useDisclosure } from "@mantine/hooks"
 import { usePathname } from "next/navigation"
+import { pick, omit } from "lodash"
 import { useEffect } from "react"
 import { twJoin } from "tailwind-merge"
-import { omit } from "lodash"
 import getNameInitials from "@helpers/getNameInitials"
 import Notifications from "./Notifications"
 import routes from "@app/routes"
@@ -78,7 +78,7 @@ export default function LayoutShell({ user, children }: LayoutShellProps){
 					<div className="flex items-center gap-md xs:gap-lg overflow-hidden">
 						{user.accountType === "candidate" && (
 							<div className="flex items-center pl-sm gap-md *:flex-shrink-0">
-								<Notifications userId={user.id} />
+								<Notifications user={pick(user, ["id", "accountType"] as const)} />
 							</div>
 						)}
 

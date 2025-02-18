@@ -28,6 +28,8 @@ export const viewport: Viewport = {
 	colorScheme: "only dark" as unknown as Viewport["colorScheme"]
 }
 
+global.baseURL = new URL("https://edu-alphka.vercel.app")
+
 export const metadata: Metadata = {
 	title: {
 		default: APPLICATION_NAME,
@@ -63,7 +65,8 @@ export const metadata: Metadata = {
 		"nosql",
 		"crud"
 	],
-	creator: "Kayo Souza"
+	creator: "Kayo Souza",
+	referrer: "origin-when-cross-origin"
 }
 
 export default function RootLayout({ children }: RootLayoutProps){

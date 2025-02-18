@@ -3,26 +3,9 @@
 import { GenericFormValidation, PasswordRecoveryFormValidation } from "@constants/forms"
 import { EMAIL_VERIFICATION_TIMEOUT } from "@constants"
 import { User, VerificationCode } from "@models"
-import { createTransport } from "nodemailer"
+import sendEmail, { type GmailError } from "@lib/sendEmail"
 import connectDatabase from "@lib/connectDatabase"
 import normalizeEmail from "normalize-email"
-
-const { RECOVERY_PASSWORD_EMAIL, RECOVERY_PASSWORD_PASSWORD } = process.env
-
-if(!RECOVERY_PASSWORD_EMAIL){
-	throw new Error("Missing environment variable RECOVERY_PASSWORD_EMAIL")
-}
-
-if(!RECOVERY_PASSWORD_PASSWORD){
-	throw new Error("Missing environment variable RECOVERY_PASSWORD_PASSWORD")
-}
-
-interface GmailError {
-	code: string
-	response: string
-	responseCode: number
-	command: string
-}
 
 const sentEmailCache = new Set<string>
 
@@ -37,17 +20,8 @@ export default async function sendVerificationCode(email: string){
 		return { errors: ["E-mail inválido"] }
 	}
 
-	const user = await User.findOne({ normalizedEmail: normalizeEmail(email) })
-
-	const transporter = createTransport({
-		service: "gmail",
-		secure: true,
-		host: "smtp.gmail.com",
-		port: 465,
-		auth: {
-			user: RECOVERY_PASSWORD_EMAIL,
-			pass: RECOVERY_PASSWORD_PASSWORD
-		}
+	const user = await User.findOne({
+		normalizedEmail: normalizeEmail(email)
 	})
 
 	if(sentEmailCache.has(email)){
@@ -66,24 +40,21 @@ export default async function sendVerificationCode(email: string){
 
 			const verificationCode = new VerificationCode({
 				code: Math.floor(Math.random() * 10 ** PasswordRecoveryFormValidation.codeLength),
-				user: user._id,
+				user: user,
 				expiresAt: expirationDate
 			})
 
-			await transporter.sendMail({
-				from: RECOVERY_PASSWORD_EMAIL,
+			await sendEmail({
 				to: email,
 				subject: "Recuperação de senha",
-				text: `O código de verificação para recuperação de senha é ${verificationCode.code}`
+				text: `Olá, ${user.name}.\n\nO código de verificação para recuperação de senha é ${verificationCode.code}`,
+				html: `Olá, ${user.name}.<br><br>O código de verificação para recuperação de senha é <b>${verificationCode.code}</b>`
 			})
 
 			await verificationCode.save()
 		}catch(error){
-			let errorMessage = typeof error === "object" && error && "responseCode" in error
-				? `[${(error as GmailError).code}] ${(error as GmailError).response
-					.split("\n")
-					.map(line => "\t" + line)
-					.join("\n")}`
+			const errorMessage = typeof error === "object" && error && "responseCode" in error
+				? `[${(error as GmailError).code}] ${(error as GmailError).response?.split("\n").map(line => "\t" + line).join("\n")}`
 				: error instanceof Error
 					? error.message
 					: error
