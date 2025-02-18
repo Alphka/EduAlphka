@@ -52,8 +52,8 @@ export default function Notifications({ user, hasUnread: _hasUnread }: Notificat
 		dedupingInterval: 5000,
 		revalidateIfStale: false,
 		revalidateOnMount: false,
-		revalidateOnFocus: false,
-		revalidateOnReconnect: false,
+		revalidateOnFocus: true,
+		revalidateOnReconnect: true,
 		refreshWhenOffline: false,
 		refreshWhenHidden: false,
 		keepPreviousData: true
@@ -123,7 +123,7 @@ export default function Notifications({ user, hasUnread: _hasUnread }: Notificat
 						<ul
 							className={twJoin(
 								"flex flex-col gap-xl",
-								"max-h-[calc(85vh-var(--app-shell-header-height,3.75rem))] overflow-auto overscroll-contain",
+								"min-h-28 max-h-[calc(90vh-var(--app-shell-header-height,3.75rem)*2)] overflow-auto overscroll-contain",
 								"[&::-webkit-scrollbar]:w-3.5",
 								"[&::-webkit-scrollbar-thumb]:bg-clip-padding [&::-webkit-scrollbar-thumb]:bg-dark-400 [&::-webkit-scrollbar-thumb]:rounded-full",
 								"[&::-webkit-scrollbar-thumb]:border-solid [&::-webkit-scrollbar-thumb]:border-4 [&::-webkit-scrollbar-thumb]:border-transparent"
