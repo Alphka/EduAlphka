@@ -87,7 +87,7 @@ export default function LayoutShell({ user, children, hasUnreadNotifications }: 
 						)}
 
 						<div className="w-full flex items-center gap-md">
-							<div className="max-w-32 max-xs:hidden text-right overflow-hidden">
+							<div className="max-xs:hidden w-full max-w-32 xs:max-w-48 text-right overflow-hidden">
 								<p className="text-sm font-medium whitespace-nowrap text-ellipsis overflow-hidden">
 									{user.name}
 								</p>
