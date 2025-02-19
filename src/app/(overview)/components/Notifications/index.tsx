@@ -98,7 +98,7 @@ export default function Notifications({ user, hasUnread: _hasUnread }: Notificat
 			<Popover.Dropdown
 				className={twJoin(
 					"w-11/12 max-w-screen-xs p-lg shadow-md",
-					"supports-[width:clamp(0px,0vw,0px)]:!w-[clamp(200px,70vw,theme('screens.xs'))] supports-[width:clamp(0px,0vw,0px)]:!max-w-unset"
+					"supports-[width:clamp(0px,0vw,0px)]:!w-[clamp(200px,90vw,theme('screens.xs'))] supports-[width:clamp(0px,0vw,0px)]:!max-w-unset"
 				)}
 				component="section"
 			>

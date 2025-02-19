@@ -17,7 +17,8 @@ export default function SettingSwitch({ name, value, promises, ...props }: ISett
 			color="blue"
 			radius="xl"
 			classNames={{
-				labelWrapper: "ml-4"
+				root: "items-center",
+				labelWrapper: "ml-3"
 			}}
 			labelPosition="right"
 			onChange={async event => {
