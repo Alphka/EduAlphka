@@ -10,7 +10,7 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface TrProps extends
-	Pick<RowData, "id" | "name" | "username" | "status" | "createdAt" | "submitId" | "isExpired" | "pendingCorrection">,
+	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "submitId" | "isExpired" | "pendingCorrection">,
 	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
@@ -18,7 +18,7 @@ interface TrProps extends
 export default function Tr({
 	pendingCorrection,
 	statusColor,
-	createdAt,
+	startedAt,
 	submitId,
 	username,
 	examId,
@@ -60,7 +60,7 @@ export default function Tr({
 			</Table.Td>
 
 			<Table.Td ta="center">
-				{createdAt || "-"}
+				{startedAt || "-"}
 			</Table.Td>
 
 			{/* TODO: Include candidate's grade */}
@@ -120,7 +120,7 @@ export default function Tr({
 								leftSection={<MdDeleteOutline className="text-base" />}
 								aria-label="Remover acesso do candidato ao teste"
 								onClick={() => handleServerAction(removeCandidate(examId, id))}
-								disabled={!!createdAt || isPending}
+								disabled={isPending || !!startedAt}
 							>
 								Remover acesso
 							</MenuItem>
@@ -132,7 +132,7 @@ export default function Tr({
 								leftSection={<MdOutlineDoNotDisturbOn className="text-base" />}
 								aria-label="Desativar candidato do teste"
 								onClick={openDisableModal}
-								disabled={!!createdAt || isPending}
+								disabled={isPending || !!startedAt}
 							>
 								Desativar
 							</MenuItem>

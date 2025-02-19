@@ -4,7 +4,8 @@ import type { Metadata } from "next"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
-import { Divider, Paper } from "@mantine/core"
+import { Button, Divider, Paper } from "@mantine/core"
+import { MdChevronLeft } from "react-icons/md"
 import { Exam, Submit } from "@models"
 import { useId } from "react"
 import { pick } from "lodash"
@@ -12,6 +13,7 @@ import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import CorrectExamForm from "../components/CorrectExamForm"
 import routes from "@app/routes"
+import Link from "next/link"
 
 const title = routes.submit.children.template.title
 
@@ -124,15 +126,33 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		isCorrect
 	}))
 
-	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id))
-	const pendingAnswers = answers.filter(({ isCorrect }) => isCorrect === undefined).length
+	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id as string))
+	const pendingAnswers = answers.filter(({ question, isCorrect }) => isCorrect === undefined && requiredQuestions.has(question)).length
 	const maxGrade = requiredQuestions.size
 	const grade = answers.filter(({ isCorrect }) => isCorrect).length
 
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header className="flex items-center justify-end flex-wrap gap-md">
-				<h1 className="flex-grow text-h4 xs:text-h3">
+			<header className="flex flex-col gap-y-xl">
+				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
+					<Button
+						href={routes.exam.children.template.pathname.replace("[id]", exam.id)}
+						size="sm"
+						radius="xl"
+						color="gray"
+						variant="light"
+						component={Link}
+						aria-label="Voltar para a página do teste"
+						prefetch
+					>
+						<div className="flex items-center gap-sm">
+							<MdChevronLeft className="text-lg" />
+							<span className="max-xs:hidden">Voltar</span>
+						</div>
+					</Button>
+				</div>
+
+				<h1 className="flex-grow text-h4 xs:text-h3 break-words">
 					{title}
 				</h1>
 			</header>
@@ -194,9 +214,9 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 			<CorrectExamForm
 				submitId={submit.id}
-				canEdit={!submitData.pendingCorrection}
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers}
+				canEdit={submitData.pendingCorrection}
 			/>
 		</div>
 	)

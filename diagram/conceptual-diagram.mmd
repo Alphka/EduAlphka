@@ -8,21 +8,25 @@ config:
 ---
 erDiagram
     Session
-    Session 0+--1 User : creates
 
     VerificationCode
-    VerificationCode 1+--1 User : requests
+
+    Notification
 
     User
+    User 1--0+ Session : creates
+    User 1--1+ VerificationCode : requests
+    User 1+--0+ Notification : receives
+    User 1--1+ Notification : sends
     User 1--0+ Exam : creates
     User 0+--0+ Exam : participates
     User 1--0+ StartedExam : starts
     User 1--0+ Submit : performs
 
     StartedExam
+    StartedExam 1--0+ Exam : refers
 
     Exam
-    Exam 1--1 StartedExam : allows
     Exam 1--1+ ExamInvite : contains
     Exam 1--1+ Question : contains
     Exam 1--0+ Submit : allows

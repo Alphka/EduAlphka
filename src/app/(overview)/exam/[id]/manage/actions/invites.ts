@@ -1,8 +1,8 @@
 "use server"
 
+import type { IExamInvite } from "@models/typings/ExamInvite"
 import { Exam, ExamInvite } from "@models"
 import { revalidatePath } from "next/cache"
-import { IExamInvite } from "@models/typings/ExamInvite"
 import { randomBytes } from "crypto"
 import { Types } from "mongoose"
 import getSessionUserData from "@helpers/getSessionUserData"

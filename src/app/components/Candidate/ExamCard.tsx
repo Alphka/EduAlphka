@@ -7,7 +7,7 @@ import { StartedExam } from "@models"
 import { FaAsterisk } from "react-icons/fa"
 import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
-import getHistoryMessage from "../ExamCard/helpers/getHistoryMessage"
+import getHistoryMessage from "@components/ExamCard/helpers/getHistoryMessage"
 import getNameInitials from "@helpers/getNameInitials"
 import getStringColor from "@helpers/getStringColor"
 import routes from "@app/routes"
@@ -104,9 +104,9 @@ export default async function ExamCard({ exam, userId }: ExamCardProps){
 								{SubmitStatus[submitStatus]}
 							</Badge>
 
-							{pendingCorrection && (
+							{(pendingCorrection || isExamSubmitted) && (
 								<p className="text-dark-100 text-sm">
-									Nota parcial: <b className="font-medium">{startedExam.grade} de {maxGrade}</b>
+									Nota{pendingCorrection && " parcial"}: <b className="font-medium">{startedExam.grade} de {maxGrade}</b>
 								</p>
 							)}
 						</div>

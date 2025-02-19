@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import verifyAuthorization from "@helpers/verifyAuthorization"
-import ProfessorDashboard from "@components/ProfessorDashboard"
-import CandidateDashboard from "@components/CandidateDashboard"
+import ProfessorDashboard from "./components/ProfessorDashboard"
+import CandidateDashboard from "./components/CandidateDashboard"
 import routes from "@app/routes"
 
 const title = routes.homepage.title

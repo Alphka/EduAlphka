@@ -28,45 +28,45 @@ export const viewport: Viewport = {
 	colorScheme: "only dark" as unknown as Viewport["colorScheme"]
 }
 
-export async function generateMetadata(){
-	return {
-		title: {
-			default: APPLICATION_NAME,
-			template: `%s | ${APPLICATION_NAME}`
-		},
-		applicationName: APPLICATION_NAME,
-		alternates: {
-			canonical: "/"
-		},
-		other: {
-			"darkreader-lock": ""
-		},
-		robots: {
-			index: true,
-			follow: true,
-			nocache: false,
-			noimageindex: false
-		},
-		openGraph: {
-			title: APPLICATION_NAME,
-			siteName: APPLICATION_NAME,
-			url: "/",
-			type: "website"
-		},
-		keywords: [
-			"alphka",
-			"education",
-			"provas",
-			"testes",
-			"exames",
-			"plataforma",
-			"online",
-			"database",
-			"nosql",
-			"crud"
-		],
-		creator: "Kayo Souza"
-	} as Metadata
+global.baseURL = new URL("https://edu-alphka.vercel.app")
+
+export const metadata: Metadata = {
+	title: {
+		default: APPLICATION_NAME,
+		template: `%s | ${APPLICATION_NAME}`
+	},
+	applicationName: APPLICATION_NAME,
+	alternates: {
+		canonical: "/"
+	},
+	other: {
+		"apple-mobile-web-app-title": APPLICATION_NAME,
+		"darkreader-lock": "true"
+	},
+	robots: {
+		index: true,
+		follow: true
+	},
+	openGraph: {
+		url: "/",
+		type: "website",
+		title: APPLICATION_NAME,
+		siteName: APPLICATION_NAME
+	},
+	keywords: [
+		"alphka",
+		"education",
+		"provas",
+		"testes",
+		"exames",
+		"plataforma",
+		"online",
+		"database",
+		"nosql",
+		"crud"
+	],
+	creator: "Kayo Souza",
+	referrer: "origin-when-cross-origin"
 }
 
 export default function RootLayout({ children }: RootLayoutProps){

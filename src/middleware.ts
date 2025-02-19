@@ -13,7 +13,10 @@ export default function middleware(request: NextRequest){
 	const token = getToken(request)
 
 	requestHeaders.set("X-Url", request.url)
-	if(token) requestHeaders.set("Authorization", "Bearer " + token)
+
+	if(token){
+		requestHeaders.set("Authorization", "Bearer " + token)
+	}
 
 	const response = NextResponse.next({
 		request: {
@@ -30,6 +33,6 @@ export default function middleware(request: NextRequest){
 
 export const config = {
 	matcher: [
-		"/((?!_logs|_src|_next/(?:static|image)|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout|invite).*)"
+		"/((?!_logs|_src|_next/(?:static|image)|api|server|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout|invite|not-found|access-denied).*)"
 	]
 }

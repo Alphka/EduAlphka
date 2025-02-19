@@ -1,6 +1,7 @@
 export { default as Exam } from "./Exam"
 export { default as User } from "./User"
 export { default as Session } from "./Session"
+export { default as Notification } from "./Notification"
 export { default as Submit } from "./Submit"
 export { default as Answer } from "./Answer"
 export { default as ExamInvite } from "./ExamInvite"

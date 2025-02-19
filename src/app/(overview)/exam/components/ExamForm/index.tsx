@@ -175,14 +175,14 @@ export default function ExamForm({
 							href={routes.exam.children.template.children.manage.pathname.replace("[id]", examId as string)}
 							variant="filled"
 							component={Link}
-							leftSection={<MdSettings className="text-lg" />}
+							leftSection={<MdSettings className="max-xs:hidden text-lg" />}
 						>
 							Gerenciar teste
 						</Button>
 					)}
 				</div>
 
-				<h1 className="flex-grow text-4xl font-bold">
+				<h1 className="flex-grow text-4xl font-bold break-words">
 					{type === "edit" ? defaultValues?.exam?.title : "Criar teste"}
 				</h1>
 			</header>
@@ -399,7 +399,7 @@ export default function ExamForm({
 				>
 					<ul className="flex flex-col gap-3xl">
 						{questionFields.map(({ id }, index, { length }) => (
-							<div
+							<li
 								className={twJoin(
 									"relative flex flex-col gap-md",
 									index !== length - 1 && [
@@ -424,7 +424,7 @@ export default function ExamForm({
 									}}
 									disabled={formDisabled}
 								/>
-							</div>
+							</li>
 						))}
 					</ul>
 

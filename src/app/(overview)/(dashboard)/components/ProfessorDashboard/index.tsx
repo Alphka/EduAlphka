@@ -1,7 +1,7 @@
 import { MdAddCircleOutline } from "react-icons/md"
 import { Suspense } from "react"
 import { Button } from "@mantine/core"
-import ExamListSkeleton from "../ExamListSkeleton"
+import ExamListSkeleton from "@components/ExamListSkeleton"
 import SeeAllButton from "./SeeAllButton"
 import RecentExams from "./RecentExams"
 import routes from "@app/routes"
@@ -25,7 +25,7 @@ export default function ProfessorDashboard({ userId, recentExamsLimit }: Profess
 					href={routes.exam.children.create.pathname}
 					variant="filled"
 					component={Link}
-					leftSection={<MdAddCircleOutline className="text-lg" />}
+					leftSection={<MdAddCircleOutline className="max-xs:hidden text-lg" />}
 				>
 					Criar teste
 				</Button>

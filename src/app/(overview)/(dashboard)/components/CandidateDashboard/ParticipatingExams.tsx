@@ -2,7 +2,7 @@ import type { CandidateDashboardProps } from "."
 import type { HydratedDocument } from "mongoose"
 import type { IUser } from "@models/typings/User"
 import { Exam } from "@models"
-import ExamList from "../../(overview)/components/Candidate/ExamList"
+import ExamList from "@components/Candidate/ExamList"
 
 export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "userId" | "recentExamsLimit"> {}
 

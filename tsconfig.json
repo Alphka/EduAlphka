@@ -34,10 +34,11 @@
 		],
 		"paths": {
 			"@components/*": ["./src/app/components/*"],
+			"@constants": ["./src/app/constants/index.ts"],
 			"@constants/*": ["./src/app/constants/*"],
 			"@schemas/*": ["./src/app/schemas/*"],
-			"@constants": ["./src/app/constants/index.ts"],
 			"@contexts/*": ["./src/app/contexts/*"],
+			"@images/*": ["./src/app/images/*"],
 			"@hooks/*": ["./src/app/hooks/*"],
 			"@helpers/*": ["./src/helpers/*"],
 			"@typings": ["./src/typings/index.d.ts"],

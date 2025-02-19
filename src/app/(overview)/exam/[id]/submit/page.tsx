@@ -53,7 +53,6 @@ export default async function SubmitExamPage({ params }: PageProps){
 
 	let expiringExamDuration = exam.duration
 
-	// TODO: Validate this on the back-end
 	if(exam.expiresAt){
 		expiringExamDuration = Math.min(exam.duration, (exam.expiresAt.getTime() - Date.now()) / 1000 / 60)
 		if(expiringExamDuration < 0) expiringExamDuration = 0
@@ -131,7 +130,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 	return (
 		<div className="flex flex-col gap-3xl">
 			<header className="flex items-center justify-end flex-wrap gap-md">
-				<h1 className="flex-grow text-h4 xs:text-h3">
+				<h1 className="flex-grow text-h4 xs:text-h3 break-words">
 					{exam.title}
 				</h1>
 

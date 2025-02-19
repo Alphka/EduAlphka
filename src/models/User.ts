@@ -20,13 +20,17 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		type: String,
 		required: true,
 		minlength: GenericFormValidation.emailMinLength,
-		maxlength: GenericFormValidation.emailMaxLength
+		maxlength: GenericFormValidation.emailMaxLength,
+		lowercase: true,
+		trim: true
 	},
 	normalizedEmail: {
 		type: String,
 		unique: true,
 		required: true,
-		maxlength: GenericFormValidation.emailMaxLength
+		maxlength: GenericFormValidation.emailMaxLength,
+		lowercase: true,
+		trim: true
 	},
 	username: {
 		type: String,
@@ -52,6 +56,12 @@ const userSchema = new Schema<IUser, UserModel, IUserMethods>({
 		enum: ACCOUNT_TYPES,
 		required: true
 	},
+	settings: {
+		notifyExamCorrection: {
+			type: Boolean,
+			default: true
+		}
+	},
 	createdAt: {
 		type: Date,
 		default: Date.now,
@@ -76,8 +86,7 @@ userSchema.static("generateToken", async function generateToken(){
 })
 
 userSchema.static("hashPassword", function hashPassword(password: string){
-	const hash = createHmac("sha512", HASH_SALT).update(password)
-	return hash.digest("hex")
+	return createHmac("sha512", HASH_SALT).update(password).digest("hex")
 })
 
 userSchema.method("validatePassword", function validatePassword(password: string){

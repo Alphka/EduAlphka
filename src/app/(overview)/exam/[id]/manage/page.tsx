@@ -95,7 +95,7 @@ export default async function ManageExamPage({ params }: PageProps){
 					/>
 				</div>
 
-				<h1 className="flex-grow text-h4 xs:text-h3">
+				<h1 className="flex-grow text-h4 xs:text-h3 break-words">
 					{exam.title}
 				</h1>
 			</header>
@@ -121,7 +121,7 @@ export default async function ManageExamPage({ params }: PageProps){
 						name,
 						submitId,
 						username,
-						createdAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
+						startedAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
 						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired() : false,
 						pendingCorrection
 					}

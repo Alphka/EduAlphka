@@ -45,7 +45,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 
 	return (
 		<form
-			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
+			className="w-full md:w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ username, password, keep_logged_in }) => {
 				await handleServerAction(loginAction({
 					username,
@@ -90,7 +90,7 @@ export default function LoginForm({ redirectURL }: LoginFormProps){
 						size="md"
 						type={isPasswordVisible ? "text" : "password"}
 						label="Senha"
-						placeholder={isPasswordVisible ? "exemplo" : "•".repeat(9)}
+						placeholder="Digite a sua senha"
 						autoComplete="current-password"
 						rightSection={(
 							<ActionIcon

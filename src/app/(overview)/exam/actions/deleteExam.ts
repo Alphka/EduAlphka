@@ -1,6 +1,6 @@
 "use server"
 
-import { Answer, Exam, ExamInvite, StartedExam, Submit, User } from "@models"
+import { Answer, Exam, ExamInvite, Notification, StartedExam, Submit, User } from "@models"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { Types } from "mongoose"
@@ -51,6 +51,7 @@ export default async function deleteExamAction(id: string){
 			exam.deleteOne(),
 			ExamInvite.deleteMany({ exam: id }),
 			StartedExam.deleteMany({ exam: id }),
+			Notification.deleteMany({ exam: id }),
 			Submit.find({ exam: id }, { _id: 1 }).lean().then(submits => {
 				const submitIds = submits.map(submit => submit._id)
 

@@ -6,8 +6,8 @@ import { model, models, Schema, Types } from "mongoose"
 const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 	owner: {
 		type: Schema.ObjectId,
-		ref: "User",
-		required: true
+		required: true,
+		ref: "User"
 	},
 	title: {
 		type: String,

@@ -1,5 +1,5 @@
 import { Exam } from "@models"
-import ExamList from "@app/(overview)/components/Professor/ExamList"
+import ExamList from "@components/Professor/ExamList"
 
 interface CreatedExamListProps {
 	userId: string
