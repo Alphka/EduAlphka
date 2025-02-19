@@ -78,8 +78,8 @@ export default async function sendCorrection(submitId: string){
 					await sendEmail({
 						to: submit.user!.email,
 						subject: "Correção finalizada",
-						text: `Olá, ${submit.user!.name}.\n\nA correção do seu teste “${submit.exam.title}” foi finalizada.\nVocê pode acessá-lo aqui: ${examUrl}`,
-						html: `Olá, ${submit.user!.name}.<br><br>A correção do seu teste “${submit.exam.title}” foi finalizada.<br>Você pode acessá-lo aqui: <a href="${examUrl}">${examUrl}</a>`
+						text: `Olá, ${submit.user!.name}.\n\nA correção das suas respostas no teste “${submit.exam.title}” foi finalizada.\nVocê pode acessá-lo aqui: ${examUrl}`,
+						html: `Olá, ${submit.user!.name}.<br><br>A correção das suas respostas no teste “<b>${submit.exam.title}</b>” foi finalizada.<br>Você pode acessá-lo aqui: <a href="${examUrl}">${examUrl}</a>`
 					})
 				}catch(error){
 					const errorMessage = typeof error === "object" && error && "responseCode" in error

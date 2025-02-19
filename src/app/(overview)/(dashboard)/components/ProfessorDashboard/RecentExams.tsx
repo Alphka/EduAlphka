@@ -7,21 +7,8 @@ interface RecentExamsProps {
 }
 
 export default async function RecentExams({ userId, limit }: RecentExamsProps){
-	const date = new Date
-
-	date.setDate(date.getDate() - 15)
-	date.setHours(0)
-	date.setMinutes(0)
-	date.setSeconds(0)
-	date.setMilliseconds(0)
-
 	const exams = await Exam
-		.find({
-			owner: userId,
-			createdAt: {
-				$gte: date
-			}
-		}, {
+		.find({ owner: userId }, {
 			title: 1,
 			subject: 1,
 			duration: 1,
