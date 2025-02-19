@@ -21,7 +21,7 @@ export default async function RegisterPage(){
 	const redirectURL = url && new URL(url).searchParams.get("redirect") || undefined
 
 	return (
-		<main className="flex flex-col items-center justify-center p-5xl min-h-dvh">
+		<main className="flex flex-col items-center justify-center p-8 xs:p-5xl min-h-dvh">
 			<RegisterForm redirectURL={redirectURL} />
 		</main>
 	)

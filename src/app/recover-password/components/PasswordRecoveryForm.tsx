@@ -20,7 +20,9 @@ export default function PasswordRecoveryForm(){
 		isPending: isVerificationCodePending
 	} = useServerActionHandler({
 		successOptions: {
-			action: () => setStep("code")
+			action(){
+				setStep("code")
+			}
 		}
 	})
 
@@ -56,7 +58,7 @@ export default function PasswordRecoveryForm(){
 
 	return (
 		<form
-			className="w-4/5 max-w-screen-sm flex flex-col gap-3xl"
+			className="w-full md:w-4/5 max-w-screen-sm flex flex-col gap-3xl"
 			onSubmit={handleSubmit(async ({ newPassword, email, code }) => {
 				await handleRecoverPasswordServerAction(recoverPassword({
 					newPassword,
