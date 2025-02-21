@@ -23,7 +23,8 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	const exam = await Exam.findById(examId, {
 		owner: 1,
 		candidates: 1,
-		disallowedCandidates: 1
+		disallowedCandidates: 1,
+		expiresAt: 1
 	})
 
 	if(!exam){
@@ -32,6 +33,10 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 
 	if(!exam.owner._id.equals(user.id)){
 		return { errors: ["Você não tem permissão para executar essa ação"] }
+	}
+
+	if(exam.isExpired()){
+		return { errors: ["O teste expirou. Não é possível adicionar novos candidatos"] }
 	}
 
 	const candidate = await User

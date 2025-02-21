@@ -34,24 +34,26 @@ export default async function deleteUser(){
 		await user.deleteOne().orFail()
 
 		await Promise.all([
-			user.accountType === "professor" && Exam.find({
-				owner: user._id
-			}).then(exams => {
-				return exams.map(exam => Promise.all([
-					exam.deleteOne(),
-					ExamInvite.deleteMany({ exam }),
-					StartedExam.deleteMany({ exam }),
-					Notification.deleteMany({ owner: user._id }),
-					Submit.find({ exam }, { _id: 1 }).lean().then(submits => {
-						const submitIds = submits.map(submit => submit._id)
+			user.accountType === "professor" && [
+				Exam.find({ owner: user._id }, { _id: 1 }).then(exams => {
+					const examIds = exams.map(exam => exam._id)
 
-						return Promise.all([
-							Answer.deleteMany({ submit: { $in: submitIds } }),
-							Submit.deleteMany({ _id: { $in: submitIds } })
-						])
-					})
-				]))
-			}),
+					return Promise.all([
+						Exam.deleteMany({ _id: { $in: examIds } }),
+						ExamInvite.deleteMany({ exam: { $in: examIds } }),
+						StartedExam.deleteMany({ exam: { $in: examIds } }),
+						Submit.find({ exam: { $in: examIds } }, { _id: 1 }).lean().then(submits => {
+							const submitIds = submits.map(submit => submit._id)
+
+							return Promise.all([
+								Submit.deleteMany({ _id: { $in: submitIds } }),
+								Answer.deleteMany({ submit: { $in: submitIds } })
+							])
+						})
+					])
+				}),
+				VerificationCode.deleteMany({ owner: user })
+			],
 			VerificationCode.deleteMany({ user }),
 			Notification.deleteMany({ user }),
 			Session.deleteMany({

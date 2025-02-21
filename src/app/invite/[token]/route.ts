@@ -1,5 +1,5 @@
+import type { IExam, IExamMethods } from "@models/typings/Exam"
 import type { IExamInvite } from "@models/typings/ExamInvite"
-import type { IExam } from "@models/typings/Exam"
 import { NextResponse, type NextRequest } from "next/server"
 import { Types, type HydratedDocument } from "mongoose"
 import { redirect, RedirectType } from "next/navigation"
@@ -17,15 +17,16 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 	const user = await verifyAuthorization()
 
 	const examInvite = await ExamInvite
-		.findOne<HydratedDocument<Pick<IExamInvite, "_id"> & {
-			exam: HydratedDocument<Pick<IExam, "_id"> & {
+		.findOne<HydratedDocument<Pick<IExamInvite, "_id">>>({ token }, { exam: 1 })
+		.populate<{
+			exam: HydratedDocument<Pick<IExam, "_id" | "expiresAt"> & {
 				owner: Types.ObjectId
 				candidates: Types.Array<Types.ObjectId>
 				disallowedCandidates: Types.Array<Types.ObjectId>
-			}>
-		}>>({ token }, { exam: 1 })
-		.populate("exam", {
+			}> & IExamMethods
+		}>("exam", {
 			owner: 1,
+			expiresAt: 1,
 			candidates: 1,
 			disallowedCandidates: 1
 		})
@@ -49,7 +50,7 @@ export async function GET(_request: NextRequest, { params }: { params: Promise<{
 	const userId = new Types.ObjectId(user.id)
 
 	if(isCandidate
-		? examInvite.exam.disallowedCandidates.includes(userId)
+		? (examInvite.exam.disallowedCandidates.includes(userId) || examInvite.exam.isExpired())
 		: !examInvite.exam.owner._id.equals(userId)
 	){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)

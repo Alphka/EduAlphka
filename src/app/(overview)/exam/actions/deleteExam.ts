@@ -18,7 +18,10 @@ export default async function deleteExamAction(id: string){
 		if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
 		if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
 
-		const exam = await Exam.findById(id, { owner: 1 })
+		const exam = await Exam.findById(id, {
+			owner: 1,
+			expiresAt: 1
+		})
 
 		if(!exam) return { errors: ["Teste não encontrado"] }
 		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
@@ -35,29 +38,22 @@ export default async function deleteExamAction(id: string){
 				}, { _id: 1 })
 				.lean()
 
-			const submits = await Submit.exists({
-				exam: id,
-				user: {
-					$in: existingUsers.map(user => user._id)
-				}
-			})
-
-			if(submits){
+			if(existingUsers.length){
 				return { errors: ["Não é possível excluir esse teste pois há candidatos que iniciaram o teste, mas ainda não o responderam"] }
 			}
 		}
 
 		await Promise.allSettled([
 			exam.deleteOne(),
-			ExamInvite.deleteMany({ exam: id }),
-			StartedExam.deleteMany({ exam: id }),
-			Notification.deleteMany({ exam: id }),
-			Submit.find({ exam: id }, { _id: 1 }).lean().then(submits => {
+			ExamInvite.deleteMany({ exam }),
+			StartedExam.deleteMany({ exam }),
+			Notification.deleteMany({ exam }),
+			Submit.find({ exam }, { _id: 1 }).lean().then(submits => {
 				const submitIds = submits.map(submit => submit._id)
 
 				return Promise.all([
-					Answer.deleteMany({ submit: { $in: submitIds } }),
-					Submit.deleteMany({ _id: { $in: submitIds } })
+					Submit.deleteMany({ _id: { $in: submitIds } }),
+					Answer.deleteMany({ submit: { $in: submitIds } })
 				])
 			})
 		])

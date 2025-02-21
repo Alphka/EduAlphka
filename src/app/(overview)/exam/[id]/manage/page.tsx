@@ -35,9 +35,9 @@ export default async function ManageExamPage({ params }: PageProps){
 				owner: 1,
 				title: 1,
 				duration: 1,
-				expiresAt: 1,
 				candidates: 1,
 				disallowedCandidates: 1,
+				expiresAt: 1,
 				__v: 1
 			})
 			.populate<{
@@ -59,7 +59,7 @@ export default async function ManageExamPage({ params }: PageProps){
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const [examInvite, submitData] = await Promise.all([
-		ExamInvite.findOne({ exam }),
+		ExamInvite.findOne({ exam }, { token: 1, __v: 1 }),
 		exam.getSubmitData(exam.candidates.map(({ _id }) => _id))
 	])
 
