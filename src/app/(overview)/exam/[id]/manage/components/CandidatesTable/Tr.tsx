@@ -10,7 +10,7 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface TrProps extends
-	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "submitId" | "isExpired" | "pendingCorrection">,
+	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "submitId" | "isDeleted" | "pendingCorrection">,
 	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
@@ -18,6 +18,7 @@ interface TrProps extends
 export default function Tr({
 	pendingCorrection,
 	statusColor,
+	isDeleted,
 	startedAt,
 	submitId,
 	username,
@@ -44,17 +45,17 @@ export default function Tr({
 				<div className="flex items-center gap-sm">
 					<Avatar
 						className="flex-shrink-0 leading-none"
-						name={name}
+						name={isDeleted ? "" : name}
 						size="md"
 						radius="xl"
 						color="initials"
 					>
-						{getNameInitials(name)}
+						{isDeleted ? "" : getNameInitials(name)}
 					</Avatar>
 
 					<div>
 						<p className="text-sm font-medium">{name}</p>
-						<p className="text-dark-200 text-xs">{username}</p>
+						{!!username && <p className="text-dark-200 text-xs">{username}</p>}
 					</div>
 				</div>
 			</Table.Td>

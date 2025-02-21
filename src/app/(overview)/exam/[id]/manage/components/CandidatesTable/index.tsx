@@ -21,11 +21,21 @@ export interface CandidatesRowData {
 	username: string
 	/** Started exam date */
 	startedAt?: string
-	isExpired: boolean
 	pendingCorrection: boolean
+	isExpired: boolean
+	isDeleted: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "startedAt" | "isExpired" | "submitId" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData,
+	| "id"
+	| "name"
+	| "username"
+	| "submitId"
+	| "startedAt"
+	| "isExpired"
+	| "isDeleted"
+	| "pendingCorrection"
+> {
 	status: SubmitStatus
 }
 
@@ -194,9 +204,9 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 								name,
 								status,
 								username,
-								startedAt,
-								isExpired,
 								submitId,
+								startedAt,
+								isDeleted,
 								pendingCorrection
 							}) => (
 								<Tr
@@ -208,7 +218,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 										submitId,
 										username,
 										startedAt,
-										isExpired,
+										isDeleted,
 										pendingCorrection
 									}}
 									statusColor={submitStatusColors[status]}

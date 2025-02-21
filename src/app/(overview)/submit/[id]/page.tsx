@@ -1,12 +1,13 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
+import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
 import { Button, Divider, Paper } from "@mantine/core"
+import { Exam, Submit, User } from "@models"
 import { MdChevronLeft } from "react-icons/md"
-import { Exam, Submit } from "@models"
 import { useId } from "react"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
@@ -39,15 +40,13 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 	const [user, submit] = await Promise.all([
 		verifyAuthorization({ accountType: "professor" }),
 		Submit
-			.findById(id, {
+			.findById<HydratedDocument<Pick<ISubmit, "_id" | "publishedAt"> & {
+				exam: Types.ObjectId
+				user: Types.ObjectId
+			}>>(id, {
 				exam: 1,
 				user: 1,
 				publishedAt: 1
-			})
-			.populate<{
-				user: HydratedDocument<Pick<IUser, "_id" | "name">>
-			}>("user", {
-				name: 1
 			})
 			.orFail(notFound)
 	])
@@ -72,7 +71,10 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
-	const submitData = await exam.getSubmitData(submit.user._id)
+	const [candidate, submitData] = await Promise.all([
+		User.findById(submit.user, { name: 1 }).lean<Pick<IUser, "_id" | "name">>(),
+		exam.getSubmitData(submit.user)
+	])
 
 	if(!submitData?.submit){
 		console.error("Started exam for submit not found")
@@ -177,7 +179,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 					<li>
 						<span className="font-semibold">Candidato: </span>
-						{submit.user.name}
+						{candidate?.name || "Conta apagada"}
 					</li>
 
 					{exam.subject && (

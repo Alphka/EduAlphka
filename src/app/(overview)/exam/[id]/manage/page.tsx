@@ -1,9 +1,10 @@
 import type { HydratedDocument, Types } from "mongoose"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
+import type { IExam } from "@models/typings/Exam"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
-import { Exam, ExamInvite, StartedExam } from "@models"
+import { Exam, ExamInvite, StartedExam, User } from "@models"
 import { Button, Divider } from "@mantine/core"
 import { MdChevronLeft } from "react-icons/md"
 import verifyAuthorization from "@helpers/verifyAuthorization"
@@ -31,7 +32,10 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById(id, {
+			.findById<HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "expiresAt"> & {
+				owner: Types.ObjectId
+				candidates: Types.Array<Types.ObjectId>
+			}>>(id, {
 				owner: 1,
 				title: 1,
 				duration: 1,
@@ -39,12 +43,6 @@ export default async function ManageExamPage({ params }: PageProps){
 				disallowedCandidates: 1,
 				expiresAt: 1,
 				__v: 1
-			})
-			.populate<{
-				candidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">>>
-			}>("candidates", {
-				name: 1,
-				username: 1
 			})
 			.populate<{
 				disallowedCandidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">>>
@@ -67,6 +65,17 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	for(const startedExam of submitData){
 		candidatesStartedExams.set(startedExam.user.toString(), startedExam)
+	}
+
+	const candidatesMap = new Map<string, HydratedDocument<Pick<IUser, "_id" | "name" | "username">> | string>(
+		(await User.find({ _id: { $in: exam.candidates } }, { name: 1, username: 1 }))
+			.map(user => [user.id as string, user] as const)
+	)
+
+	for(const candidateId of exam.candidates.map(candidate => candidate.toString())){
+		if(!candidatesMap.has(candidateId)){
+			candidatesMap.set(candidateId, candidateId)
+		}
 	}
 
 	return (
@@ -110,22 +119,41 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<CandidatesTable
 				examId={id}
-				data={await Promise.all(exam.candidates.map(async ({ _id, name, username }) => {
-					const id = _id.toString()
+				data={(await Promise.all(Array.from(candidatesMap.values()).map(async candidate => {
+					const isDeleted = typeof candidate === "string"
+					const id = isDeleted ? candidate : candidate._id.toString()
+
 					const startedExam = candidatesStartedExams.get(id)
 					const submitId = startedExam?.submit?._id.toString() as string | undefined
 					const pendingCorrection = !!startedExam?.pendingCorrection
 
 					return {
 						id,
-						name,
+						name: isDeleted ? "Conta apagada" : candidate.name,
 						submitId,
-						username,
-						startedAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
+						username: isDeleted ? "" : candidate.username,
+						startedAt: startedExam?.createdAt,
 						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired() : false,
-						pendingCorrection
+						pendingCorrection,
+						isDeleted
 					}
-				}))}
+				})))
+					.sort((a, b) => {
+						if(!a.startedAt && !b.startedAt) return 0
+
+						if(!a.startedAt) return -1
+						if(!b.startedAt) return 1
+
+						const dateA = new Date(a.startedAt)
+						const dateB = new Date(b.startedAt)
+
+						return dateB.getTime() - dateA.getTime()
+					})
+					.map(data => ({
+						...data,
+						startedAt: data.startedAt?.toLocaleDateString("pt-BR")
+					}))
+				}
 				disallowedCandidates={exam.disallowedCandidates.map(({ _id, name, username }) => ({
 					id: _id.toString(),
 					name,

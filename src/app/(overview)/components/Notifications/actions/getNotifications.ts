@@ -35,7 +35,7 @@ export async function getNotifications(){
 				name: 1,
 				username: 1
 			})
-			.sort({ createdAt: -1 })
+			.sort({ createdAt: "descending" })
 			.limit(15)
 			.lean<NotificationObject[]>()
 

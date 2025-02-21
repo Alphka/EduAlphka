@@ -26,8 +26,6 @@ const verificationCodeSchema = new Schema<IVerificationCode>({
 	}
 })
 
-delete models?.VerificationCode
-
 const VerificationCode: VerificationCodeModel = models?.VerificationCode || model<IVerificationCode, VerificationCodeModel>("VerificationCode", verificationCodeSchema)
 
 export default VerificationCode

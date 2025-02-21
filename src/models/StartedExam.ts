@@ -53,8 +53,6 @@ startedExamSchema.method("isExpired", async function isExpired({ exam: _exam }: 
 	return Date.now() > submitExpirationDate || exam.isExpired()
 })
 
-delete models?.StartedExam
-
 const StartedExam = models?.StartedExam as StartedExamModel || model<IStartedExam, StartedExamModel>("StartedExam", startedExamSchema)
 
 export default StartedExam
