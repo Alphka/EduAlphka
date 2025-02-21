@@ -27,8 +27,12 @@ export default async function deleteExamAction(id: string){
 		if(!exam.owner._id.equals(user.id)) return { errors: ["Você não tem acesso a esse teste"] }
 
 		if(!exam.isExpired()){
-			const startedExams = (await StartedExam.find({ exam: id }, { user: 1 }))
-				.filter(startedExam => !startedExam.isExpired())
+			const startedExams = (await Promise.all((await StartedExam.find({ exam }, {
+				user: 1,
+				createdAt: 1
+			})).map(async startedExam => [await startedExam.isExpired({ exam }), startedExam] as const)))
+				.filter(([isExpired]) => !isExpired)
+				.map(([, startedExam]) => startedExam)
 
 			const existingUsers = await User
 				.find({

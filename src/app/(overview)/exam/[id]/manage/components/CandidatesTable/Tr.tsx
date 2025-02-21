@@ -196,7 +196,10 @@ export default function Tr({
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(removeCandidate(examId, id, true))}
+					onClick={async () => {
+						await handleServerAction(removeCandidate(examId, id, true))
+						closeDisableModal()
+					}}
 					aria-label="Desativar candidato do teste"
 					loading={isPending}
 				>

@@ -85,7 +85,10 @@ export default function RemoveAccountButton({ user }: RemoveAccountButtonProps){
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(deleteUser())}
+					onClick={async () => {
+						await handleServerAction(deleteUser())
+						close()
+					}}
 					aria-label="Excluir conta"
 					loading={isPending}
 				>

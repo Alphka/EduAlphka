@@ -102,7 +102,7 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 		user: userId
 	}, { _id: 1 })
 
-	if(startedExam && !startedExam.isExpired()){
+	if(startedExam && !(await startedExam.isExpired())){
 		return { errors: [`Não é possível ${disable ? "desativar" : "remover"} um candidato que já iniciou o teste`] }
 	}
 

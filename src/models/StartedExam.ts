@@ -17,10 +17,11 @@ const startedExamSchema = new Schema<IStartedExam, StartedExamModel, IStartedExa
 	}
 }, { versionKey: false })
 
-startedExamSchema.method("isExpired", async function isExpired({ exam: _exam }: {
-	checkExam?: boolean
-	exam?: string | Types.ObjectId | Document
-} = {}){
+startedExamSchema.method("isExpired", async function isExpired({ exam: _exam }: { exam?: string | Types.ObjectId | Document } = {}){
+	if(!this.createdAt){
+		throw new Error("Missing 'createdAt' property in StartedExam.isExpired() function")
+	}
+
 	const { default: Exam } = await import("./Exam")
 
 	if(_exam instanceof Document && !Types.ObjectId.isValid(_exam._id as Types.ObjectId)){
@@ -28,13 +29,11 @@ startedExamSchema.method("isExpired", async function isExpired({ exam: _exam }: 
 		_exam = undefined
 	}
 
-	if(
-		_exam && !(
-			_exam instanceof Document ||
-			_exam instanceof Types.ObjectId ||
-			Types.ObjectId.isValid(_exam)
-		)
-	){
+	if(_exam && !(
+		_exam instanceof Document ||
+		_exam instanceof Types.ObjectId ||
+		Types.ObjectId.isValid(_exam)
+	)){
 		throw new Error("Invalid exam object given for StartedExam.isExpired() function")
 	}
 
@@ -47,12 +46,14 @@ startedExamSchema.method("isExpired", async function isExpired({ exam: _exam }: 
 			duration: 1,
 			expiresAt: 1
 		})
-		.orFail()
+		.orFail(new Error("Exam not found in StartedExam.isExpired() function"))
 
 	const submitExpirationDate = this.createdAt.getTime() + exam.duration * 60 * 1000
 
 	return Date.now() > submitExpirationDate || exam.isExpired()
 })
+
+delete models?.StartedExam
 
 const StartedExam = models?.StartedExam as StartedExamModel || model<IStartedExam, StartedExamModel>("StartedExam", startedExamSchema)
 

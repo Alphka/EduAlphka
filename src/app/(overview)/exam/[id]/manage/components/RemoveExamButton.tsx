@@ -78,7 +78,10 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(deleteExamAction(examId))}
+					onClick={async () => {
+						await handleServerAction(deleteExamAction(examId))
+						close()
+					}}
 					aria-label="Excluir teste"
 					loading={isPending}
 				>
