@@ -26,7 +26,7 @@ async function getUserByToken(token: string, hydrated = false){
 
 	const session = await Session
 		.findOne({ token })
-		.populate("user")
+		.populate("user", { __v: 0 })
 		.lean<Omit<ISession, "user"> & { user: IUser | null }>()
 
 	if(!session?.user){
@@ -63,7 +63,7 @@ async function getUserByToken(token: string, hydrated = false){
 
 	return {
 		id: session.user._id.toString(),
-		...omit(session.user, ["_id", "__v"] as const),
+		...omit(session.user, "_id"),
 		session: {
 			id: session._id.toString(),
 			...omit(session, ["_id", "user"] as const)

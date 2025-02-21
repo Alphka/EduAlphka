@@ -5,6 +5,7 @@ import { after } from "next/server"
 import { Types } from "mongoose"
 import { omit } from "lodash"
 import getSessionUserData from "./getSessionUserData"
+import connectDatabase from "@lib/connectDatabase"
 import getRequestURL from "./getRequestURL"
 import routes from "@app/routes"
 
@@ -22,7 +23,11 @@ export default async function verifyAuthorization(options: AuthorizationOptions 
 	const { session } = user
 
 	if(Date.now() > session.expiresAt.getTime()){
-		after(() => Session.deleteOne({ _id: new Types.ObjectId(session.id) }).exec())
+		after(async () => {
+			await connectDatabase()
+			await Session.deleteOne({ _id: new Types.ObjectId(session.id) })
+		})
+
 		return redirectToLogin()
 	}
 

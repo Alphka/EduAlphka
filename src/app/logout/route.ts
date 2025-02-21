@@ -1,5 +1,5 @@
 import { TOKEN_KEY, TOKEN_LENGTH } from "@constants"
-import { NextResponse } from "next/server"
+import { after, NextResponse } from "next/server"
 import { Session } from "@models"
 import connectDatabase from "@lib/connectDatabase"
 import getToken from "@helpers/getToken"
@@ -9,8 +9,10 @@ export async function GET(){
 	const token = await getToken()
 
 	if(token && token.length === TOKEN_LENGTH){
-		await connectDatabase()
-		await Session.deleteOne({ token })
+		after(async () => {
+			await connectDatabase()
+			await Session.deleteOne({ token })
+		})
 	}
 
 	return new NextResponse(null, {
