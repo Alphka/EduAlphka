@@ -29,27 +29,30 @@ export default function Notifications({ user, hasUnread: _hasUnread }: Notificat
 		error,
 		mutate,
 		isLoading
-	} = useSWR(`notifications-${user.id}`, async () => {
+	} = useSWR(`notifications-${user.id}`, async function fetchNotifications(){
 		const notifications = await getNotifications()
 
 		if("errors" in notifications){
 			throw notifications.errors[0]
 		}
 
+		const hasUnreadNotifications = notifications.some(notification => !notification.readAt)
+
+		if(opened){
+			if(hasUnreadNotifications){
+				readNotifications()
+			}
+
+			setHasUnread(false)
+		}else{
+			setHasUnread(hasUnreadNotifications)
+		}
+
 		return notifications
 	}, {
-		onSuccess(){
-			if(opened){
-				if(notifications?.some(notification => !notification.readAt)){
-					readNotifications()
-				}
-
-				setHasUnread(false)
-			}else{
-				setHasUnread(!!notifications?.some(notification => !notification.readAt))
-			}
-		},
+		errorRetryCount: 3,
 		dedupingInterval: 5000,
+		errorRetryInterval: 5000,
 		revalidateIfStale: false,
 		revalidateOnMount: false,
 		revalidateOnFocus: true,
@@ -67,7 +70,7 @@ export default function Notifications({ user, hasUnread: _hasUnread }: Notificat
 				}
 			}}
 			opened={opened}
-			onChange={opened => opened ? open() : close()}
+			onChange={opened => (opened ? open : close)()}
 			position="bottom"
 			closeOnClickOutside
 			closeOnEscape
@@ -87,7 +90,7 @@ export default function Notifications({ user, hasUnread: _hasUnread }: Notificat
 						variant="default"
 						onClick={() => {
 							toggle()
-							mutate()
+							setTimeout(mutate)
 						}}
 					>
 						<MdNotifications className="text-[1.25rem]" />
