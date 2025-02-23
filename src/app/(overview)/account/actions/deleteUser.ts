@@ -1,5 +1,6 @@
 "use server"
 
+import type { IExam } from "@models/typings/Exam"
 import {
 	Answer,
 	Exam,
@@ -34,8 +35,8 @@ export default async function deleteUser(){
 		await user.deleteOne().orFail()
 
 		await Promise.all([
-			user.accountType === "professor" && [
-				Exam.find({ owner: user._id }, { _id: 1 }).then(exams => {
+			...(user.accountType === "professor" ? [
+				Exam.find({ owner: user }, { _id: 1 }).lean<Pick<IExam, "_id">[]>().then(exams => {
 					const examIds = exams.map(exam => exam._id)
 
 					return Promise.all([
@@ -53,7 +54,29 @@ export default async function deleteUser(){
 					])
 				}),
 				VerificationCode.deleteMany({ owner: user })
-			],
+			] : [
+				Exam.updateMany({ disallowedCandidates: user }, {
+					$pull: {
+						candidates: user._id,
+						disallowedCandidates: user._id
+					}
+				}),
+				Exam.distinct("_id", { candidates: user }).then(async examIds => {
+					const startedExamExists = (await StartedExam.distinct("exam", {
+						exam: { $in: examIds },
+						user: user._id
+					})).map(id => id.toString())
+
+					const examsToUpdate = examIds.filter(id => !startedExamExists.includes(id.toString()))
+
+					if(examsToUpdate.length){
+						await Exam.updateMany(
+							{ _id: { $in: examsToUpdate } },
+							{ $pull: { candidates: user._id } }
+						)
+					}
+				})
+			]),
 			VerificationCode.deleteMany({ user }),
 			Notification.deleteMany({ user }),
 			Session.deleteMany({

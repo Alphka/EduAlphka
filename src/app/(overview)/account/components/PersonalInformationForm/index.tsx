@@ -4,8 +4,8 @@ import type { PersonalInformationData } from "../../actions/editPersonalInformat
 import type verifyAuthorization from "@helpers/verifyAuthorization"
 import { MdEdit, MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { ActionIcon, Button, Paper, TextInput } from "@mantine/core"
+import { useCallback, useMemo, useState } from "react"
 import { GenericFormValidation } from "@constants/forms"
-import { useMemo, useState } from "react"
 import { isEqual, pick } from "lodash"
 import { useForm } from "react-hook-form"
 import { twJoin } from "tailwind-merge"
@@ -27,7 +27,6 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 	const {
 		register,
 		setFocus,
-		getValues,
 		handleSubmit,
 		formState: { errors }
 	} = useForm<PersonalInformationData>({
@@ -35,6 +34,15 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 		defaultValues,
 		mode: "onChange"
 	})
+
+	const handleClose = useCallback(() => {
+		setModalData(undefined)
+	}, [])
+
+	const handleSave = useCallback(() => {
+		setModalData(undefined)
+		setEnabled(false)
+	}, [])
 
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
@@ -177,7 +185,7 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 							aria-label={isPasswordVisible ? "Esconder senha" : "Mostrar senha"}
 							onPointerDown={event => event.detail === 1 || event.preventDefault()}
 							onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-							hidden={!enabled || getValues("password") === undefined}
+							hidden={!enabled}
 						>
 							<PasswordEyeIcon className="text-[1.25rem]" />
 						</ActionIcon>
@@ -206,7 +214,7 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 				<Button
 					size="md"
 					type="submit"
-					className="self-start"
+					className="self-start mt-sm"
 					aria-label="Enviar formulário"
 				>
 					Salvar
@@ -215,11 +223,8 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 
 			<PersonalInformationModal
 				data={modalData}
-				onClose={() => setModalData(undefined)}
-				onSave={() => {
-					setModalData(undefined)
-					setEnabled(false)
-				}}
+				onClose={handleClose}
+				onSave={handleSave}
 			/>
 		</Paper>
 	)
