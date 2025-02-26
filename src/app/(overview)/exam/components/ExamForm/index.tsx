@@ -207,10 +207,10 @@ export default function ExamForm({
 							...questionData
 						}) => ({
 							type,
-							...(type === "multiple_choice" ? {
+							...(type === "multiple_choice" && {
 								options,
 								correct_answer
-							} : undefined),
+							}),
 							...questionData
 						}))
 					}

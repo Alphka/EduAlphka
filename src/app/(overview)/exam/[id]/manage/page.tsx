@@ -178,13 +178,9 @@ export default async function ManageExamPage({ params }: PageProps){
 						</h2>
 					</header>
 
-					<Paper
-						className="bg-dark-800 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 p-xs sm:p-md shadow-none"
-						component="ul"
-						withBorder
-					>
+					<ul className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 shadow-none">
 						{Object.entries({
-							"Nota média": averageGrade
+							"Nota média": Math.round(Number(averageGrade.toPrecision(6)) * 100) / 100
 						}).map(([key, value]) => (
 							<Paper
 								className="flex flex-col p-md shadow-xs"
@@ -196,7 +192,7 @@ export default async function ManageExamPage({ params }: PageProps){
 								<p>{value}</p>
 							</Paper>
 						))}
-					</Paper>
+					</ul>
 				</section>
 			</Paper>
 		</div>

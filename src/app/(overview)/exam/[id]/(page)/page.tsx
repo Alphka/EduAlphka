@@ -73,10 +73,10 @@ export default async function EditExamPage({ params }: PageProps){
 					text: text,
 					required: isRequired,
 					question_type: type,
-					...(type === "multiple_choice" ? {
+					...(type === "multiple_choice" && {
 						option: options.map(({ text }) => ({ text })),
 						correct_answer: options.findIndex(({ _id }) => _id.equals(correctAnswer))
-					} : undefined)
+					})
 				}))
 			}}
 		/>

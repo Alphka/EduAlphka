@@ -67,8 +67,8 @@ export default async function editPersonalInformation(
 		if(email || username){
 			const existingUser = await User.exists({
 				$or: [
-					username ? { username } : undefined,
-					email ? { normalizedEmail: normalizeEmail(email) } : undefined
+					username && { username },
+					email && { normalizedEmail: normalizeEmail(email) }
 				].filter(Boolean) as FilterQuery<IUser>[]
 			})
 

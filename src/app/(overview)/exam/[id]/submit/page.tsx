@@ -216,12 +216,12 @@ export default async function SubmitExamPage({ params }: PageProps){
 			<SubmitExamForm
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers && pendingCorrection ? answers.map(answer => omit(answer, "feedback")) : answers}
-				defaultValues={submitData.submit ? {
+				defaultValues={submitData.submit && {
 					question: submitData.submit.answers.map(({ option, content }) => ({
 						option: option?.toString(),
 						content
 					}))
-				} : undefined}
+				}}
 			/>
 		</div>
 	)
