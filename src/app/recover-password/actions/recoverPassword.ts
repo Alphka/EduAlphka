@@ -36,8 +36,15 @@ export default async function recoverPassword({
 		await connectDatabase()
 
 		const verificationCode = await VerificationCode
-			.findOne({ code: validatedFields.data.code }, { user: 1 })
-			.populate<{ user: HydratedDocument<Pick<IUser, "_id" | "password" | "normalizedEmail">> }>("user", "password normalizedEmail")
+			.findOne({
+				code: validatedFields.data.code
+			}, { user: 1 })
+			.populate<{
+				user: HydratedDocument<Pick<IUser, "_id" | "password" | "normalizedEmail">>
+			}>("user", {
+				password: 1,
+				normalizedEmail: 1
+			})
 
 		const user = verificationCode?.user
 

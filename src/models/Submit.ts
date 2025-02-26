@@ -4,13 +4,13 @@ import { model, models, Schema } from "mongoose"
 const submitSchema = new Schema<ISubmit, SubmitModel, ISubmitMethods>({
 	user: {
 		type: Schema.ObjectId,
-		ref: "User",
-		required: true
+		required: true,
+		ref: "User"
 	},
 	exam: {
 		type: Schema.ObjectId,
-		ref: "Exam",
-		required: true
+		required: true,
+		ref: "Exam"
 	},
 	createdAt: {
 		type: Date,

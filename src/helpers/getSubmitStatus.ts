@@ -11,31 +11,25 @@ export function getSubmitStatus({
 	hasSubmit,
 	isExpired
 }: SubmitStatusProps){
-	return hasStartedExam
-		? pendingCorrection
-			? "Pendente"
-			: hasSubmit
-				? "Finalizado"
-				: isExpired
-					? "Expirado"
-					: "Ativo"
-		: "Não iniciado"
+	if(pendingCorrection) return SubmitStatus.Pendente
+	if(hasSubmit) return SubmitStatus.Finalizado
+	if(isExpired) return SubmitStatus.Expirado
+	if(!hasStartedExam) return SubmitStatus["Não iniciado"]
+	return SubmitStatus.Ativo
 }
 
-export type SubmitStatus = ReturnType<typeof getSubmitStatus>
+export enum SubmitStatus {
+	Ativo = 0,
+	Pendente = 1,
+	Finalizado = 2,
+	Expirado = 3,
+	"Não iniciado" = 4
+}
 
 export const submitStatusColors = {
-	Ativo: "blue",
-	Finalizado: "green",
-	Pendente: "orange",
-	Expirado: "red",
-	"Não iniciado": "gray"
-} satisfies Record<SubmitStatus, string>
-
-export const submitStatusPriority = {
-	Ativo: 0,
-	Pendente: 1,
-	Finalizado: 2,
-	Expirado: 3,
-	"Não iniciado": 4
-} satisfies Record<SubmitStatus, number>
+	[SubmitStatus.Ativo]: "blue",
+	[SubmitStatus.Finalizado]: "green",
+	[SubmitStatus.Pendente]: "orange",
+	[SubmitStatus.Expirado]: "red",
+	[SubmitStatus["Não iniciado"]]: "gray"
+}

@@ -9,8 +9,8 @@ export const examInviteSchema = new Schema<IExamInvite, ExamInviteModel>({
 	},
 	exam: {
 		type: Schema.ObjectId,
-		ref: "Exam",
-		required: true
+		required: true,
+		ref: "Exam"
 	},
 	createdAt: {
 		type: Date,

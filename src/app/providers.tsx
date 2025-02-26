@@ -61,8 +61,7 @@ export default function Providers({ fontFamily, children }: ProviderProps){
 			TimeInput: TimeInput.extend({
 				classNames: {
 					label: "mb-1",
-					error: "mt-1",
-					input: "[&::-webkit-calendar-picker-indicator]:hidden"
+					error: "mt-1"
 				}
 			}),
 			Select: Select.extend({

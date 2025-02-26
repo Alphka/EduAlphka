@@ -1,16 +1,20 @@
-import type { HydratedDocument, Types } from "mongoose"
+import type { IExamInvite } from "@models/typings/ExamInvite"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
+import type { IExam } from "@models/typings/Exam"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, ExamInvite, StartedExam } from "@models"
-import { Divider, Paper } from "@mantine/core"
+import { Types, type HydratedDocument } from "mongoose"
+import { Button, Divider, Paper } from "@mantine/core"
+import { MdChevronLeft } from "react-icons/md"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import ExamInvitation from "./components/ExamInvitation"
 import routes from "@app/routes"
+import Link from "next/link"
 
 const title = routes.exam.children.template.children.manage.title
 
@@ -29,20 +33,27 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById(id, {
+			.findById<HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "expiresAt"> & {
+				owner: Types.ObjectId
+				candidates: Types.Array<Types.ObjectId>
+			}>>(id, {
 				owner: 1,
 				title: 1,
 				duration: 1,
-				expiresAt: 1,
 				candidates: 1,
 				disallowedCandidates: 1,
+				expiresAt: 1,
 				__v: 1
 			})
 			.populate<{
-				candidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">>>
-			}>("candidates", {
-				name: 1,
-				username: 1
+				candidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">> | Types.ObjectId>
+			}>({
+				path: "candidates",
+				select: {
+					name: 1,
+					username: 1
+				},
+				transform: (document, id) => document === null ? id : document
 			})
 			.populate<{
 				disallowedCandidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">>>
@@ -57,7 +68,10 @@ export default async function ManageExamPage({ params }: PageProps){
 	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
 
 	const [examInvite, submitData] = await Promise.all([
-		ExamInvite.findOne({ exam }),
+		ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id" | "token">>>({ exam }, {
+			token: 1,
+			__v: 1
+		}),
 		exam.getSubmitData(exam.candidates.map(({ _id }) => _id))
 	])
 
@@ -71,15 +85,33 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header className="flex justify-end flex-wrap gap-md">
-				<h1 className="flex-grow text-h4 xs:text-h3">
+			<header className="flex flex-col gap-y-xl">
+				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
+					<Button
+						href={routes.exam.children.template.pathname.replace("[id]", id)}
+						size="sm"
+						radius="xl"
+						color="gray"
+						variant="light"
+						component={Link}
+						aria-label="Voltar para a página do teste"
+						prefetch
+					>
+						<div className="flex items-center gap-sm">
+							<MdChevronLeft className="text-lg" />
+							<span className="max-xs:hidden">Voltar</span>
+						</div>
+					</Button>
+
+					<RemoveExamButton
+						examId={id}
+						examName={exam.title}
+					/>
+				</div>
+
+				<h1 className="flex-grow text-h4 xs:text-h3 break-words">
 					{exam.title}
 				</h1>
-
-				<RemoveExamButton
-					examId={id}
-					examName={exam.title}
-				/>
 			</header>
 
 			<Divider />
@@ -92,22 +124,41 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<CandidatesTable
 				examId={id}
-				data={await Promise.all(exam.candidates.map(async ({ _id, name, username }) => {
-					const id = _id.toString()
+				data={(await Promise.all(exam.candidates.map(async candidate => {
+					const isDeleted = candidate instanceof Types.ObjectId
+					const id = isDeleted ? candidate.toString() : candidate._id.toString()
+
 					const startedExam = candidatesStartedExams.get(id)
 					const submitId = startedExam?.submit?._id.toString() as string | undefined
 					const pendingCorrection = !!startedExam?.pendingCorrection
 
 					return {
 						id,
-						name,
+						name: isDeleted ? "Conta apagada" : candidate.name,
 						submitId,
-						username,
-						createdAt: startedExam?.createdAt.toLocaleDateString("pt-BR"),
-						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
-						pendingCorrection
+						username: isDeleted ? "" : candidate.username,
+						startedAt: startedExam?.createdAt,
+						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired() : false,
+						pendingCorrection,
+						isDeleted
 					}
-				}))}
+				})))
+					.sort((a, b) => {
+						if(!a.startedAt && !b.startedAt) return 0
+
+						if(!a.startedAt) return -1
+						if(!b.startedAt) return 1
+
+						const dateA = new Date(a.startedAt)
+						const dateB = new Date(b.startedAt)
+
+						return dateB.getTime() - dateA.getTime()
+					})
+					.map(data => ({
+						...data,
+						startedAt: data.startedAt?.toLocaleDateString("pt-BR")
+					}))
+				}
 				disallowedCandidates={exam.disallowedCandidates.map(({ _id, name, username }) => ({
 					id: _id.toString(),
 					name,

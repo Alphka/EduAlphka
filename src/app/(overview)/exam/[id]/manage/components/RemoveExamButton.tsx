@@ -17,10 +17,9 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 
 	return <>
 		<Button
-			className="flex-shrink-0"
 			color="red.9"
 			variant="filled"
-			leftSection={<MdDeleteForever className="text-lg" />}
+			leftSection={<MdDeleteForever className="max-xs:hidden text-lg" />}
 			aria-label="Excluir teste"
 			onClick={open}
 		>
@@ -79,7 +78,10 @@ export default function RemoveExamButton({ examId, examName }: RemoveExamButtonP
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(deleteExamAction(examId))}
+					onClick={async () => {
+						await handleServerAction(deleteExamAction(examId))
+						close()
+					}}
 					aria-label="Excluir teste"
 					loading={isPending}
 				>

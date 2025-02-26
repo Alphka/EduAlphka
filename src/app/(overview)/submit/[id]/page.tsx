@@ -1,17 +1,20 @@
 import type { ExamMultipleChoiceQuestion, ExamQuestion, IExam } from "@models/typings/Exam"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
+import type { ISubmit } from "@models/typings/Submit"
 import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Types, type HydratedDocument } from "mongoose"
-import { Divider, Paper } from "@mantine/core"
-import { Exam, Submit } from "@models"
+import { Button, Divider, Paper } from "@mantine/core"
+import { Exam, Submit, User } from "@models"
+import { MdChevronLeft } from "react-icons/md"
 import { useId } from "react"
 import { pick } from "lodash"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import connectDatabase from "@lib/connectDatabase"
 import CorrectExamForm from "../components/CorrectExamForm"
 import routes from "@app/routes"
+import Link from "next/link"
 
 const title = routes.submit.children.template.title
 
@@ -30,43 +33,48 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		connectDatabase()
 	])
 
-	if(!Types.ObjectId.isValid(id)) notFound()
+	if(!Types.ObjectId.isValid(id)){
+		notFound()
+	}
 
-	const submit = await Submit
-		.findById(id, {
-			exam: 1,
-			user: 1,
-			publishedAt: 1
-		})
-		.populate<{
-			user: HydratedDocument<Pick<IUser, "_id" | "name">>
-		}>("user", {
-			name: 1
-		})
-		.orFail(notFound)
-
-	const [exam, user] = await Promise.all([
-		Exam
-			.findById(submit.exam, {
-				owner: 1,
-				title: 1,
-				subject: 1,
-				duration: 1,
-				questions: 1,
-				candidates: 1,
-				description: 1,
-				expiresAt: 1
+	const [user, submit] = await Promise.all([
+		verifyAuthorization({ accountType: "professor" }),
+		Submit
+			.findById<HydratedDocument<Pick<ISubmit, "_id" | "publishedAt"> & {
+				exam: Types.ObjectId
+				user: Types.ObjectId
+			}>>(id, {
+				exam: 1,
+				user: 1,
+				publishedAt: 1
 			})
-			.orFail(() => {
-				console.error("Submit exam not found")
-				notFound()
-			}),
-		verifyAuthorization({ accountType: "professor" })
+			.orFail(notFound)
 	])
 
-	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	const exam = await Exam
+		.findById(submit.exam, {
+			owner: 1,
+			title: 1,
+			subject: 1,
+			duration: 1,
+			questions: 1,
+			candidates: 1,
+			description: 1,
+			expiresAt: 1
+		})
+		.orFail(() => {
+			console.error("Submit exam not found")
+			notFound()
+		})
 
-	const submitData = await exam.getSubmitData(submit.user._id)
+	if(!exam.owner._id.equals(user.id)){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
+
+	const [candidate, submitData] = await Promise.all([
+		User.findById(submit.user, { name: 1 }).lean<Pick<IUser, "_id" | "name">>(),
+		exam.getSubmitData(submit.user)
+	])
 
 	if(!submitData?.submit){
 		console.error("Started exam for submit not found")
@@ -120,15 +128,33 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 		isCorrect
 	}))
 
-	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id))
-	const pendingAnswers = answers.filter(({ isCorrect }) => isCorrect === undefined).length
+	const requiredQuestions = new Set(exam.questions.filter(({ isRequired }) => isRequired).map(question => question.id as string))
+	const pendingAnswers = answers.filter(({ question, isCorrect }) => isCorrect === undefined && requiredQuestions.has(question)).length
 	const maxGrade = requiredQuestions.size
 	const grade = answers.filter(({ isCorrect }) => isCorrect).length
 
 	return (
 		<div className="flex flex-col gap-3xl">
-			<header className="flex items-center justify-end flex-wrap gap-md">
-				<h1 className="flex-grow text-h4 xs:text-h3">
+			<header className="flex flex-col gap-y-xl">
+				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
+					<Button
+						href={routes.exam.children.template.pathname.replace("[id]", exam.id)}
+						size="sm"
+						radius="xl"
+						color="gray"
+						variant="light"
+						component={Link}
+						aria-label="Voltar para a página do teste"
+						prefetch
+					>
+						<div className="flex items-center gap-sm">
+							<MdChevronLeft className="text-lg" />
+							<span className="max-xs:hidden">Voltar</span>
+						</div>
+					</Button>
+				</div>
+
+				<h1 className="flex-grow text-h4 xs:text-h3 break-words">
 					{title}
 				</h1>
 			</header>
@@ -153,7 +179,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 					<li>
 						<span className="font-semibold">Candidato: </span>
-						{submit.user.name}
+						{candidate?.name || "Conta apagada"}
 					</li>
 
 					{exam.subject && (
@@ -171,7 +197,13 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 					{exam.expiresAt && (
 						<li>
 							<span className="font-semibold">Data final para entrega: </span>
-							{exam.expiresAt.toLocaleString("pt-BR")}
+							{exam.expiresAt.toLocaleString("pt-BR", {
+								day: "2-digit",
+								month: "2-digit",
+								year: "numeric",
+								hour: "2-digit",
+								minute: "2-digit"
+							})}
 						</li>
 					)}
 
@@ -184,9 +216,9 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 
 			<CorrectExamForm
 				submitId={submit.id}
-				canEdit={!submitData.pendingCorrection}
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers}
+				canEdit={submitData.pendingCorrection}
 			/>
 		</div>
 	)

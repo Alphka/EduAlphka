@@ -6,8 +6,8 @@ import { model, models, Schema, Types } from "mongoose"
 const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 	owner: {
 		type: Schema.ObjectId,
-		ref: "User",
-		required: true
+		required: true,
+		ref: "User"
 	},
 	title: {
 		type: String,
@@ -45,7 +45,8 @@ const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 		required: true
 	},
 	updatedAt: Date,
-	expiresAt: Date
+	expiresAt: Date,
+	startsAt: Date
 })
 
 examSchema.method("isExpired", function isExpired(){
@@ -54,6 +55,10 @@ examSchema.method("isExpired", function isExpired(){
 
 examSchema.method("getSubmitData", async function getSubmitData(candidates: (Types.ObjectId | string) | (Types.ObjectId | string)[]){
 	const { default: StartedExam } = await import("../StartedExam")
+
+	const exam = await Exam
+		.findById(this._id, { questions: 1 })
+		.orFail(new Error("Exam not found"))
 
 	const isMultipleCandidates = Array.isArray(candidates)
 
@@ -111,7 +116,9 @@ examSchema.method("getSubmitData", async function getSubmitData(candidates: (Typ
 	const results = startedExamResult.map(async submitData => {
 		if(!submitData) return null
 
-		const pendingCorrection = submitData.submit?.answers.some(answer => answer.type === "dissertative") && !submitData.submit.publishedAt
+		const requiredQuestions = exam.questions.filter(question => question.isRequired).map(question => question.id as string)
+		const pendingCorrection = !submitData.submit?.publishedAt &&
+			!!submitData.submit?.answers.some(answer => answer.type === "dissertative" && requiredQuestions.includes(answer.question.toString()))
 
 		let pendingAnswers = 0
 		let grade: number | null = 0

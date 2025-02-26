@@ -2,11 +2,11 @@ import type { CandidateDashboardProps } from "."
 import type { HydratedDocument } from "mongoose"
 import type { IUser } from "@models/typings/User"
 import { Exam } from "@models"
-import ExamList from "../../(overview)/components/Candidate/ExamList"
+import ExamList from "@components/Candidate/ExamList"
 
-export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "userId"> {}
+export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "userId" | "recentExamsLimit"> {}
 
-export default async function ParticipatingExams({ userId }: ParticipatingExamsProps){
+export default async function ParticipatingExams({ userId/*, recentExamsLimit */ }: ParticipatingExamsProps){
 	const exams = await Exam
 		.find({
 			candidates: userId
@@ -19,12 +19,14 @@ export default async function ParticipatingExams({ userId }: ParticipatingExamsP
 			description: 1,
 			questions: 1,
 			createdAt: 1,
-			updatedAt: 1
+			updatedAt: 1,
+			expiresAt: 1
 		})
 		.sort({
-			createdAt: -1,
-			updatedAt: -1
+			createdAt: "descending",
+			updatedAt: "descending"
 		})
+		// .limit(recentExamsLimit)
 		.populate<{
 			owner: HydratedDocument<Pick<IUser, "name" | "username">>
 		}>("owner", {

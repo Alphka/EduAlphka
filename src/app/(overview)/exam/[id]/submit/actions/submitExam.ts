@@ -25,7 +25,9 @@ export default async function submitExam(id: string, data: SubmitExamData){
 		return { errors: ["ID do teste inválido"] }
 	}
 
-	if(!Array.isArray(data?.questions) || !data.questions.length) return { errors: ["As respostas do teste não foram encontradas"] }
+	if(!Array.isArray(data?.questions) || !data.questions.length){
+		return { errors: ["As respostas do teste não foram encontradas"] }
+	}
 
 	const questions = data.questions.map(question => {
 		const { id } = question

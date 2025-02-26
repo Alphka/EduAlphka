@@ -1,7 +1,7 @@
 import { MdAddCircleOutline } from "react-icons/md"
 import { Suspense } from "react"
 import { Button } from "@mantine/core"
-import ExamListSkeleton from "../ExamListSkeleton"
+import ExamListSkeleton from "@components/ExamListSkeleton"
 import SeeAllButton from "./SeeAllButton"
 import RecentExams from "./RecentExams"
 import routes from "@app/routes"
@@ -15,7 +15,7 @@ interface ProfessorDashboardProps {
 export default function ProfessorDashboard({ userId, recentExamsLimit }: ProfessorDashboardProps){
 	return <>
 		<div className="flex flex-col gap-lg">
-			<header className="flex justify-end flex-wrap gap-md">
+			<header className="flex justify-end flex-wrap-reverse gap-md">
 				<h1 className="flex-grow text-h4 xs:text-h3 font-bold">
 					Testes criados recentemente
 				</h1>
@@ -25,7 +25,7 @@ export default function ProfessorDashboard({ userId, recentExamsLimit }: Profess
 					href={routes.exam.children.create.pathname}
 					variant="filled"
 					component={Link}
-					leftSection={<MdAddCircleOutline className="text-lg" />}
+					leftSection={<MdAddCircleOutline className="max-xs:hidden text-lg" />}
 				>
 					Criar teste
 				</Button>

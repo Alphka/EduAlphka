@@ -2,8 +2,8 @@ import type { ComponentPropsWithoutRef } from "react"
 import type { IExam, IExamMethods } from "@models/typings/Exam"
 import type { HydratedDocument } from "mongoose"
 import { Badge, Box, Card, Text, Title, Tooltip } from "@mantine/core"
+import { getSubmitStatus, SubmitStatus } from "@helpers/getSubmitStatus"
 import { MdOutlineTimer, MdPerson } from "react-icons/md"
-import { getSubmitStatus } from "@helpers/getSubmitStatus"
 import { twJoin } from "tailwind-merge"
 import formatTimeDuration from "@helpers/formatTimeDuration"
 import getHistoryMessage from "../ExamCard/helpers/getHistoryMessage"
@@ -71,7 +71,7 @@ export default async function ExamCard({ exam, prefetch = false }: ExamCardProps
 							className="shrink-0"
 							color={isExamExpired ? "yellow" : "blue"}
 						>
-							{submitStatus}
+							{SubmitStatus[submitStatus]}
 						</Badge>
 					</div>
 

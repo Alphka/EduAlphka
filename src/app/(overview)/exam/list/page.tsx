@@ -19,7 +19,7 @@ export default async function ListExamPage(){
 
 	return (
 		<div className="flex flex-col gap-lg">
-			<header className="flex justify-end flex-wrap gap-md">
+			<header className="flex justify-end flex-wrap-reverse gap-md">
 				<h1 className="flex-grow text-h4 xs:text-h3 font-bold">
 					Lista de testes criados
 				</h1>

@@ -11,6 +11,9 @@ export interface IUser {
 	accountType: typeof ACCOUNT_TYPES[number]
 	createdAt: Date
 	updatedAt?: Date
+	settings?: {
+		notifyExamCorrection?: boolean
+	}
 }
 
 export interface IUserMethods {
@@ -21,3 +24,9 @@ export interface UserModel extends Model<IUser, {}, IUserMethods> {
 	hashPassword(password: string): string
 	generateToken(): Promise<string>
 }
+
+export interface IUserSettings {
+	notifyExamCorrection?: boolean
+}
+
+export type UserSettingsModel = Model<IUserSettings>

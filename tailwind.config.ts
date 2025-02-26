@@ -83,6 +83,24 @@ const config: Config = {
 				"5xl": "3rem",
 				"6xl": "4rem"
 			},
+			width: {
+				unset: "unset"
+			},
+			minWidth: {
+				unset: "unset"
+			},
+			maxWidth: {
+				unset: "unset"
+			},
+			height: {
+				unset: "unset"
+			},
+			minHeight: {
+				unset: "unset"
+			},
+			maxHeight: {
+				unset: "unset"
+			},
 			zIndex: {
 				1: "1",
 				2: "2",

@@ -12,8 +12,8 @@ export const sessionSchema = new Schema<ISession, SessionModel>({
 	},
 	user: {
 		type: Schema.ObjectId,
-		ref: "User",
-		required: true
+		required: true,
+		ref: "User"
 	},
 	userAgent: {
 		type: String,

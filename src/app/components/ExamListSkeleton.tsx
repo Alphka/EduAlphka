@@ -1,4 +1,4 @@
-import { ExamCardSkeleton } from "../(overview)/components/ExamCard"
+import { ExamCardSkeleton } from "@components/ExamCard"
 import { Grid, GridCol } from "@mantine/core"
 
 interface ExamListProps {

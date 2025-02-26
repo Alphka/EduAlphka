@@ -2,8 +2,9 @@
 
 import type { ExamMultipleChoiceQuestion, ExamQuestion } from "@models/typings/Exam"
 import type { IAnswer } from "@models/typings/Answer"
+import { createRef, useId, useMemo } from "react"
 import { Button } from "@mantine/core"
-import { useId } from "react"
+import { toast } from "react-toastify"
 import CorrectExamFormQuestion from "./Question"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import sendCorrection from "../../actions/sendCorrection"
@@ -28,16 +29,17 @@ export interface CorrectExamFormProps {
 }
 
 export default function CorrectExamForm({ submitId, exam, answers, canEdit }: CorrectExamFormProps){
-	const titleId = useId()
 	const { handleServerAction, isPending } = useServerActionHandler()
+	const questionRefs = useMemo(() => Array.from(new Array(exam.questions.length), () => createRef<HTMLLIElement>()), [exam.questions.length])
+	const titleId = useId()
 
 	const answersByQuestion = new Map(answers.map(({ question, ...answer }) => [question, answer]))
 
 	return (
-		<form className="flex flex-col gap-lg">
-			<h2 id={titleId} className="text-h3">
+		<section className="flex flex-col gap-lg">
+			<h1 id={titleId} className="text-h3">
 				Questões
-			</h2>
+			</h1>
 
 			<ul
 				className="flex flex-col gap-md"
@@ -52,7 +54,7 @@ export default function CorrectExamForm({ submitId, exam, answers, canEdit }: Co
 				}, questionIndex) => (
 					<CorrectExamFormQuestion
 						questionNumber={questionIndex + 1}
-						formDisabled={canEdit}
+						formDisabled={!canEdit}
 						answer={answersByQuestion.get(questionId)}
 						{...{
 							type,
@@ -61,6 +63,7 @@ export default function CorrectExamForm({ submitId, exam, answers, canEdit }: Co
 							submitId,
 							isRequired
 						}}
+						questionRef={questionRefs[questionIndex]}
 						key={questionId}
 					/>
 				))}
@@ -73,19 +76,32 @@ export default function CorrectExamForm({ submitId, exam, answers, canEdit }: Co
 				</div>
 
 				<Button
-					type="submit"
+					type="button"
 					variant="filled"
 					loading={isPending}
-					onClick={event => {
-						event.preventDefault()
+					onClick={() => {
+						if(!canEdit || isPending) return
+
+						const pendingAnswerElement = questionRefs.find(ref => ref.current?.dataset.pending === "true")?.current
+
+						if(pendingAnswerElement){
+							pendingAnswerElement.scrollIntoView({
+								behavior: "smooth",
+								block: "center"
+							})
+
+							toast.error("Há respostas pendentes de correção")
+
+							return
+						}
 
 						handleServerAction(sendCorrection(submitId))
 					}}
-					disabled={canEdit}
+					disabled={!canEdit}
 				>
 					Enviar correção
 				</Button>
 			</div>
-		</form>
+		</section>
 	)
 }

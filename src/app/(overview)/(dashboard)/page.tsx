@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import verifyAuthorization from "@helpers/verifyAuthorization"
-import ProfessorDashboard from "@components/ProfessorDashboard"
-import CandidateDashboard from "@components/CandidateDashboard"
+import ProfessorDashboard from "./components/ProfessorDashboard"
+import CandidateDashboard from "./components/CandidateDashboard"
 import routes from "@app/routes"
 
 const title = routes.homepage.title
@@ -21,11 +21,12 @@ export default async function Homepage(){
 			{user.accountType === "professor" ? (
 				<ProfessorDashboard
 					userId={user.id}
-					recentExamsLimit={6}
+					recentExamsLimit={12}
 				/>
 			) : (
 				<CandidateDashboard
 					userId={user.id}
+					recentExamsLimit={12}
 				/>
 			)}
 		</div>

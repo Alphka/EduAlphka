@@ -1,3 +1,4 @@
+@import "@mantine/dates/styles.css";
 @import "@mantine/core/styles.css";
 
 @tailwind base;
@@ -34,10 +35,6 @@
 			bottom: 0;
 		}
 	}
-}
-
-:root{
-	--toastify-toast-width: theme(screens.xs);
 }
 
 button,

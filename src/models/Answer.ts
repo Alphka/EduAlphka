@@ -11,8 +11,8 @@ const answerSchema = new Schema<IAnswer>({
 	},
 	submit: {
 		type: Schema.ObjectId,
-		ref: "Submit",
-		required: true
+		required: true,
+		ref: "Submit"
 	},
 	question: {
 		type: Schema.ObjectId,

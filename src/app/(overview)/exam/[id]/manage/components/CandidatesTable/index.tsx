@@ -1,6 +1,6 @@
 "use client"
 
-import { getSubmitStatus, submitStatusColors, submitStatusPriority, type SubmitStatus } from "@helpers/getSubmitStatus"
+import { getSubmitStatus, submitStatusColors, SubmitStatus } from "@helpers/getSubmitStatus"
 import { useMemo, useState, type ChangeEventHandler } from "react"
 import { Divider, Paper, Table, Text, TextInput } from "@mantine/core"
 import { useMediaQuery } from "@mantine/hooks"
@@ -10,7 +10,7 @@ import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
 import Tr from "./Tr"
 
-const filters = ["name", "status", "createdAt"] as const
+const filters = ["name", "status", "startedAt"] as const
 
 type FilterTypes = typeof filters[number]
 
@@ -20,12 +20,22 @@ export interface CandidatesRowData {
 	submitId?: string
 	username: string
 	/** Started exam date */
-	createdAt?: string
-	isExpired: boolean
+	startedAt?: string
 	pendingCorrection: boolean
+	isExpired: boolean
+	isDeleted: boolean
 }
 
-export interface RowData extends Pick<CandidatesRowData, "id" | "name" | "username" | "createdAt" | "isExpired" | "submitId" | "pendingCorrection"> {
+export interface RowData extends Pick<CandidatesRowData,
+	| "id"
+	| "name"
+	| "username"
+	| "submitId"
+	| "startedAt"
+	| "isExpired"
+	| "isDeleted"
+	| "pendingCorrection"
+> {
 	status: SubmitStatus
 }
 
@@ -45,16 +55,16 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 		.toSorted((a, b) => {
 			if(!sortBy) return 0
 
-			if(sortBy === "createdAt"){
-				const dateA = a.createdAt ? parseDate(a.createdAt) : 0
-				const dateB = b.createdAt ? parseDate(b.createdAt) : 0
+			if(sortBy === "startedAt"){
+				const dateA = a.startedAt ? parseDate(a.startedAt) : 0
+				const dateB = b.startedAt ? parseDate(b.startedAt) : 0
 
 				return reversed ? dateB - dateA : dateA - dateB
 			}
 
 			if(sortBy === "status"){
-				const statusA = submitStatusPriority[a.status as SubmitStatus]
-				const statusB = submitStatusPriority[b.status as SubmitStatus]
+				const statusA = a.status
+				const statusB = b.status
 
 				return reversed ? statusB - statusA : statusA - statusB
 			}
@@ -63,7 +73,18 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 		})
 		.filter(item => {
 			const keys = Object.keys(item).filter(key => filters.includes(key as FilterTypes)) as FilterTypes[]
-			return keys.some(key => (item[key] || "").toLocaleLowerCase().includes(query))
+
+			return keys.some(key => {
+				const rowData = item[key as Exclude<typeof key, "status">]
+
+				if(!rowData) return false
+
+				if(key === "status"){
+					return SubmitStatus[rowData as unknown as SubmitStatus].toLocaleLowerCase().includes(query)
+				}
+
+				return rowData.toLocaleLowerCase().includes(query)
+			})
 		})
 }
 
@@ -77,7 +98,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 	const rowsData = useMemo(() => data.map(data => ({
 		status: getSubmitStatus({
 			pendingCorrection: data.pendingCorrection,
-			hasStartedExam: !!data.createdAt,
+			hasStartedExam: !!data.startedAt,
 			hasSubmit: !!data.submitId,
 			isExpired: data.isExpired
 		}),
@@ -151,9 +172,9 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 
 								<Th
 									className="w-16 xs:w-36"
-									sorted={sortBy === "createdAt"}
+									sorted={sortBy === "startedAt"}
 									reversed={reverseSortDirection}
-									onSort={() => setSorting("createdAt")}
+									onSort={() => setSorting("startedAt")}
 									ta="center"
 								>
 									<span className="hidden xs:block">Data de início</span>
@@ -183,9 +204,9 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 								name,
 								status,
 								username,
-								createdAt,
-								isExpired,
 								submitId,
+								startedAt,
+								isDeleted,
 								pendingCorrection
 							}) => (
 								<Tr
@@ -196,8 +217,8 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 										status,
 										submitId,
 										username,
-										createdAt,
-										isExpired,
+										startedAt,
+										isDeleted,
 										pendingCorrection
 									}}
 									statusColor={submitStatusColors[status]}

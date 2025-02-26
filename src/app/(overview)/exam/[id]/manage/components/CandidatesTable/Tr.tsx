@@ -3,13 +3,14 @@ import { ActionIcon, Avatar, Badge, Button, Menu, MenuDropdown, MenuItem, MenuTa
 import { MdMenu, MdEdit, MdChecklist, MdWarningAmber, MdDeleteOutline, MdOutlineDoNotDisturbOn } from "react-icons/md"
 import { useDisclosure, useMediaQuery } from "@mantine/hooks"
 import { removeCandidate } from "../../actions/candidates"
+import { SubmitStatus } from "@helpers/getSubmitStatus"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 import getNameInitials from "@helpers/getNameInitials"
 import routes from "@app/routes"
 import Link from "next/link"
 
 interface TrProps extends
-	Pick<RowData, "id" | "name" | "username" | "status" | "createdAt" | "submitId" | "isExpired" | "pendingCorrection">,
+	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "submitId" | "isDeleted" | "pendingCorrection">,
 	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
@@ -17,7 +18,8 @@ interface TrProps extends
 export default function Tr({
 	pendingCorrection,
 	statusColor,
-	createdAt,
+	isDeleted,
+	startedAt,
 	submitId,
 	username,
 	examId,
@@ -43,23 +45,23 @@ export default function Tr({
 				<div className="flex items-center gap-sm">
 					<Avatar
 						className="flex-shrink-0 leading-none"
-						name={name}
+						name={isDeleted ? "" : name}
 						size="md"
 						radius="xl"
 						color="initials"
 					>
-						{getNameInitials(name)}
+						{isDeleted ? "" : getNameInitials(name)}
 					</Avatar>
 
 					<div>
 						<p className="text-sm font-medium">{name}</p>
-						<p className="text-dark-200 text-xs">{username}</p>
+						{!!username && <p className="text-dark-200 text-xs">{username}</p>}
 					</div>
 				</div>
 			</Table.Td>
 
 			<Table.Td ta="center">
-				{createdAt || "-"}
+				{startedAt || "-"}
 			</Table.Td>
 
 			{/* TODO: Include candidate's grade */}
@@ -71,7 +73,7 @@ export default function Tr({
 					size={isMobile ? "xs" : "sm"}
 					fullWidth
 				>
-					{status}
+					{SubmitStatus[status]}
 				</Badge>
 			</Table.Td>
 
@@ -119,7 +121,7 @@ export default function Tr({
 								leftSection={<MdDeleteOutline className="text-base" />}
 								aria-label="Remover acesso do candidato ao teste"
 								onClick={() => handleServerAction(removeCandidate(examId, id))}
-								disabled={!!createdAt || isPending}
+								disabled={isPending || !!startedAt}
 							>
 								Remover acesso
 							</MenuItem>
@@ -131,7 +133,7 @@ export default function Tr({
 								leftSection={<MdOutlineDoNotDisturbOn className="text-base" />}
 								aria-label="Desativar candidato do teste"
 								onClick={openDisableModal}
-								disabled={!!createdAt || isPending}
+								disabled={isPending || !!startedAt}
 							>
 								Desativar
 							</MenuItem>
@@ -195,7 +197,10 @@ export default function Tr({
 					size="sm"
 					color="red"
 					variant="filled"
-					onClick={() => handleServerAction(removeCandidate(examId, id, true))}
+					onClick={async () => {
+						await handleServerAction(removeCandidate(examId, id, true))
+						closeDisableModal()
+					}}
 					aria-label="Desativar candidato do teste"
 					loading={isPending}
 				>

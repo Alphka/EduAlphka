@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 export default function PasswordRecoveryPage(){
 	return (
-		<main className="flex flex-col items-center justify-center p-5xl min-h-dvh">
+		<main className="flex flex-col items-center justify-center p-8 xs:p-5xl min-h-dvh">
 			<PasswordRecoveryForm />
 		</main>
 	)

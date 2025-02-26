@@ -1,7 +1,7 @@
 import { MdInfoOutline, MdVisibility, MdVisibilityOff } from "react-icons/md"
 import { ActionIcon, Badge, Button, Modal, TextInput } from "@mantine/core"
+import { memo, useCallback, useState } from "react"
 import { GenericFormValidation } from "@constants/forms"
-import { useState } from "react"
 import { useForm } from "react-hook-form"
 import editPersonalInformation, { type PersonalInformationData } from "../../actions/editPersonalInformation"
 import useServerActionHandler from "@hooks/useServerActionHandler"
@@ -12,7 +12,7 @@ interface PersonalInformationModalProps {
 	onClose: () => void
 }
 
-export default function PersonalInformationModal({ data, onSave, onClose }: PersonalInformationModalProps){
+const PersonalInformationModal = memo(function PersonalInformationModal({ data, onSave, onClose }: PersonalInformationModalProps){
 	const [isPasswordVisible, setIsPasswordVisible] = useState(false)
 
 	const { handleServerAction, isPending } = useServerActionHandler({
@@ -23,8 +23,8 @@ export default function PersonalInformationModal({ data, onSave, onClose }: Pers
 	})
 
 	const {
+		reset,
 		register,
-		getValues,
 		handleSubmit,
 		formState: { errors }
 	} = useForm<{ password: string }>({
@@ -34,13 +34,19 @@ export default function PersonalInformationModal({ data, onSave, onClose }: Pers
 		mode: "onSubmit"
 	})
 
+	const handleClose = useCallback(() => {
+		reset()
+		onClose()
+		setIsPasswordVisible(false)
+	}, [reset, onClose])
+
 	const PasswordEyeIcon = isPasswordVisible ? MdVisibilityOff : MdVisibility
 
 	return (
 		<Modal
 			size="md"
 			opened={!!data}
-			onClose={onClose}
+			onClose={handleClose}
 			transitionProps={{ transition: "fade", duration: 200 }}
 			withCloseButton={false}
 			closeOnClickOutside
@@ -66,7 +72,6 @@ export default function PersonalInformationModal({ data, onSave, onClose }: Pers
 					<h1 className="text-h4 font-medium">
 						Confirme a sua identidade
 					</h1>
-
 				</div>
 
 				<h2 className="text-dark-200 text-h6 font-normal">
@@ -94,7 +99,6 @@ export default function PersonalInformationModal({ data, onSave, onClose }: Pers
 							aria-label={isPasswordVisible ? "Esconder senha" : "Mostrar senha"}
 							onPointerDown={event => event.detail === 1 || event.preventDefault()}
 							onClick={() => setIsPasswordVisible(!isPasswordVisible)}
-							hidden={getValues("password") === undefined}
 						>
 							<PasswordEyeIcon className="text-[1.25rem]" />
 						</ActionIcon>
@@ -125,7 +129,7 @@ export default function PersonalInformationModal({ data, onSave, onClose }: Pers
 						size="sm"
 						color="gray"
 						variant="light"
-						onClick={onClose}
+						onClick={handleClose}
 						aria-label="Cancelar exclusão"
 					>
 						Cancelar
@@ -146,4 +150,6 @@ export default function PersonalInformationModal({ data, onSave, onClose }: Pers
 			</form>
 		</Modal>
 	)
-}
+})
+
+export default PersonalInformationModal

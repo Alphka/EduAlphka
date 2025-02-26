@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Avatar, Paper } from "@mantine/core"
 import { pick } from "lodash"
 import PersonalInformationForm from "./components/PersonalInformationForm"
+import NotificationsSettings from "./components/NotificationsSettings"
 import RemoveAccountButton from "./components/RemoveAccountButton"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import getNameInitials from "@helpers/getNameInitials"
@@ -22,7 +23,7 @@ export default async function AccountPage(){
 	return (
 		<div className="flex flex-col gap-2xl">
 			<div className="flex flex-col gap-lg">
-				<header className="flex justify-end flex-wrap gap-md">
+				<header className="flex justify-end flex-wrap-reverse gap-md">
 					<h1 className="flex-grow text-h4 xs:text-h3 font-bold">
 						Minha conta
 					</h1>
@@ -61,6 +62,15 @@ export default async function AccountPage(){
 			<PersonalInformationForm
 				user={pick(user, ["name", "username", "email"] as const)}
 			/>
+
+			{
+				// TODO: Remove this when professors also receive notifications
+				user.accountType === "candidate" && (
+					<NotificationsSettings
+						settings={user.settings ?? {}}
+					/>
+				)
+			}
 
 			<Paper
 				className="flex flex-col p-lg rounded border-error shadow-xs gap-md"

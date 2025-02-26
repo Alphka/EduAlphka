@@ -1,4 +1,6 @@
 declare global {
+	var baseURL: URL
+
 	namespace NodeJS {
 		interface ProcessEnv {
 			PORT?: string
@@ -6,8 +8,8 @@ declare global {
 			MONGODB_URI?: string
 			DATABASE_NAME?: string
 
-			RECOVERY_PASSWORD_EMAIL?: string
-			RECOVERY_PASSWORD_PASSWORD?: string
+			EMAIL?: string
+			EMAIL_PASSWORD?: string
 		}
 	}
 }

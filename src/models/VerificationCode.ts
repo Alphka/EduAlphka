@@ -5,8 +5,8 @@ import { model, models, Schema } from "mongoose"
 const verificationCodeSchema = new Schema<IVerificationCode>({
 	user: {
 		type: Schema.ObjectId,
-		ref: "User",
-		required: true
+		required: true,
+		ref: "User"
 	},
 	code: {
 		type: String,
@@ -25,8 +25,6 @@ const verificationCodeSchema = new Schema<IVerificationCode>({
 		required: true
 	}
 })
-
-delete models?.VerificationCode
 
 const VerificationCode: VerificationCodeModel = models?.VerificationCode || model<IVerificationCode, VerificationCodeModel>("VerificationCode", verificationCodeSchema)
 

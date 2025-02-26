@@ -1,0 +1,8 @@
+{
+	"reject": [
+		"react-toastify",
+		"tailwind-merge",
+		"tailwind-preset-mantine",
+		"tailwindcss"
+	]
+}
