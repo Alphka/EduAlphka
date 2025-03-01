@@ -7,11 +7,11 @@ import { MdCheck, MdCopyAll } from "react-icons/md"
 import { twJoin } from "tailwind-merge"
 import useServerActionHandler from "@hooks/useServerActionHandler"
 
-interface InviteURLProps extends Pick<ExamInvitationProps, "examId"> {
+interface InviteURLProps extends Pick<ExamInvitationProps, "examId" | "isExpired"> {
 	inviteURL: URL | string | undefined
 }
 
-export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
+export default function ManageInviteURL({ examId, isExpired, inviteURL }: InviteURLProps){
 	const { handleServerAction, isPending } = useServerActionHandler({
 		successOptions: {
 			message: `Link de convite ${inviteURL ? "atualizado" : "gerado"} com sucesso`
@@ -30,7 +30,8 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 						dir="rtl"
 						className={twJoin([
 							"[@media(min-width:290px)]:basis-3/4 [@media(min-width:768px)]:basis-auto",
-							"w-min block font-semibold whitespace-nowrap text-ellipsis px-sm overflow-hidden shadow-none"
+							"w-min block font-semibold whitespace-nowrap text-ellipsis px-sm overflow-hidden shadow-none",
+							isExpired && "border-red-800 select-none"
 						])}
 						component="p"
 						withBorder
@@ -38,33 +39,35 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 						{inviteURL.href}
 					</Paper>
 
-					<CopyButton
-						value={inviteURL.href}
-						timeout={2000}
-					>
-						{({ copied, copy }) => {
-							const iconColor = copied ? "teal" : "gray"
-							const message = copied ? "Link copiado" : "Clique para copiar o link"
-							const Icon = copied ? MdCheck : MdCopyAll
+					{!isExpired && (
+						<CopyButton
+							value={inviteURL.href}
+							timeout={2000}
+						>
+							{({ copied, copy }) => {
+								const iconColor = copied ? "teal" : "gray"
+								const message = copied ? "Link copiado" : "Clique para copiar o link"
+								const Icon = copied ? MdCheck : MdCopyAll
 
-							return (
-								<Tooltip
-									label={message}
-									position="top"
-									withArrow
-								>
-									<ActionIcon
-										color={iconColor}
-										variant="default"
-										aria-label={message}
-										onClick={copy}
+								return (
+									<Tooltip
+										label={message}
+										position="top"
+										withArrow
 									>
-										<Icon className="text-base" />
-									</ActionIcon>
-								</Tooltip>
-							)
-						}}
-					</CopyButton>
+										<ActionIcon
+											color={iconColor}
+											variant="default"
+											aria-label={message}
+											onClick={copy}
+										>
+											<Icon className="text-base" />
+										</ActionIcon>
+									</Tooltip>
+								)
+							}}
+						</CopyButton>
+					)}
 				</div>
 			) : (
 				<p className="text-dark-200">
@@ -83,9 +86,13 @@ export default function ManageInviteURL({ examId, inviteURL }: InviteURLProps){
 			onClick={() => {
 				handleServerAction(generateExamInviteURL(examId))
 			}}
+			disabled={isExpired}
 			loading={isPending}
 		>
-			{inviteURL ? "Atualizar" : "Gerar"} link de convite
+			{isExpired
+				? "O teste está expirado!"
+				: <>{inviteURL ? "Atualizar" : "Gerar"} link de convite</>
+			}
 		</Button>
 	</>
 }

@@ -83,7 +83,11 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 	if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
 	if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
 
-	const exam = await Exam.findById(examId, { owner: 1 })
+	const exam = await Exam.findById(examId, {
+		owner: 1,
+		duration: 1,
+		expiresAt: 1
+	})
 
 	if(!exam){
 		return { errors: ["Teste não encontrado"] }
@@ -95,11 +99,11 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 
 	const startedExam = await StartedExam.findOne({
 		exam,
-		user: userId,
-		duration: 1,
-		createdAt: 1,
-		expiresAt: 1
-	}, { _id: 1 })
+		user: userId
+	}, {
+		_id: 1,
+		createdAt: 1
+	})
 
 	if(startedExam && !(await startedExam.isExpired({ exam }))){
 		return { errors: [`Não é possível ${disable ? "desativar" : "remover"} um candidato que já iniciou o teste`] }

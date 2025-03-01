@@ -109,7 +109,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 		)
 	}
 
-	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired()){
+	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired({ exam })){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 

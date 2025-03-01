@@ -71,6 +71,7 @@ export interface IExamMethods {
 	getSubmitData(candidate: Types.ObjectId | string): Promise<StartedExamWithSubmit | null>
 	getSubmitData(candidates: (Types.ObjectId | string)[]): Promise<StartedExamWithSubmit[]>
 	getAverageGrade(): Promise<number>
+	getQuestionCorrectPercentage: () => Promise<Record<string, number>>
 }
 
 export type QuestionModel = Model<ExamQuestion>

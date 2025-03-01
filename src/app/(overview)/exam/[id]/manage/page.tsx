@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import type { IExamInvite } from "@models/typings/ExamInvite"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
@@ -6,13 +7,14 @@ import type { IUser } from "@models/typings/User"
 import { notFound, redirect, RedirectType } from "next/navigation"
 import { Exam, ExamInvite, StartedExam } from "@models"
 import { Types, type HydratedDocument } from "mongoose"
-import { Button, Divider, Paper } from "@mantine/core"
+import { Button, Divider } from "@mantine/core"
 import { MdChevronLeft } from "react-icons/md"
 import verifyAuthorization from "@helpers/verifyAuthorization"
 import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import ExamInvitation from "./components/ExamInvitation"
+import ExamReport from "./components/ExamReport"
 import routes from "@app/routes"
 import Link from "next/link"
 
@@ -33,13 +35,13 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById<HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "expiresAt"> & {
+			.findById<HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "questions" | "expiresAt"> & {
 				owner: Types.ObjectId
-				candidates: Types.Array<Types.ObjectId>
 			}>>(id, {
 				owner: 1,
 				title: 1,
 				duration: 1,
+				questions: 1,
 				candidates: 1,
 				disallowedCandidates: 1,
 				expiresAt: 1,
@@ -65,7 +67,9 @@ export default async function ManageExamPage({ params }: PageProps){
 		verifyAuthorization({ accountType: "professor" })
 	])
 
-	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	if(!exam.owner._id.equals(user.id)){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
 
 	const [examInvite, submitData] = await Promise.all([
 		ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id" | "token">>>({ exam }, {
@@ -80,8 +84,6 @@ export default async function ManageExamPage({ params }: PageProps){
 	for(const startedExam of submitData){
 		candidatesStartedExams.set(startedExam.user.toString(), startedExam)
 	}
-
-	const [averageGrade] = await Promise.all([exam.getAverageGrade()])
 
 	return (
 		<div className="flex flex-col gap-3xl">
@@ -118,8 +120,9 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<ExamInvitation
 				examId={id}
+				isExpired={exam.isExpired()}
 				inviteToken={examInvite?.token || undefined}
-				key={examInvite?.__v}
+				key={`invite:${examInvite?.__v}`}
 			/>
 
 			<CandidatesTable
@@ -138,7 +141,7 @@ export default async function ManageExamPage({ params }: PageProps){
 						submitId,
 						username: isDeleted ? "" : candidate.username,
 						startedAt: startedExam?.createdAt,
-						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired() : false,
+						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
 						pendingCorrection,
 						isDeleted
 					}
@@ -164,37 +167,13 @@ export default async function ManageExamPage({ params }: PageProps){
 					name,
 					username
 				}))}
-				key={`${exam.__v}.${exam.candidates.length}`}
+				key={`candidates:${exam.__v}.${exam.candidates.length}`}
 			/>
 
-			<Paper
-				className="flex flex-col p-xl gap-lg"
-				withBorder
-			>
-				<section className="flex flex-col gap-md">
-					<header>
-						<h2 className="text-h5">
-							Relatório das respostas do teste
-						</h2>
-					</header>
-
-					<ul className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 shadow-none">
-						{Object.entries({
-							"Nota média": Math.round(Number(averageGrade.toPrecision(6)) * 100) / 100
-						}).map(([key, value]) => (
-							<Paper
-								className="flex flex-col p-md shadow-xs"
-								component="ul"
-								withBorder
-								key={key}
-							>
-								<h3 className="font-medium">{key}</h3>
-								<p>{value}</p>
-							</Paper>
-						))}
-					</ul>
-				</section>
-			</Paper>
+			<ExamReport
+				exam={exam as ComponentProps<typeof ExamReport>["exam"]}
+				key={`report:${exam.__v}.${exam.candidates.length}`}
+			/>
 		</div>
 	)
 }

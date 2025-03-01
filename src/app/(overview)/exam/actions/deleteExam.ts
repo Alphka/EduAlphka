@@ -20,6 +20,7 @@ export default async function deleteExamAction(id: string){
 
 		const exam = await Exam.findById(id, {
 			owner: 1,
+			duration: 1,
 			expiresAt: 1
 		})
 

@@ -41,7 +41,27 @@ startedExamSchema.method("isExpired", async function isExpired({ exam: _exam }: 
 		throw new Error("Missing 'exam' property in StartedExam.isExpired() function")
 	}
 
-	const exam = await Exam
+	let exam: InstanceType<typeof Exam>
+
+	if(_exam){
+		if(!(_exam as InstanceType<typeof Exam>).duration){
+			console.warn("Missing 'exam.duration' property in StartedExam.isExpired() function")
+		}else if(!("expiresAt" in (_exam as InstanceType<typeof Exam>))){
+			console.warn("Missing 'exam.expiresAt' property in StartedExam.isExpired() function")
+		}else{
+			exam = _exam as InstanceType<typeof Exam>
+		}
+
+		if(!exam! && !(_exam instanceof Document && !_exam._id)){
+			console.warn("Missing 'exam._id' property in StartedExam.isExpired() function")
+		}
+	}
+
+	if(!exam!){
+		console.warn("Fetching exam from database in StartedExam.isExpired() function")
+	}
+
+	exam ||= await Exam
 		.findById(_exam || this.exam, {
 			duration: 1,
 			expiresAt: 1

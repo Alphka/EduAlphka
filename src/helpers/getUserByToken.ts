@@ -55,6 +55,15 @@ async function getUserByToken(token: string, hydrated = false){
 		return null
 	}
 
+	if(session.expiresAt < new Date){
+		await Promise.all([
+			cookies().then(cookiesStore => cookiesStore.delete(TOKEN_KEY)),
+			Session.deleteMany({ _id: session._id })
+		])
+
+		return null
+	}
+
 	if(hydrated){
 		return User.hydrate(Object.assign(session.user, {
 			session: Session.hydrate(omit(session, "user"))
