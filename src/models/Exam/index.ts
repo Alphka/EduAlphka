@@ -206,7 +206,12 @@ examSchema.method("getAverageGrade", async function getAverageGrade(){
 examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorrectPercentage(){
 	const { default: Answer } = await import("../Answer")
 
-	const result = await Answer.aggregate<{ questionId: Schema.Types.ObjectId, correctPercentage: number }>([
+	const result = await Answer.aggregate<{
+		questionId: Types.ObjectId,
+		totalAnswers: number,
+		correctAnswers: number,
+		correctPercentage: number
+	}>([
 		{
 			$match: {
 				question: {
@@ -230,6 +235,8 @@ examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorr
 		{
 			$project: {
 				questionId: "$_id",
+				totalAnswers: "$totalAnswers",
+				correctAnswers: "$correctAnswers",
 				correctPercentage: {
 					$multiply: [
 						{ $divide: ["$correctAnswers", "$totalAnswers"] },
@@ -240,7 +247,14 @@ examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorr
 		}
 	])
 
-	return Object.fromEntries(result.map(item => [item.questionId.toString(), item.correctPercentage]))
+	return Object.fromEntries(result.map(({ questionId, totalAnswers, correctAnswers, correctPercentage }) => [
+		questionId.toString(),
+		{
+			correctPercentage,
+			correctAnswers,
+			totalAnswers
+		}
+	]))
 })
 
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)

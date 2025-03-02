@@ -32,6 +32,10 @@ export default async function connectDatabase(){
 		}
 
 		cached.promise = connect(MONGODB_URI!, options)
+			.then(mongoose => {
+				mongoose.set("debug", process.env.NODE_ENV === "development")
+				return mongoose
+			})
 	}
 
 	try{

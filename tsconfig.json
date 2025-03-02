@@ -47,7 +47,8 @@
 			"@models/*": ["./src/models/*"],
 			"@lib/*": ["./src/lib/*"],
 			"@app/*": ["./src/app/*"],
-			"@src/*": ["./src/*"]
+			"@src/*": ["./src/*"],
+			"@root/*": ["./*"]
 		},
 		"noEmit": true
 	},
