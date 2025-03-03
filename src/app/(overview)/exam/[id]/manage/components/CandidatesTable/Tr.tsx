@@ -77,7 +77,7 @@ export default function Tr({
 			</Table.Td>
 
 			<Table.Td ta="center">
-				{grade || "-"}
+				{grade ?? "-"}
 			</Table.Td>
 
 			<Table.Td>

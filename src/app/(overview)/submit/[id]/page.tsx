@@ -139,13 +139,13 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
 					<Button
 						className="max-xs:ps-2 max-xs:pe-2"
-						href={routes.exam.children.template.pathname.replace("[id]", exam.id)}
+						href={routes.exam.children.template.children.manage.pathname.replace("[id]", exam.id)}
 						size="sm"
 						radius="xl"
 						color="gray"
 						variant="light"
 						component={Link}
-						aria-label="Voltar para a página do teste"
+						aria-label="Voltar para a página de gerenciamento do teste"
 						prefetch
 					>
 						<div className="flex items-center gap-sm">

@@ -47,7 +47,7 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 			valueFormatter={{
 				x: (value) => `Questão ${value}`
 			}}
-			withTooltip={false}
+			withTooltip
 		/>
 	)
 }

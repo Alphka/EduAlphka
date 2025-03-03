@@ -30,7 +30,7 @@
 		"autoprefixer": "^10.4.20",
 		"dayjs": "^1.11.13",
 		"lodash": "^4.17.21",
-		"mongoose": "^8.11.0",
+		"mongoose": "^8.12.0",
 		"next": "^15.2.0",
 		"nodemailer": "^6.10.0",
 		"normalize-email": "^1.1.1",
