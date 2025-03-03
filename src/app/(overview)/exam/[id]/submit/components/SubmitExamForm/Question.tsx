@@ -151,6 +151,8 @@ export default function SubmitExamFormQuestion({
 									size="lg"
 									variant="outline"
 									onChange={() => {
+										if(formDisabled) return
+
 										setValue(optionPath, _id)
 										clearErrors(optionPath)
 									}}
@@ -185,7 +187,6 @@ export default function SubmitExamFormQuestion({
 						spellCheck
 						autosize
 						readOnly
-						inert
 					/>
 				</>}
 			</div>

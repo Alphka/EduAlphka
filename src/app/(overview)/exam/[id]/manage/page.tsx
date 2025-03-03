@@ -71,12 +71,13 @@ export default async function ManageExamPage({ params }: PageProps){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
-	const [examInvite, submitData] = await Promise.all([
+	const [examInvite, submitData, gradesByCandidate] = await Promise.all([
 		ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id" | "token">>>({ exam }, {
 			token: 1,
 			__v: 1
 		}),
-		exam.getSubmitData(exam.candidates.map(({ _id }) => _id))
+		exam.getSubmitData(exam.candidates.map(({ _id }) => _id)),
+		exam.getGradesByCandidate()
 	])
 
 	const candidatesStartedExams = new Map<string, typeof submitData[number]>
@@ -130,15 +131,16 @@ export default async function ManageExamPage({ params }: PageProps){
 				examId={id}
 				data={(await Promise.all(exam.candidates.map(async candidate => {
 					const isDeleted = candidate instanceof Types.ObjectId
-					const id = isDeleted ? candidate.toString() : candidate._id.toString()
+					const id = isDeleted ? candidate.toString() : candidate.id as string
 
 					const startedExam = candidatesStartedExams.get(id)
-					const submitId = startedExam?.submit?._id.toString() as string | undefined
+					const submitId = startedExam?.submit?._id.toString()
 					const pendingCorrection = !!startedExam?.pendingCorrection
 
 					return {
 						id,
 						name: isDeleted ? "Conta apagada" : candidate.name,
+						grade: gradesByCandidate[id]?.grade ?? null,
 						submitId,
 						username: isDeleted ? "" : candidate.username,
 						startedAt: startedExam?.createdAt,
@@ -146,23 +148,17 @@ export default async function ManageExamPage({ params }: PageProps){
 						pendingCorrection,
 						isDeleted
 					}
-				})))
-					.sort((a, b) => {
-						if(!a.startedAt && !b.startedAt) return 0
+				}))).sort((a, b) => {
+					if(!a.startedAt && !b.startedAt) return 0
 
-						if(!a.startedAt) return -1
-						if(!b.startedAt) return 1
+					if(!a.startedAt) return -1
+					if(!b.startedAt) return 1
 
-						const dateA = new Date(a.startedAt)
-						const dateB = new Date(b.startedAt)
-
-						return dateB.getTime() - dateA.getTime()
-					})
-					.map(data => ({
-						...data,
-						startedAt: data.startedAt?.toLocaleDateString("pt-BR")
-					}))
-				}
+					return b.startedAt.getTime() - a.startedAt.getTime()
+				}).map(data => ({
+					...data,
+					startedAt: data.startedAt?.toLocaleDateString("pt-BR")
+				}))}
 				disallowedCandidates={exam.disallowedCandidates.map(({ _id, name, username }) => ({
 					id: _id.toString(),
 					name,
