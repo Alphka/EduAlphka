@@ -115,7 +115,7 @@ export async function GET(){
 
 	const existingUsersIds = await User.find({}, { _id: 1 }).lean().then(users => users.map(user => user._id))
 
-	const results = await Promise.all([
+	await Promise.all([
 		deleteSessions(existingUsersIds),
 		deleteVerificationCodes(existingUsersIds),
 		deleteExams(existingUsersIds).then(result => Exam.find({}, { _id: 1 }).lean().then(async exams => {
@@ -133,8 +133,6 @@ export async function GET(){
 			])]
 		}))
 	])
-
-	console.log(results.flat(3))
 
 	return new NextResponse(null, { status: 204 })
 }

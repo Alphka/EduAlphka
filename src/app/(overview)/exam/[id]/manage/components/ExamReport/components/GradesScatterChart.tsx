@@ -2,7 +2,7 @@
 
 import type { IExamMethods } from "@models/typings/Exam"
 import { ScatterChart } from "@mantine/charts"
-import { max, min } from "lodash"
+import { max } from "lodash"
 
 interface GradesScatterChartProps {
 	requiredQuestions: {
@@ -14,7 +14,7 @@ interface GradesScatterChartProps {
 }
 
 export default function GradesScatterChart({ requiredQuestions, questionCorrectPercentage }: GradesScatterChartProps){
-	const questionNumbers = requiredQuestions.map(question => question.number)
+	const questionsSize = max(requiredQuestions.map(question => question.number)) as number
 
 	return (
 		<ScatterChart
@@ -39,9 +39,11 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 			]}
 			dataKey={{ x: "number", y: "answers" }}
 			labels={{ x: "Questão", y: "Respostas" }}
-			xAxisLabel="Questão"
 			yAxisLabel="Nota"
-			xAxisProps={{ domain: [min(questionNumbers) as number, max(questionNumbers) as number] }}
+			xAxisProps={{
+				domain: [1, questionsSize],
+				tickCount: questionsSize
+			}}
 			valueFormatter={{
 				x: (value) => `Questão ${value}`
 			}}

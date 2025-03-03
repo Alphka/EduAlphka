@@ -138,6 +138,7 @@ export default async function SubmitFeedbackPage({ params }: PageProps){
 			<header className="flex flex-col gap-y-xl">
 				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
 					<Button
+						className="max-xs:ps-2 max-xs:pe-2"
 						href={routes.exam.children.template.pathname.replace("[id]", exam.id)}
 						size="sm"
 						radius="xl"

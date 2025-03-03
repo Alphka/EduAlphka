@@ -16,7 +16,7 @@ interface DisabledCandidatesTableProps {
 export default function DisabledCandidatesTable({ examId, disallowedCandidates }: DisabledCandidatesTableProps){
 	const { handleServerAction, isPending } = useServerActionHandler()
 
-	const isMobile = useMediaQuery("(max-width: 500px)")
+	const isMobile = useMediaQuery("not all and (min-width: 500px)")
 
 	return (
 		<Table.ScrollContainer minWidth={180}>

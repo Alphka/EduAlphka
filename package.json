@@ -53,9 +53,7 @@
 		"zod": "^3.24.2"
 	},
 	"browserslist": [
-		"defaults and fully supports es6-module and not dead",
-		">= .2% and fully supports es6-module and not dead",
-		">= .2% in BR and fully supports es6-module"
+		"fully supports es6 and supports rem and supports calc and supports currentcolor and supports css-mediaqueries and fully supports css-variables and fully supports css-grid and fully supports flexbox and supports css3-boxsizing and supports arrow-functions and supports async-functions and supports promises"
 	],
 	"engines": {
 		"node": "^18.18 || ^19.8 || ^20.3 || >=21"

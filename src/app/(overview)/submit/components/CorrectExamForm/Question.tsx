@@ -120,7 +120,6 @@ export default function CorrectExamFormQuestion({
 										spellCheck
 										autosize
 										readOnly={formDisabled}
-										inert={formDisabled}
 										ref={feedbackRef}
 									/>
 

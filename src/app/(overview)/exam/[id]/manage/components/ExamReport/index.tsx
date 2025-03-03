@@ -2,18 +2,13 @@ import type { HydratedDocument, Types } from "mongoose"
 import type { IExam, IExamMethods } from "@models/typings/Exam"
 import type { ComponentProps } from "react"
 import type { IUser } from "@models/typings/User"
-import { BarChart } from "@mantine/charts"
 import { Submit } from "@models"
 import { Paper } from "@mantine/core"
+import { pick } from "lodash"
 import GradesScatterChart from "./components/GradesScatterChart"
 import GradesPieChart from "./components/GradesPieChart"
-import { pick } from "lodash"
 
-const QUESTION_TEXT_LIMIT = 20
-
-const truncate = (input: string) => input.length > QUESTION_TEXT_LIMIT ? `${input.substring(0, QUESTION_TEXT_LIMIT)}…` : input
-
-interface ExamReportProps{
+interface ExamReportProps {
 	exam: HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "questions" | "expiresAt"> & {
 		owner: Types.ObjectId
 		candidates: Types.Array<HydratedDocument<Pick<IUser, "_id" | "name" | "username">> | Types.ObjectId>
@@ -78,7 +73,7 @@ export default async function ExamReport({ exam }: ExamReportProps){
 				</ul>
 
 				<div className="flex flex-col gap-xl">
-					<ul className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-md shadow-none">
+					<ul className="grid grid-cols lg:grid-cols-2 xl:grid-cols-3 gap-md shadow-none">
 						<Paper
 							className="flex flex-col p-md gap-lg shadow-xs"
 							component="li"
@@ -109,29 +104,6 @@ export default async function ExamReport({ exam }: ExamReportProps){
 							/>
 						</Paper>
 					</ul>
-
-					<article className="flex flex-col gap-md">
-						<h2 className="text-h5">Porcentagem de acertos por questão</h2>
-
-						<BarChart
-							h={requiredQuestions.length * 75}
-							data={requiredQuestions.map(question => ({
-								// @ts-expect-error
-								text: `Questão ${question.number}: ${truncate(question.text)}`,
-								percentage: questionCorrectPercentage[question.id]?.correctPercentage ?? 0
-							}))}
-							dataKey="text"
-							maxBarWidth={20}
-							orientation="vertical"
-							yAxisProps={{ width: 180 }}
-							barProps={{ radius: 4 }}
-							series={[{
-								label: "Porcentagem de acertos",
-								name: "percentage",
-								color: "blue"
-							}]}
-						/>
-					</article>
 				</div>
 			</section>
 		</Paper>

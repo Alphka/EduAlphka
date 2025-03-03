@@ -11,12 +11,12 @@ interface GradesChartProps {
 }
 
 export default function GradesPieChart({ totalCorrectAnswers, totalIncorrectAnswers }: GradesChartProps){
-	const isMobile = useMediaQuery(`(max-width: ${tailwindConfig.theme.screens.lg})`)
+	const isMobile = useMediaQuery(`not all and (min-width: ${tailwindConfig.theme.screens.lg})`)
 
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-md">
 			<PieChart
-				size={isMobile ? 80 : 100}
+				size={isMobile ? 80 : 164}
 				data={[
 					{ name: "Acertos", value: totalCorrectAnswers, color: "blue.6" },
 					{ name: "Erros", value: totalIncorrectAnswers, color: "red.6" },

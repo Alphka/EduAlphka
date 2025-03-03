@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
-import { Avatar, Paper } from "@mantine/core"
+import { Paper } from "@mantine/core"
 import { pick } from "lodash"
 import PersonalInformationForm from "./components/PersonalInformationForm"
 import NotificationsSettings from "./components/NotificationsSettings"
 import RemoveAccountButton from "./components/RemoveAccountButton"
 import verifyAuthorization from "@helpers/verifyAuthorization"
-import getNameInitials from "@helpers/getNameInitials"
+import AccountDetails from "./components/AccountDetails"
 import routes from "@app/routes"
 
 const title = routes.account.title
@@ -30,34 +30,9 @@ export default async function AccountPage(){
 				</header>
 			</div>
 
-			<Paper
-				className="p-lg rounded shadow-xs"
-				withBorder
-			>
-				<div className="flex items-center gap-xl">
-					<Avatar
-						className="flex-shrink-0 leading-none"
-						name={user.name}
-						size="xl"
-						radius="100%"
-						color="initials"
-					>
-						{getNameInitials(user.name)}
-					</Avatar>
-
-					<div>
-						<p className="text-lg font-bold">
-							{user.name}
-						</p>
-						<p className="text-dark-100 text-md font-medium">
-							{user.username}
-						</p>
-						<p className="text-dark-200 text-md font-medium">
-							{user.accountType === "professor" ? "Aplicador de testes" : "Candidato"}
-						</p>
-					</div>
-				</div>
-			</Paper>
+			<AccountDetails
+				user={pick(user, ["name", "username", "accountType"] as const)}
+			/>
 
 			<PersonalInformationForm
 				user={pick(user, ["name", "username", "email"] as const)}

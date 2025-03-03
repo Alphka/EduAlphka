@@ -44,6 +44,9 @@ export default function SubmitExamFormQuestion({
 	const isPending = isRequired && isAnswered && !isCorrect && answer.isCorrect === undefined
 	const isWrong = isRequired && isAnswered && !isCorrect && !isPending
 
+	const optionPath = `question.${questionIndex}.option` as const
+	const optionError = errors.question?.[questionIndex]?.option?.message
+
 	return (
 		<Paper
 			className={twJoin(
@@ -114,61 +117,54 @@ export default function SubmitExamFormQuestion({
 						spellCheck
 						autosize
 						readOnly={formDisabled}
-						inert={formDisabled}
 					/>
 				) : (
 					<ul className="flex flex-col gap-md">
 						{options.map(({
 							_id,
 							text
-						}, optionIndex) => {
-							const optionPath = `question.${questionIndex}.option` as const
-							const optionError = errors.question?.[questionIndex]?.option?.message
-
-							return (
-								<li className="flex items-center gap-md" key={_id}>
-									{optionIndex === 0 && (
-										<input
-											type="text"
-											className="sr-only"
-											aria-hidden
-											tabIndex={-1}
-											onFocus={() => {
-												const options = document.getElementsByName(optionPath)
-												options[0]?.focus()
-											}}
-											{...register(optionPath, {
-												required: {
-													value: isRequired,
-													message: "Nenhuma opção foi selecionada como a resposta correta"
-												}
-											})}
-											name={undefined}
-											defaultValue={watch(optionPath)}
-										/>
-									)}
-
-									<Radio
-										name={optionPath}
-										size="lg"
-										variant="outline"
-										onChange={() => {
-											setValue(optionPath, _id)
-											clearErrors(optionPath)
+						}, optionIndex) => (
+							<li className="flex items-center gap-md" key={_id}>
+								{optionIndex === 0 && (
+									<input
+										type="text"
+										className="sr-only"
+										aria-hidden
+										tabIndex={-1}
+										onFocus={() => {
+											const options = document.getElementsByName(optionPath)
+											options[0]?.focus()
 										}}
-										defaultChecked={watch(`question.${questionIndex}.option`) === _id}
-										aria-label="Selecionar resposta"
-										title={optionError || (!formDisabled ? "Selecionar resposta" : undefined)}
-										readOnly={formDisabled}
-										inert={formDisabled}
-										error={!!optionError}
+										{...register(optionPath, {
+											required: {
+												value: isRequired,
+												message: "Nenhuma opção foi selecionada como a resposta correta"
+											}
+										})}
+										name={undefined}
+										defaultValue={watch(optionPath)}
 									/>
+								)}
 
-									<p>{text}</p>
-								</li>
-							)
-						}
-						)}
+								<Radio
+									name={optionPath}
+									size="lg"
+									variant="outline"
+									onChange={() => {
+										setValue(optionPath, _id)
+										clearErrors(optionPath)
+									}}
+									title={optionError || (!formDisabled ? "Selecionar resposta" : undefined)}
+									aria-label="Selecionar resposta"
+									defaultChecked={watch(`question.${questionIndex}.option`) === _id}
+									readOnly={formDisabled}
+									inert={formDisabled}
+									error={!!optionError}
+								/>
+
+								<p>{text}</p>
+							</li>
+						))}
 					</ul>
 				)}
 

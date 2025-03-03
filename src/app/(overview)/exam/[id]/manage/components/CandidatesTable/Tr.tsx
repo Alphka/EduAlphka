@@ -37,7 +37,7 @@ export default function Tr({
 		}
 	})
 
-	const isMobile = useMediaQuery("(max-width: 500px)")
+	const isMobile = useMediaQuery("not all and (min-width: 500px)")
 
 	return <>
 		<Table.Tr>

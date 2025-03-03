@@ -110,7 +110,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 	const [sortBy, setSortBy] = useState<FilterTypes | null>(null)
 	const [search, setSearch] = useState("")
 
-	const isMobile = useMediaQuery("(max-width: 500px)")
+	const isMobile = useMediaQuery("not all and (min-width: 500px)")
 
 	const setSorting = (field: FilterTypes) => {
 		const reversed = field === sortBy ? !reverseSortDirection : false
