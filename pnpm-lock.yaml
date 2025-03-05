@@ -10,6 +10,7 @@ overrides:
   glob-parent@^5.1.2: ^6.0.2
   postcss: ^8.5.3
   postcss-import: ^16.1.0
+  postcss-load-config: ^4.0.2
 
 importers:
 
@@ -124,6 +125,9 @@ importers:
       dotenv:
         specifier: ^16.4.7
         version: 16.4.7
+      postcss-load-config:
+        specifier: ^4.0.2
+        version: 4.0.2(postcss@8.5.3)(ts-node@10.9.2(@types/node@22.13.9)(typescript@5.8.2))
       ts-node:
         specifier: ^10.9.2
         version: 10.9.2(@types/node@22.13.9)(typescript@5.8.2)

@@ -18,6 +18,7 @@
 		"@types/react-dom": "^19.0.4",
 		"cross-env": "^7.0.3",
 		"dotenv": "^16.4.7",
+		"postcss-load-config": "^4.0.2",
 		"ts-node": "^10.9.2",
 		"tsconfig-paths": "^4.2.0"
 	},
@@ -59,13 +60,12 @@
 		"node": "^18.18 || ^19.8 || ^20.3 || >=21"
 	},
 	"overrides": {
+		"chokidar@^3.6.0": "^4.0.1",
 		"detect-libc@^1.0.3": "^2.0.3",
 		"glob-parent@^5.1.2": "^6.0.2",
 		"postcss": "$postcss",
 		"postcss-import": "$postcss-import",
-		"react-dom": "$react-dom",
-		"react": "$react",
-		"chokidar@^3.6.0": "^4.0.1"
+		"postcss-load-config": "$postcss-load-config"
 	},
 	"pnpm": {
 		"overrides": {
@@ -73,7 +73,8 @@
 			"detect-libc@^1.0.3": "^2.0.3",
 			"glob-parent@^5.1.2": "^6.0.2",
 			"postcss": "$postcss",
-			"postcss-import": "$postcss-import"
+			"postcss-import": "$postcss-import",
+			"postcss-load-config": "$postcss-load-config"
 		},
 		"onlyBuiltDependencies": [
 			"@parcel/watcher",

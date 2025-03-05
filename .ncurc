@@ -1,5 +1,6 @@
 {
 	"reject": [
+		"postcss-load-config",
 		"react-toastify",
 		"tailwind-merge",
 		"tailwind-preset-mantine",
