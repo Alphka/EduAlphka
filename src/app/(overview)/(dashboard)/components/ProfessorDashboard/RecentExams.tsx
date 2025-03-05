@@ -17,9 +17,10 @@ export default async function RecentExams({ userId, limit }: RecentExamsProps){
 			candidates: 1,
 			description: 1,
 			expiresAt: 1
+		}, {
+			sort: { createdAt: "descending" },
+			limit
 		})
-		.sort({ createdAt: "descending" })
-		.limit(limit)
 
 	return exams.length ? (
 		<ExamList
