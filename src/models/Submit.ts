@@ -1,7 +1,7 @@
-import type { ISubmit, ISubmitMethods, SubmitModel } from "./typings/Submit"
+import type { ISubmit, SubmitModel } from "./typings/Submit"
 import { model, models, Schema } from "mongoose"
 
-const submitSchema = new Schema<ISubmit, SubmitModel, ISubmitMethods>({
+const submitSchema = new Schema<ISubmit, SubmitModel>({
 	user: {
 		type: Schema.ObjectId,
 		required: true,
@@ -18,16 +18,6 @@ const submitSchema = new Schema<ISubmit, SubmitModel, ISubmitMethods>({
 		required: true
 	},
 	publishedAt: Date
-})
-
-submitSchema.method("getAnswers", async function getAnswers(){
-	const { default: Answer } = await import("./Answer")
-	return Answer.find({ submit: this })
-})
-
-submitSchema.method("isPendingCorrection", async function isPendingCorrection(){
-	const answers = await this.getAnswers()
-	return answers.some(answer => !("isCorrect" in answer) || answer.isCorrect === undefined)
 })
 
 const Submit: SubmitModel = models?.Submit || model<ISubmit, SubmitModel>("Submit", submitSchema)

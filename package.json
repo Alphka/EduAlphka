@@ -6,13 +6,13 @@
 	"scripts": {
 		"start": "next start",
 		"build": "next build",
-		"dev": "next dev --turbo",
+		"dev": "next dev --turbopack",
 		"dev:inspect": "cross-env NODE_OPTIONS='--inspect' npm run dev",
 		"dev:test": "node --no-warnings -r ts-node/register test.ts"
 	},
 	"devDependencies": {
 		"@types/lodash": "^4.17.16",
-		"@types/node": "^22.13.8",
+		"@types/node": "^22.13.9",
 		"@types/nodemailer": "^6.4.17",
 		"@types/react": "^19.0.10",
 		"@types/react-dom": "^19.0.4",
@@ -30,8 +30,8 @@
 		"autoprefixer": "^10.4.20",
 		"dayjs": "^1.11.13",
 		"lodash": "^4.17.21",
-		"mongoose": "^8.12.0",
-		"next": "^15.2.0",
+		"mongoose": "^8.12.1",
+		"next": "^15.2.1",
 		"nodemailer": "^6.10.0",
 		"normalize-email": "^1.1.1",
 		"postcss": "^8.5.3",
@@ -53,7 +53,7 @@
 		"zod": "^3.24.2"
 	},
 	"browserslist": [
-		"fully supports es6 and supports rem and supports calc and supports currentcolor and supports css-mediaqueries and fully supports css-variables and fully supports css-grid and fully supports flexbox and supports css3-boxsizing and supports arrow-functions and supports async-functions and supports promises"
+		"fully supports es6 and supports rem and supports calc and supports currentcolor and supports css-mediaqueries and fully supports css-variables and fully supports css-grid and fully supports flexbox and supports css3-boxsizing and supports arrow-functions and supports async-functions and supports promises and not dead"
 	],
 	"engines": {
 		"node": "^18.18 || ^19.8 || ^20.3 || >=21"

@@ -14,7 +14,18 @@ interface GradesScatterChartProps {
 }
 
 export default function GradesScatterChart({ requiredQuestions, questionCorrectPercentage }: GradesScatterChartProps){
-	const questionsSize = max(requiredQuestions.map(question => question.number)) as number
+	const questionsData = requiredQuestions.map(question => {
+		const { correctAnswers, totalAnswers } = questionCorrectPercentage[question.id] || {}
+
+		return {
+			number: question.number,
+			correctAnswers: correctAnswers ?? 0,
+			incorrectAnswers: totalAnswers ?? 0 - correctAnswers ?? 0
+		}
+	})
+
+	const questionsSize = max(requiredQuestions.map(question => question.number))!
+	const maxYValue = max(questionsData.map(question => max([question.correctAnswers, question.incorrectAnswers])!))!
 
 	return (
 		<ScatterChart
@@ -23,17 +34,17 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 				{
 					color: "blue.6",
 					name: "Acertos",
-					data: requiredQuestions.map(question => ({
-						number: question.number,
-						answers: questionCorrectPercentage[question.id]?.correctAnswers ?? 0
+					data: questionsData.map(({ number, correctAnswers }) => ({
+						number,
+						answers: correctAnswers
 					}))
 				},
 				{
 					color: "red.6",
 					name: "Erros",
-					data: requiredQuestions.map(question => ({
-						number: question.number,
-						answers: (questionCorrectPercentage[question.id]?.totalAnswers ?? 0) - (questionCorrectPercentage[question.id]?.correctAnswers ?? 0)
+					data: questionsData.map(({ number, incorrectAnswers }) => ({
+						number,
+						answers: incorrectAnswers
 					}))
 				}
 			]}
@@ -44,10 +55,15 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 				domain: [1, questionsSize],
 				tickCount: questionsSize
 			}}
+			yAxisProps={{
+				domain: [0, maxYValue],
+				tickCount: maxYValue < 5 ? maxYValue + 1 : 6
+			}}
 			valueFormatter={{
 				x: (value) => `Questão ${value}`
 			}}
 			withTooltip
+			withLegend
 		/>
 	)
 }

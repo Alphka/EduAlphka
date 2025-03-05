@@ -159,7 +159,7 @@ export default async function ManageExamPage({ params }: PageProps){
 					...data,
 					startedAt: data.startedAt?.toLocaleDateString("pt-BR")
 				}))}
-				disallowedCandidates={exam.disallowedCandidates.map(({ _id, name, username }) => ({
+				disallowedCandidates={exam.disallowedCandidates.sort((a, b) => a.name.localeCompare(b.name)).map(({ _id, name, username }) => ({
 					id: _id.toString(),
 					name,
 					username

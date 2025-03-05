@@ -74,6 +74,8 @@ export interface IExamMethods {
 	getGradesByCandidate(): Promise<Record<string, {
 		grade: number
 	}>>
+	/** Average time to finish the exam in milliseconds */
+	getAverageCompletionTime(): Promise<number>
 	getQuestionCorrectPercentage: () => Promise<Record<string, {
 		correctPercentage: number
 		correctAnswers: number

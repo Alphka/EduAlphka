@@ -1,11 +1,11 @@
 import type { HydratedDocument, Types } from "mongoose"
 import type { IExam, IExamMethods } from "@models/typings/Exam"
-import type { ComponentProps } from "react"
 import type { IUser } from "@models/typings/User"
 import { Submit } from "@models"
 import { Paper } from "@mantine/core"
 import { pick } from "lodash"
 import GradesScatterChart from "./components/GradesScatterChart"
+import formatTimeDuration from "@helpers/formatTimeDuration"
 import GradesPieChart from "./components/GradesPieChart"
 
 interface ExamReportProps {
@@ -33,9 +33,11 @@ export default async function ExamReport({ exam }: ExamReportProps){
 
 	const [
 		averageGrade,
+		averageCompletionTime,
 		questionCorrectPercentage
 	] = await Promise.all([
 		exam.getAverageGrade(),
+		exam.getAverageCompletionTime(),
 		exam.getQuestionCorrectPercentage()
 	])
 
@@ -55,11 +57,12 @@ export default async function ExamReport({ exam }: ExamReportProps){
 
 	return (
 		<Paper
+			id="exam-report"
 			className="flex flex-col p-xl gap-lg"
 			withBorder
 		>
 			<section className="flex flex-col gap-xl">
-				<header>
+				<header className="flex items-start gap-md">
 					<h1 className="text-h5">
 						Relatório das respostas do teste
 					</h1>
@@ -69,6 +72,10 @@ export default async function ExamReport({ exam }: ExamReportProps){
 					<li className="flex flex-col gap-xs">
 						<h2 className="font-bold">Nota média do teste</h2>
 						<p>{Math.round(Number(averageGrade.toPrecision(6)) * 100) / 100} de {requiredQuestions.length}</p>
+					</li>
+					<li>
+						<h2 className="font-bold">Tempo médio de conclusão</h2>
+						<p>{formatTimeDuration(averageCompletionTime / 1000 / 60)}</p>
 					</li>
 				</ul>
 
@@ -98,7 +105,10 @@ export default async function ExamReport({ exam }: ExamReportProps){
 
 							<GradesScatterChart
 								{...{
-									requiredQuestions: requiredQuestions.map(question => pick(question, ["id", "text", "number"] as const)) as ComponentProps<typeof GradesScatterChart>["requiredQuestions"],
+									requiredQuestions: requiredQuestions.map(({ _id, ...question }) => ({
+										id: _id.toString(),
+										...pick(question as typeof question & { number: number }, ["text", "number"] as const)
+									})),
 									questionCorrectPercentage
 								}}
 							/>

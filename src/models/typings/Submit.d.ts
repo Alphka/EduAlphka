@@ -1,5 +1,4 @@
-import type { HydratedDocument, Model, PopulatedDoc, Types } from "mongoose"
-import type { IAnswer } from "./Answer"
+import type { Model, PopulatedDoc, Types } from "mongoose"
 import type { IUser } from "./User"
 import type { IExam } from "./Exam"
 
@@ -11,9 +10,4 @@ export interface ISubmit {
 	publishedAt?: Date
 }
 
-export interface ISubmitMethods {
-	getAnswers: () => Promise<HydratedDocument<IAnswer>[]>
-	isPendingCorrection: () => Promise<boolean>
-}
-
-export type SubmitModel = Model<ISubmit, {}, ISubmitMethods>
+export type SubmitModel = Model<ISubmit>

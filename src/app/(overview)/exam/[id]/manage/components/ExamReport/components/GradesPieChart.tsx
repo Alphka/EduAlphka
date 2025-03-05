@@ -18,8 +18,8 @@ export default function GradesPieChart({ totalCorrectAnswers, totalIncorrectAnsw
 			<PieChart
 				size={isMobile ? 80 : 164}
 				data={[
-					{ name: "Acertos", value: totalCorrectAnswers, color: "blue.6" },
 					{ name: "Erros", value: totalIncorrectAnswers, color: "red.6" },
+					{ name: "Acertos", value: totalCorrectAnswers, color: "blue.6" }
 				]}
 				strokeWidth={2}
 				withTooltip

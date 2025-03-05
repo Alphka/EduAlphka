@@ -29,7 +29,7 @@ classDiagram
         +Date expiresAt
 
         +sendEmail() Promise~void~$
-        +validateCode()$ boolean
+        +validateCode() boolean$
     }
     VerificationCode "1..*" --> "1" User : contains
 
@@ -158,8 +158,8 @@ classDiagram
         +Date createdAt
         +Date publishedAt
 
-        +getAnswers() Promise~Answer[]~
         +getGrade() Promise~Number~*
-        +isPendingCorrection() Promise~boolean~
+        +getAnswers() Promise~Answer[]~*
+        +isPendingCorrection() Promise~boolean~*
         +sendNotification(exam: Exam, user: User) Promise~void~$
     }
