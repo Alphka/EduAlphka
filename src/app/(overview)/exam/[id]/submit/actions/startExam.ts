@@ -27,10 +27,12 @@ export default async function startExam(id: string){
 	if(!exam.candidates.some(candidate => candidate._id.equals(user.id))) return { errors: ["Você não está inscrito nesse teste"] }
 	if(exam.startsAt && Date.now() < exam.startsAt.getTime()) return { errors: ["Esse teste não iniciou ainda"]}
 
-	await StartedExam.create({
-		exam,
-		user: user.id
-	})
+	if(!(await StartedExam.exists({ exam, user: user.id }))){
+		await StartedExam.create({
+			exam,
+			user: user.id
+		})
+	}
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.list.pathname)

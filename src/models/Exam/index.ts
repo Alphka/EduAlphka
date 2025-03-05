@@ -109,7 +109,11 @@ examSchema.method("getSubmitData", async function getSubmitData(candidates: (Typ
 			}
 		},
 		{
-			$unwind: "$submit"
+			$set: {
+				submit: {
+					$arrayElemAt: ["$submit", 0]
+				}
+			}
 		}
 	])
 
