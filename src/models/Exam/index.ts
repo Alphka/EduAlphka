@@ -222,10 +222,27 @@ examSchema.method("getGradesByCandidate", async function getGradesByCandidate(){
 examSchema.method("getAverageGrade", async function getAverageGrade(){
 	const { default: Submit } = await import("../Submit")
 
+	let questions: ExamQuestion[] = this.questions
+
+	if(!("questions" in this) || !Array.isArray(this.questions)){
+		const exam = await Exam.findById(this._id, { questions: 1 })
+			.orFail(new Error("Exam not found"))
+			.lean()
+
+		questions = exam.questions as typeof questions
+	}
+
+	const hasRequiredDissertative = questions.some(question => question.isRequired && question.type === "dissertative")
+
 	const result = await Submit.aggregate<{ averageGrade: number }>([
 		{
 			$match: {
-				exam: this._id
+				exam: this._id,
+				...(hasRequiredDissertative && {
+					publishedAt: {
+						$exists: true
+					}
+				})
 			}
 		},
 		{
