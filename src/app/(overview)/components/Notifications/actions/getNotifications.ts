@@ -27,6 +27,9 @@ export async function getNotifications(){
 			.find({ user: user.id }, {
 				user: 0,
 				__v: 0
+			}, {
+				sort: { createdAt: "descending" },
+				limit: 15
 			})
 			.populate("exam", {
 				title: 1
@@ -35,8 +38,6 @@ export async function getNotifications(){
 				name: 1,
 				username: 1
 			})
-			.sort({ createdAt: "descending" })
-			.limit(15)
 			.lean<NotificationObject[]>()
 
 		for(const notification of notifications){

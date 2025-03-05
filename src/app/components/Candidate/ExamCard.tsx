@@ -26,7 +26,7 @@ export default async function ExamCard({ exam, userId }: ExamCardProps){
 	const isExamStarted = !!startedExam
 	const isExamSubmitted = !!startedExam?.submit
 	const isExamExpired = isExamStarted
-		? !isExamSubmitted && await StartedExam.hydrate(startedExam).isExpired()
+		? !isExamSubmitted && await StartedExam.hydrate(startedExam).isExpired({ exam })
 		: exam.isExpired()
 	const pendingCorrection = !!startedExam?.pendingCorrection
 

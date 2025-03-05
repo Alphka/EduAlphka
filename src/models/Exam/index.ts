@@ -1,4 +1,4 @@
-import type { IExam, ExamModel, IExamMethods, StartedExamWithSubmit } from "../typings/Exam"
+import type { IExam, ExamModel, IExamMethods, StartedExamWithSubmit, ExamQuestion } from "../typings/Exam"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
 import { QuestionSchema, QuestionTypes } from "./Question"
 import { model, models, Schema, Types } from "mongoose"
@@ -54,7 +54,11 @@ examSchema.method("isExpired", function isExpired(){
 })
 
 examSchema.method("getSubmitData", async function getSubmitData(candidates: (Types.ObjectId | string) | (Types.ObjectId | string)[]){
-	const { default: StartedExam } = await import("../StartedExam")
+	const [{ default: StartedExam }] = await Promise.all([
+		import("../StartedExam"),
+		import("../Submit"),
+		import("../Answer")
+	])
 
 	const exam = await Exam
 		.findById(this._id, { questions: 1 })
@@ -145,6 +149,269 @@ examSchema.method("getSubmitData", async function getSubmitData(candidates: (Typ
 	})
 
 	return isMultipleCandidates ? Promise.all(results) : results[0]
+})
+
+examSchema.method("getGradesByCandidate", async function getGradesByCandidate(){
+	const { default: Submit } = await import("../Submit")
+
+	let questions: ExamQuestion[] = this.questions
+
+	if(!("questions" in this) || !Array.isArray(this.questions)){
+		const exam = await Exam.findById(this._id, { questions: 1 })
+			.orFail(new Error("Exam not found"))
+			.lean()
+
+		questions = exam.questions as typeof questions
+	}
+
+	const hasRequiredDissertative = questions.some(question => question.isRequired && question.type === "dissertative")
+
+	const result = await Submit.aggregate<{ user: string, grade: number }>([
+		{
+			$match: {
+				exam: this._id,
+				...(hasRequiredDissertative && {
+					publishedAt: {
+						$exists: true
+					}
+				})
+			}
+		},
+		{
+			$lookup: {
+				from: "answers",
+				localField: "_id",
+				foreignField: "submit",
+				as: "answers"
+			}
+		},
+		{
+			$unwind: "$answers"
+		},
+		{
+			$match: {
+				"answers.question": {
+					$in: questions
+						.filter(question => question.isRequired)
+						.map(question => question._id)
+				}
+			}
+		},
+		{
+			$group: {
+				_id: "$user",
+				totalCorrect: {
+					$sum: {
+						$cond: ["$answers.isCorrect", 1, 0]
+					}
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 0,
+				user: "$_id",
+				grade: "$totalCorrect"
+			}
+		}
+	])
+
+	return Object.fromEntries(result.map(({ user, grade }) => [user.toString(), { grade }]))
+})
+
+examSchema.method("getAverageGrade", async function getAverageGrade(){
+	const { default: Submit } = await import("../Submit")
+
+	let questions: ExamQuestion[] = this.questions
+
+	if(!("questions" in this) || !Array.isArray(this.questions)){
+		const exam = await Exam.findById(this._id, { questions: 1 })
+			.orFail(new Error("Exam not found"))
+			.lean()
+
+		questions = exam.questions as typeof questions
+	}
+
+	const hasRequiredDissertative = questions.some(question => question.isRequired && question.type === "dissertative")
+
+	const result = await Submit.aggregate<{ averageGrade: number }>([
+		{
+			$match: {
+				exam: this._id,
+				...(hasRequiredDissertative && {
+					publishedAt: {
+						$exists: true
+					}
+				})
+			}
+		},
+		{
+			$lookup: {
+				from: "answers",
+				localField: "_id",
+				foreignField: "submit",
+				as: "answers"
+			}
+		},
+		{
+			$unwind: "$answers"
+		},
+		{
+			$group: {
+				_id: "$_id",
+				totalCorrect: {
+					$sum: {
+						$cond: ["$answers.isCorrect", 1, 0]
+					}
+				}
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				totalCorrect: {
+					$sum: "$totalCorrect"
+				},
+				totalCandidates: {
+					$sum: 1
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 0,
+				averageGrade: {
+					$divide: ["$totalCorrect", "$totalCandidates"]
+				}
+			}
+		}
+	])
+
+	return result.length ? result[0].averageGrade : 0
+})
+
+examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorrectPercentage(){
+	const { default: Answer } = await import("../Answer")
+
+	let questions: ExamQuestion[] = this.questions
+
+	if(!("questions" in this) || !Array.isArray(this.questions)){
+		const exam = await Exam.findById(this._id, { questions: 1 })
+			.orFail(new Error("Exam not found"))
+			.lean()
+
+		questions = exam.questions as typeof questions
+	}
+
+	const result = await Answer.aggregate<{
+		questionId: Types.ObjectId,
+		totalAnswers: number,
+		correctAnswers: number,
+		correctPercentage: number
+	}>([
+		{
+			$match: {
+				question: {
+					$in: questions
+						.filter(question => question.isRequired)
+						.map(question => question._id)
+				}
+			}
+		},
+		{
+			$group: {
+				_id: "$question",
+				totalAnswers: {
+					$sum: 1
+				},
+				correctAnswers: {
+					$sum: {
+						$cond: ["$isCorrect", 1, 0]
+					}
+				}
+			}
+		},
+		{
+			$project: {
+				_id: 0,
+				questionId: "$_id",
+				totalAnswers: "$totalAnswers",
+				correctAnswers: "$correctAnswers",
+				correctPercentage: {
+					$multiply: [
+						{ $divide: ["$correctAnswers", "$totalAnswers"] },
+						100
+					]
+				}
+			}
+		}
+	])
+
+	return Object.fromEntries(result.map(({ questionId, totalAnswers, correctAnswers, correctPercentage }) => [
+		questionId.toString(),
+		{ correctPercentage, correctAnswers, totalAnswers }
+	]))
+})
+
+examSchema.method("getAverageCompletionTime", async function getAverageCompletionTime(){
+	const [{ default: StartedExam }] = await Promise.all([
+		import("../StartedExam"),
+		import("../Submit")
+	])
+
+	const result = await StartedExam.aggregate<{ averageTime: number }>([
+		{
+			$match: {
+				exam: this._id
+			}
+		},
+		{
+			$lookup: {
+				from: "submits",
+				localField: "user",
+				foreignField: "user",
+				let: {
+					examId: "$exam"
+				},
+				pipeline: [
+					{
+						$match: {
+							$expr: {
+								$eq: ["$exam", "$$examId"]
+							}
+						}
+					},
+					{
+						$project: {
+							user: 1,
+							createdAt: 1
+						}
+					}
+				],
+				as: "submit"
+			}
+		},
+		{
+			$unwind: "$submit"
+		},
+		{
+			$set: {
+				completionTime: {
+					$subtract: ["$submit.createdAt", "$createdAt"]
+				}
+			}
+		},
+		{
+			$group: {
+				_id: null,
+				averageTime: {
+					$avg: "$completionTime"
+				}
+			}
+		}
+	])
+
+	return result.length ? result[0].averageTime : 0
 })
 
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)

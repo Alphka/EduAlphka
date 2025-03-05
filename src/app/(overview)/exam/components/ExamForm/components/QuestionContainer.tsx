@@ -45,7 +45,7 @@ export default function QuestionContainer({
 	watch,
 	index
 }: QuestionContainerProps){
-	const isMobile = useMediaQuery("(max-width: 400px)")
+	const isMobile = useMediaQuery("not all and (min-width: 400px)")
 
 	const {
 		fields: optionFields,
@@ -130,10 +130,7 @@ export default function QuestionContainer({
 				label="Selecione o tipo da questão"
 				placeholder="Selecione uma opção"
 				aria-label="Tipo da questão"
-				data={Object.entries(QuestionTypes).map(([value, label]) => ({
-					label,
-					value
-				}))}
+				data={Object.entries(QuestionTypes).map(([value, label]) => ({ label, value }))}
 				{...register(`question.${index}.question_type`, {
 					required: "O tipo da questão é obrigatório"
 				})}

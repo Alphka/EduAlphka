@@ -6,10 +6,11 @@ import routes from "@app/routes"
 
 export interface ExamInvitationProps {
 	examId: string
+	isExpired: boolean
 	inviteToken: string | undefined
 }
 
-export default async function ExamInvitation({ examId, inviteToken }: ExamInvitationProps){
+export default async function ExamInvitation({ examId, isExpired, inviteToken }: ExamInvitationProps){
 	const id = useId()
 	const url = (await getRequestURL())!
 
@@ -30,6 +31,7 @@ export default async function ExamInvitation({ examId, inviteToken }: ExamInvita
 
 				<ManageInviteURL
 					examId={examId}
+					isExpired={isExpired}
 					inviteURL={inviteToken ? new URL(routes.invite.children.template.pathname.replace("[token]", inviteToken), url).href : undefined}
 				/>
 			</section>

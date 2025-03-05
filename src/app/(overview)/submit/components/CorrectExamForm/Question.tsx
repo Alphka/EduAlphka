@@ -99,7 +99,6 @@ export default function CorrectExamFormQuestion({
 								spellCheck
 								autosize
 								readOnly
-								inert
 							/>
 
 							{isRequired && <>
@@ -116,11 +115,10 @@ export default function CorrectExamFormQuestion({
 										minRows={2}
 										maxRows={12}
 										withAsterisk={false}
-										defaultValue={answer!.feedback}
+										defaultValue={answer?.feedback}
 										spellCheck
 										autosize
 										readOnly={formDisabled}
-										inert={formDisabled}
 										ref={feedbackRef}
 									/>
 

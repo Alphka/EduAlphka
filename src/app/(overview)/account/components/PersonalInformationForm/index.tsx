@@ -107,7 +107,6 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 					})}
 					defaultValue={user.name}
 					readOnly={!enabled}
-					inert={!enabled}
 					error={enabled ? errors.name?.message : undefined}
 				/>
 
@@ -135,7 +134,6 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 					})}
 					defaultValue={user.username}
 					readOnly={!enabled}
-					inert={!enabled}
 					error={enabled ? errors.username?.message : undefined}
 				/>
 
@@ -166,7 +164,6 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 					})}
 					defaultValue={user.email}
 					readOnly={!enabled}
-					inert={!enabled}
 					error={enabled ? errors.email?.message : undefined}
 				/>
 
@@ -205,7 +202,6 @@ export default function PersonalInformationForm({ user }: PersonalInformationFor
 						}
 					})}
 					readOnly={!enabled}
-					inert={!enabled}
 					error={enabled ? errors.password?.message : undefined}
 				/>
 			</fieldset>

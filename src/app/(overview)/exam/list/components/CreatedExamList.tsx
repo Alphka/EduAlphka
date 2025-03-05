@@ -7,9 +7,7 @@ interface CreatedExamListProps {
 
 export default async function CreatedExamList({ userId }: CreatedExamListProps){
 	const exams = await Exam
-		.find({
-			owner: userId
-		}, {
+		.find({ owner: userId }, {
 			title: 1,
 			subject: 1,
 			duration: 1,
@@ -18,8 +16,9 @@ export default async function CreatedExamList({ userId }: CreatedExamListProps){
 			candidates: 1,
 			description: 1,
 			expiresAt: 1
+		}, {
+			sort: { createdAt: "descending" }
 		})
-		.sort({ createdAt: "descending" })
 
 	return exams.length ? (
 		<ExamList exams={exams} />

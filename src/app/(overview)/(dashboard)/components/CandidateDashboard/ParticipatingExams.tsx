@@ -8,9 +8,7 @@ export interface ParticipatingExamsProps extends Pick<CandidateDashboardProps, "
 
 export default async function ParticipatingExams({ userId/*, recentExamsLimit */ }: ParticipatingExamsProps){
 	const exams = await Exam
-		.find({
-			candidates: userId
-		}, {
+		.find({ candidates: userId }, {
 			id: 1,
 			owner: 1,
 			title: 1,
@@ -21,12 +19,10 @@ export default async function ParticipatingExams({ userId/*, recentExamsLimit */
 			createdAt: 1,
 			updatedAt: 1,
 			expiresAt: 1
+		}, {
+			sort: { createdAt: "descending" },
+			// limit: recentExamsLimit
 		})
-		.sort({
-			createdAt: "descending",
-			updatedAt: "descending"
-		})
-		// .limit(recentExamsLimit)
 		.populate<{
 			owner: HydratedDocument<Pick<IUser, "name" | "username">>
 		}>("owner", {

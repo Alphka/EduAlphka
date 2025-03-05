@@ -109,7 +109,7 @@ export default async function SubmitExamPage({ params }: PageProps){
 		)
 	}
 
-	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired()){
+	if(!submitData.submit && await StartedExam.hydrate(submitData).isExpired({ exam })){
 		redirect(routes.accessDenied.pathname, RedirectType.replace)
 	}
 
@@ -216,12 +216,20 @@ export default async function SubmitExamPage({ params }: PageProps){
 			<SubmitExamForm
 				exam={pick(examClient, ["_id", "questions"] as const)}
 				answers={answers && pendingCorrection ? answers.map(answer => omit(answer, "feedback")) : answers}
-				defaultValues={submitData.submit ? {
-					question: submitData.submit.answers.map(({ option, content }) => ({
-						option: option?.toString(),
-						content
-					}))
-				} : undefined}
+				defaultValues={submitData.submit && (() => {
+					const answerByQuestionMap = new Map(submitData.submit.answers.map(answer => [answer.question.toString(), answer]))
+
+					return {
+						question: exam.questions.map(({ _id }) => {
+							const { option, content } = answerByQuestionMap.get(_id.toString()) || {}
+
+							return {
+								option: option?.toString(),
+								content
+							}
+						})
+					}
+				})()}
 			/>
 		</div>
 	)

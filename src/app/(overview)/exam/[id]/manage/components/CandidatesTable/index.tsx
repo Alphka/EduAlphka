@@ -10,13 +10,14 @@ import AddCandidate from "./components/AddCandidate"
 import Th from "./Th"
 import Tr from "./Tr"
 
-const filters = ["name", "status", "startedAt"] as const
+const filters = ["name", "status", "startedAt", "grade"] as const
 
 type FilterTypes = typeof filters[number]
 
 export interface CandidatesRowData {
 	id: string
 	name: string
+	grade: number | null
 	submitId?: string
 	username: string
 	/** Started exam date */
@@ -29,6 +30,7 @@ export interface CandidatesRowData {
 export interface RowData extends Pick<CandidatesRowData,
 	| "id"
 	| "name"
+	| "grade"
 	| "username"
 	| "submitId"
 	| "startedAt"
@@ -69,6 +71,13 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 				return reversed ? statusB - statusA : statusA - statusB
 			}
 
+			if(sortBy === "grade"){
+				const gradeA = a.grade ?? 0
+				const gradeB = b.grade ?? 0
+
+				return reversed ? gradeB - gradeA : gradeA - gradeB
+			}
+
 			return (reversed ? b : a)[sortBy].localeCompare((reversed ? a : b)[sortBy])
 		})
 		.filter(item => {
@@ -77,13 +86,19 @@ function sortData(data: RowData[], { search, sortBy, reversed }: {
 			return keys.some(key => {
 				const rowData = item[key as Exclude<typeof key, "status">]
 
-				if(!rowData) return false
+				if(rowData === undefined || rowData === null){
+					return false
+				}
 
 				if(key === "status"){
 					return SubmitStatus[rowData as unknown as SubmitStatus].toLocaleLowerCase().includes(query)
 				}
 
-				return rowData.toLocaleLowerCase().includes(query)
+				if(key === "grade"){
+					return rowData.toString().includes(query)
+				}
+
+				return (rowData as NonNullable<RowData[typeof key]>).toLocaleLowerCase().includes(query)
 			})
 		})
 }
@@ -110,7 +125,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 	const [sortBy, setSortBy] = useState<FilterTypes | null>(null)
 	const [search, setSearch] = useState("")
 
-	const isMobile = useMediaQuery("(max-width: 500px)")
+	const isMobile = useMediaQuery("not all and (min-width: 500px)")
 
 	const setSorting = (field: FilterTypes) => {
 		const reversed = field === sortBy ? !reverseSortDirection : false
@@ -150,7 +165,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 					disabled={!data.length}
 				/>
 
-				<Table.ScrollContainer minWidth={300}>
+				<Table.ScrollContainer minWidth={400}>
 					<Table
 						className="bg-dark-600 rounded"
 						horizontalSpacing={isMobile ? "sm" : "md"}
@@ -175,10 +190,11 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 									sorted={sortBy === "startedAt"}
 									reversed={reverseSortDirection}
 									onSort={() => setSorting("startedAt")}
+									aria-label="Data de início"
 									ta="center"
 								>
 									<span className="hidden xs:block">Data de início</span>
-									<span className="block xs:hidden" aria-hidden>Início</span>
+									<span className="block xs:hidden">Início</span>
 								</Th>
 
 								<Th
@@ -189,6 +205,16 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 									ta="center"
 								>
 									Status
+								</Th>
+
+								<Th
+									w="5%"
+									sorted={sortBy === "grade"}
+									reversed={reverseSortDirection}
+									onSort={() => setSorting("grade")}
+									ta="center"
+								>
+									Nota
 								</Th>
 
 								<Table.Th
@@ -202,6 +228,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 							{sortedData.length > 0 ? sortedData.map(({
 								id,
 								name,
+								grade,
 								status,
 								username,
 								submitId,
@@ -213,6 +240,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 									{...{
 										id,
 										name,
+										grade,
 										examId,
 										status,
 										submitId,

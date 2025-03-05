@@ -1,3 +1,4 @@
+import type { ComponentProps } from "react"
 import type { IExamInvite } from "@models/typings/ExamInvite"
 import type { PageProps } from "@typings"
 import type { Metadata } from "next"
@@ -13,6 +14,7 @@ import RemoveExamButton from "./components/RemoveExamButton"
 import connectDatabase from "@lib/connectDatabase"
 import CandidatesTable from "./components/CandidatesTable"
 import ExamInvitation from "./components/ExamInvitation"
+import ExamReport from "./components/ExamReport"
 import routes from "@app/routes"
 import Link from "next/link"
 
@@ -33,13 +35,13 @@ export default async function ManageExamPage({ params }: PageProps){
 
 	const [exam, user] = await Promise.all([
 		Exam
-			.findById<HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "expiresAt"> & {
+			.findById<HydratedDocument<Pick<IExam, "_id" | "title" | "duration" | "questions" | "expiresAt"> & {
 				owner: Types.ObjectId
-				candidates: Types.Array<Types.ObjectId>
 			}>>(id, {
 				owner: 1,
 				title: 1,
 				duration: 1,
+				questions: 1,
 				candidates: 1,
 				disallowedCandidates: 1,
 				expiresAt: 1,
@@ -65,14 +67,17 @@ export default async function ManageExamPage({ params }: PageProps){
 		verifyAuthorization({ accountType: "professor" })
 	])
 
-	if(!exam.owner._id.equals(user.id)) redirect(routes.accessDenied.pathname, RedirectType.replace)
+	if(!exam.owner._id.equals(user.id)){
+		redirect(routes.accessDenied.pathname, RedirectType.replace)
+	}
 
-	const [examInvite, submitData] = await Promise.all([
+	const [examInvite, submitData, gradesByCandidate] = await Promise.all([
 		ExamInvite.findOne<HydratedDocument<Pick<IExamInvite, "_id" | "token">>>({ exam }, {
 			token: 1,
 			__v: 1
 		}),
-		exam.getSubmitData(exam.candidates.map(({ _id }) => _id))
+		exam.getSubmitData(exam.candidates.map(({ _id }) => _id)),
+		exam.getGradesByCandidate()
 	])
 
 	const candidatesStartedExams = new Map<string, typeof submitData[number]>
@@ -86,6 +91,7 @@ export default async function ManageExamPage({ params }: PageProps){
 			<header className="flex flex-col gap-y-xl">
 				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
 					<Button
+						className="max-xs:ps-2 max-xs:pe-2"
 						href={routes.exam.children.template.pathname.replace("[id]", id)}
 						size="sm"
 						radius="xl"
@@ -116,53 +122,54 @@ export default async function ManageExamPage({ params }: PageProps){
 
 			<ExamInvitation
 				examId={id}
+				isExpired={exam.isExpired()}
 				inviteToken={examInvite?.token || undefined}
-				key={examInvite?.__v}
+				key={`invite:${examInvite?.__v}`}
 			/>
 
 			<CandidatesTable
 				examId={id}
 				data={(await Promise.all(exam.candidates.map(async candidate => {
 					const isDeleted = candidate instanceof Types.ObjectId
-					const id = isDeleted ? candidate.toString() : candidate._id.toString()
+					const id = isDeleted ? candidate.toString() : candidate.id as string
 
 					const startedExam = candidatesStartedExams.get(id)
-					const submitId = startedExam?.submit?._id.toString() as string | undefined
+					const submitId = startedExam?.submit?._id.toString()
 					const pendingCorrection = !!startedExam?.pendingCorrection
 
 					return {
 						id,
 						name: isDeleted ? "Conta apagada" : candidate.name,
+						grade: gradesByCandidate[id]?.grade ?? null,
 						submitId,
 						username: isDeleted ? "" : candidate.username,
 						startedAt: startedExam?.createdAt,
-						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired() : false,
+						isExpired: startedExam ? await StartedExam.hydrate(startedExam).isExpired({ exam }) : false,
 						pendingCorrection,
 						isDeleted
 					}
-				})))
-					.sort((a, b) => {
-						if(!a.startedAt && !b.startedAt) return 0
+				}))).sort((a, b) => {
+					if(!a.startedAt && !b.startedAt) return 0
 
-						if(!a.startedAt) return -1
-						if(!b.startedAt) return 1
+					if(!a.startedAt) return -1
+					if(!b.startedAt) return 1
 
-						const dateA = new Date(a.startedAt)
-						const dateB = new Date(b.startedAt)
-
-						return dateB.getTime() - dateA.getTime()
-					})
-					.map(data => ({
-						...data,
-						startedAt: data.startedAt?.toLocaleDateString("pt-BR")
-					}))
-				}
-				disallowedCandidates={exam.disallowedCandidates.map(({ _id, name, username }) => ({
+					return b.startedAt.getTime() - a.startedAt.getTime()
+				}).map(data => ({
+					...data,
+					startedAt: data.startedAt?.toLocaleDateString("pt-BR")
+				}))}
+				disallowedCandidates={exam.disallowedCandidates.sort((a, b) => a.name.localeCompare(b.name)).map(({ _id, name, username }) => ({
 					id: _id.toString(),
 					name,
 					username
 				}))}
-				key={`${exam.__v}.${exam.candidates.length}`}
+				key={`candidates:${exam.__v}.${exam.candidates.length}`}
+			/>
+
+			<ExamReport
+				exam={exam as ComponentProps<typeof ExamReport>["exam"]}
+				key={`report:${exam.__v}.${exam.candidates.length}`}
 			/>
 		</div>
 	)

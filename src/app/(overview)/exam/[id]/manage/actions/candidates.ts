@@ -42,13 +42,10 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 	const candidate = await User
 		.findOne({
 			$or: [
-				{ normalizedEmail: normalizeEmail(usernameOrEmail) },
+				...(usernameOrEmail.includes("@") ? [{ normalizedEmail: normalizeEmail(usernameOrEmail) }] : []),
 				{ username: usernameOrEmail }
 			]
-		}, {
-			_id: 1,
-			accountType: 1
-		})
+		}, { accountType: 1 })
 		.collation({ locale: "en", strength: 2 })
 
 	if(!candidate) return { errors: ["Usuário não encontrado"] }
@@ -62,8 +59,11 @@ export async function addCandidate(examId: string, usernameOrEmail: string){
 		return { errors: ["Esse candidato está desativado do teste"] }
 	}
 
-	exam.candidates.unshift(candidate._id)
-	await exam.save()
+	await exam.updateOne({
+		$addToSet: {
+			candidates: candidate._id
+		}
+	})
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.list.pathname)
@@ -85,8 +85,8 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 
 	const exam = await Exam.findById(examId, {
 		owner: 1,
-		candidates: 1,
-		...(disable ? { disallowedCandidates: 1 } : undefined)
+		duration: 1,
+		expiresAt: 1
 	})
 
 	if(!exam){
@@ -98,23 +98,27 @@ export async function removeCandidate(examId: string, userId: string, disable = 
 	}
 
 	const startedExam = await StartedExam.findOne({
-		exam: examId,
+		exam,
 		user: userId
-	}, { _id: 1 })
+	}, {
+		_id: 1,
+		createdAt: 1
+	})
 
-	if(startedExam && !(await startedExam.isExpired())){
+	if(startedExam && !(await startedExam.isExpired({ exam }))){
 		return { errors: [`Não é possível ${disable ? "desativar" : "remover"} um candidato que já iniciou o teste`] }
 	}
 
-	if(disable){
-		exam.disallowedCandidates.addToSet(userId)
-	}
-
-	exam.candidates.pull(userId)
-
-	if(exam.isModified()){
-		await exam.save()
-	}
+	await exam.updateOne({
+		...(disable && {
+			$addToSet: {
+				disallowedCandidates: userId
+			}
+		}),
+		$pull: {
+			candidates: userId
+		}
+	})
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.list.pathname)
@@ -134,11 +138,7 @@ export async function enableCandidate(examId: string, userId: string){
 	if(!user) return { errors: ["Você precisa estar logado para executar essa ação"] }
 	if(user.accountType !== "professor") return { errors: ["Você não tem permissão para executar essa ação"] }
 
-	const exam = await Exam.findById(examId, {
-		owner: 1,
-		candidates: 1,
-		disallowedCandidates: 1
-	})
+	const exam = await Exam.findById(examId, { owner: 1 })
 
 	if(!exam){
 		return { errors: ["Teste não encontrado"] }
@@ -148,12 +148,14 @@ export async function enableCandidate(examId: string, userId: string){
 		return { errors: ["Você não tem permissão para executar essa ação"] }
 	}
 
-	exam.disallowedCandidates.pull(userId)
-	exam.candidates.addToSet(userId)
-
-	if(exam.isModified()){
-		await exam.save()
-	}
+	await exam.updateOne({
+		$addToSet: {
+			candidates: userId
+		},
+		$pull: {
+			disallowedCandidates: userId
+		}
+	})
 
 	revalidatePath(routes.homepage.pathname)
 	revalidatePath(routes.exam.children.list.pathname)

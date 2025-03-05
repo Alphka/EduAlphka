@@ -10,7 +10,7 @@ import routes from "@app/routes"
 import Link from "next/link"
 
 interface TrProps extends
-	Pick<RowData, "id" | "name" | "username" | "status" | "startedAt" | "submitId" | "isDeleted" | "pendingCorrection">,
+	Pick<RowData, "id" | "name" | "username" | "status" | "grade" | "startedAt" | "submitId" | "isDeleted" | "pendingCorrection">,
 	Pick<CandidatesTableProps, "examId"> {
 	statusColor: string
 }
@@ -24,6 +24,7 @@ export default function Tr({
 	username,
 	examId,
 	status,
+	grade,
 	name,
 	id
 }: TrProps){
@@ -37,7 +38,7 @@ export default function Tr({
 		}
 	})
 
-	const isMobile = useMediaQuery("(max-width: 500px)")
+	const isMobile = useMediaQuery("not all and (min-width: 500px)")
 
 	return <>
 		<Table.Tr>
@@ -64,8 +65,6 @@ export default function Tr({
 				{startedAt || "-"}
 			</Table.Td>
 
-			{/* TODO: Include candidate's grade */}
-
 			<Table.Td>
 				<Badge
 					color={statusColor}
@@ -75,6 +74,10 @@ export default function Tr({
 				>
 					{SubmitStatus[status]}
 				</Badge>
+			</Table.Td>
+
+			<Table.Td ta="center">
+				{grade ?? "-"}
 			</Table.Td>
 
 			<Table.Td>

@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss"
 import { DEFAULT_THEME } from "@mantine/core"
 import tailwindPresetMantine from "tailwind-preset-mantine"
 
-const config: Config = {
+const config = {
 	content: [
 		"./src/**/*.tsx"
 	],
@@ -134,6 +134,6 @@ const config: Config = {
 		})
 	],
 	darkMode: ["selector", '[data-mantine-color-scheme="dark"]']
-}
+} as const satisfies Config
 
 export default config

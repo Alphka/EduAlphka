@@ -40,7 +40,12 @@ export default function LayoutShell({ user, children, hasUnreadNotifications }: 
 					mobile: !burgerOpened
 				}
 			}}
-			padding="xl"
+			padding={{
+				base: "xs",
+				"280px": "sm",
+				sm: "md",
+				md: "xl"
+			}}
 			zIndex={5}
 		>
 			<AppShell.Header>

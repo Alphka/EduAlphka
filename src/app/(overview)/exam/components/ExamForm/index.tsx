@@ -58,8 +58,8 @@ export default function ExamForm({
 	type = "create"
 }: ExamFormProps){
 	const { handleServerAction, isPending } = useServerActionHandler()
+	const isMobile = useMediaQuery("not all and (min-width: 36em)")
 	const durationInputRef = useRef<HTMLInputElement>(null)
-	const isMobile = useMediaQuery("(max-width: 600px)")
 
 	const formDisabled = loading || canEdit === false
 
@@ -154,6 +154,7 @@ export default function ExamForm({
 			<header className="flex flex-col gap-y-xl">
 				<div className="flex items-center justify-between *:flex-shrink-0 gap-md">
 					<Button
+						className="max-xs:ps-2 max-xs:pe-2"
 						href={routes.homepage.pathname}
 						size="sm"
 						radius="xl"
@@ -207,10 +208,10 @@ export default function ExamForm({
 							...questionData
 						}) => ({
 							type,
-							...(type === "multiple_choice" ? {
+							...(type === "multiple_choice" && {
 								options,
 								correct_answer
-							} : undefined),
+							}),
 							...questionData
 						}))
 					}
@@ -329,8 +330,16 @@ export default function ExamForm({
 										color={errors.exam?.duration ? "currentColor" : "gray"}
 										variant="subtle"
 										onClick={event => {
-											if(!event.currentTarget.disabled){
-												durationInputRef.current?.showPicker?.()
+											const input = durationInputRef.current
+
+											if(!input) return
+											if(event.currentTarget.disabled) return
+
+											try{
+												input.focus()
+												input.showPicker()
+											}catch{
+												input.click()
 											}
 										}}
 										aria-label="Escolha o horário"
