@@ -1,8 +1,10 @@
 "use client"
 
 import type { IExamMethods } from "@models/typings/Exam"
+import { useMediaQuery } from "@mantine/hooks"
 import { ScatterChart } from "@mantine/charts"
 import { max } from "lodash"
+import tailwindConfig from "@root/tailwind.config"
 
 interface GradesScatterChartProps {
 	requiredQuestions: {
@@ -14,6 +16,8 @@ interface GradesScatterChartProps {
 }
 
 export default function GradesScatterChart({ requiredQuestions, questionCorrectPercentage }: GradesScatterChartProps){
+	const isMobile = useMediaQuery(`not all and (min-width: ${tailwindConfig.theme.screens.xs})`)
+
 	const questionsData = requiredQuestions.map(question => {
 		const { correctAnswers, totalAnswers } = questionCorrectPercentage[question.id] || {}
 
@@ -62,7 +66,7 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 			valueFormatter={{
 				x: (value) => `Questão ${value}`
 			}}
-			withTooltip
+			withTooltip={!isMobile}
 			withLegend
 		/>
 	)

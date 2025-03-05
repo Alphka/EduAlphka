@@ -165,7 +165,7 @@ export default function CandidatesTable({ examId, data, disallowedCandidates }: 
 					disabled={!data.length}
 				/>
 
-				<Table.ScrollContainer minWidth={300}>
+				<Table.ScrollContainer minWidth={400}>
 					<Table
 						className="bg-dark-600 rounded"
 						horizontalSpacing={isMobile ? "sm" : "md"}
