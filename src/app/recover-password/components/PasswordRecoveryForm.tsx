@@ -86,11 +86,11 @@ export default function PasswordRecoveryForm(){
 
 			<header className="flex flex-col gap-xs">
 				<h1 className="text-6xl font-extrabold">
-					Recuperação de senha
+					Recuperação de conta
 				</h1>
 				<h2 className="text-gray-500 text-3xl font-medium leading-relaxed tracking-tight" aria-live="polite">
 					{step === "email"
-						? "Informe seu e-mail para iniciar o processo de recuperação de senha."
+						? "Informe seu e-mail para iniciar o processo de recuperação de conta."
 						: <>
 							Informe o código enviado para o seu e-mail para recuperar o acesso à sua conta.
 							<br />

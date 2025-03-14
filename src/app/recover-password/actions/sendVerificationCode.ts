@@ -46,9 +46,9 @@ export default async function sendVerificationCode(email: string){
 
 			await sendEmail({
 				to: email,
-				subject: "Recuperação de senha",
-				text: `Olá, ${user.name}.\n\nO código de verificação para recuperação de senha é ${verificationCode.code}`,
-				html: `Olá, ${user.name}.<br><br>O código de verificação para recuperação de senha é <b>${verificationCode.code}</b>`
+				subject: "Recuperação de conta",
+				text: `Olá, ${user.name}.\n\nO código de verificação para recuperação de conta é ${verificationCode.code}`,
+				html: `Olá, ${user.name}.<br><br>O código de verificação para recuperação de conta é <b>${verificationCode.code}</b>`
 			})
 
 			await verificationCode.save()

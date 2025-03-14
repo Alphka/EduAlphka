@@ -3,7 +3,7 @@ import PasswordRecoveryForm from "./components/PasswordRecoveryForm"
 import routes from "@app/routes"
 
 const title = routes.recoverPassword.title
-const description = "Formuário para recuperação de senha"
+const description = "Formuário para recuperação de conta"
 
 export const metadata: Metadata = {
 	title,

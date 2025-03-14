@@ -205,7 +205,7 @@ export default async function ExamCard({ exam, userId }: ExamCardProps){
 									<FaAsterisk className="text-sm" />
 
 									<p className="text-xs font-medium leading-none">
-										{exam.questions.length}
+										{requiredQuestions.length}
 									</p>
 								</div>
 							</Tooltip>
