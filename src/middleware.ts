@@ -33,6 +33,6 @@ export default function middleware(request: NextRequest){
 
 export const config = {
 	matcher: [
-		"/((?!_logs|_src|_next/(?:static|image)|api|server|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout|invite|not-found|access-denied).*)"
+		"/((?!_logs|_src|_next/(?:static|image)|api|server|_vercel/(?:speed-)?insights/*|(?:apple-)?icon[\\w.-]?(?:\\?\\w+)?|favicon.ico|robots.txt|logout|not-found|access-denied).*)"
 	]
 }
