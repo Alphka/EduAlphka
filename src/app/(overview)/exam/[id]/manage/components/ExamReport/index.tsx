@@ -49,10 +49,10 @@ export default async function ExamReport({ exam }: ExamReportProps){
 
 		if(!correctPercentage) continue
 
-		const { correctAnswers, totalAnswers } = correctPercentage
+		const { correctAnswers, incorrectAnswers } = correctPercentage
 
 		totalCorrectAnswers += correctAnswers
-		totalIncorrectAnswers += totalAnswers - correctAnswers
+		totalIncorrectAnswers += incorrectAnswers
 	}
 
 	return (

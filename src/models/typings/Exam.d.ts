@@ -78,6 +78,7 @@ export interface IExamMethods {
 	getAverageCompletionTime(): Promise<number>
 	getQuestionCorrectPercentage: () => Promise<Record<string, {
 		correctPercentage: number
+		incorrectAnswers: number
 		correctAnswers: number
 		totalAnswers: number
 	}>>

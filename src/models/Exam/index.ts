@@ -304,9 +304,10 @@ examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorr
 	}
 
 	const result = await Answer.aggregate<{
-		questionId: Types.ObjectId,
-		totalAnswers: number,
-		correctAnswers: number,
+		questionId: Types.ObjectId
+		totalAnswers: number
+		correctAnswers: number
+		incorrectAnswers: number
 		correctPercentage: number
 	}>([
 		{
@@ -328,6 +329,11 @@ examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorr
 					$sum: {
 						$cond: ["$isCorrect", 1, 0]
 					}
+				},
+				incorrectAnswers: {
+					$sum: {
+						$cond: [{ $eq: ["$isCorrect", false] }, 1, 0]
+					}
 				}
 			}
 		},
@@ -337,6 +343,7 @@ examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorr
 				questionId: "$_id",
 				totalAnswers: "$totalAnswers",
 				correctAnswers: "$correctAnswers",
+				incorrectAnswers: "$incorrectAnswers",
 				correctPercentage: {
 					$multiply: [
 						{ $divide: ["$correctAnswers", "$totalAnswers"] },
@@ -347,9 +354,9 @@ examSchema.method("getQuestionCorrectPercentage", async function getQuestionCorr
 		}
 	])
 
-	return Object.fromEntries(result.map(({ questionId, totalAnswers, correctAnswers, correctPercentage }) => [
+	return Object.fromEntries(result.map(({ questionId, ...data }) => [
 		questionId.toString(),
-		{ correctPercentage, correctAnswers, totalAnswers }
+		data
 	]))
 })
 

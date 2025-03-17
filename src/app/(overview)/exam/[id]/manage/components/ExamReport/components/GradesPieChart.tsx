@@ -16,14 +16,15 @@ export default function GradesPieChart({ totalCorrectAnswers, totalIncorrectAnsw
 	return (
 		<div className="h-full flex flex-col items-center justify-center gap-md">
 			<PieChart
+				className="w-full"
 				size={isMobile ? 80 : 164}
 				data={[
 					{ name: "Erros", value: totalIncorrectAnswers, color: "red.6" },
 					{ name: "Acertos", value: totalCorrectAnswers, color: "blue.6" }
 				]}
-				strokeWidth={2}
+				strokeWidth={1}
 				withTooltip
-				tooltipDataSource="segment"
+				tooltipDataSource="all"
 				withLabels
 				withLabelsLine
 				labelsType="percent"

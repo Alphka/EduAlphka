@@ -19,12 +19,12 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 	const isMobile = useMediaQuery(`not all and (min-width: ${tailwindConfig.theme.screens.xs})`)
 
 	const questionsData = requiredQuestions.map(question => {
-		const { correctAnswers, totalAnswers } = questionCorrectPercentage[question.id] || {}
+		const { correctAnswers, incorrectAnswers } = questionCorrectPercentage[question.id] || {}
 
 		return {
 			number: question.number,
-			correctAnswers: correctAnswers ?? 0,
-			incorrectAnswers: totalAnswers ?? 0 - correctAnswers ?? 0
+			correctAnswers: correctAnswers || undefined,
+			incorrectAnswers: incorrectAnswers || undefined
 		}
 	})
 
@@ -40,7 +40,7 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 					name: "Acertos",
 					data: questionsData.map(({ number, correctAnswers }) => ({
 						number,
-						answers: correctAnswers
+						answers: correctAnswers as unknown as number
 					}))
 				},
 				{
@@ -48,7 +48,7 @@ export default function GradesScatterChart({ requiredQuestions, questionCorrectP
 					name: "Erros",
 					data: questionsData.map(({ number, incorrectAnswers }) => ({
 						number,
-						answers: incorrectAnswers
+						answers: incorrectAnswers  as unknown as number
 					}))
 				}
 			]}
