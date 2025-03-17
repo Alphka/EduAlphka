@@ -53,7 +53,7 @@ export default async function deleteUser(){
 						})
 					])
 				}),
-				VerificationCode.deleteMany({ owner: user })
+				Notification.deleteMany({ owner: user })
 			] : [
 				Exam.updateMany({ disallowedCandidates: user }, {
 					$pull: {
