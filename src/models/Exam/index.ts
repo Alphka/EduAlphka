@@ -1,7 +1,7 @@
 import type { IExam, ExamModel, IExamMethods, StartedExamWithSubmit, ExamQuestion } from "../typings/Exam"
 import { ExamFormValidation, GenericFormValidation } from "@constants/forms"
-import { QuestionSchema, QuestionTypes } from "./Question"
 import { model, models, Schema, Types } from "mongoose"
+import { QuestionSchema } from "./Question"
 
 const examSchema = new Schema<IExam, ExamModel, IExamMethods>({
 	owner: {
@@ -120,9 +120,9 @@ examSchema.method("getSubmitData", async function getSubmitData(candidates: (Typ
 	const results = startedExamResult.map(async submitData => {
 		if(!submitData) return null
 
-		const requiredQuestions = exam.questions.filter(question => question.isRequired).map(question => question.id as string)
+		const requiredQuestions = new Set(exam.questions.filter(question => question.isRequired).map(question => question.id as string))
 		const pendingCorrection = !submitData.submit?.publishedAt &&
-			!!submitData.submit?.answers.some(answer => answer.type === "dissertative" && requiredQuestions.includes(answer.question.toString()))
+			!!submitData.submit?.answers.some(answer => answer.type === "dissertative" && requiredQuestions.has(answer.question.toString()))
 
 		let pendingAnswers = 0
 		let grade: number | null = 0
@@ -424,4 +424,4 @@ examSchema.method("getAverageCompletionTime", async function getAverageCompletio
 const Exam = models?.Exam as ExamModel || model<IExam, ExamModel>("Exam", examSchema)
 
 export default Exam
-export { QuestionTypes }
+export { QuestionTypes } from "./Question"

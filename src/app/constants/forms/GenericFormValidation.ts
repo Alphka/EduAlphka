@@ -20,5 +20,5 @@ export default class GenericFormValidation {
 	static readonly validNamePattern = `^[${this.validNameChars}]+$` as const
 	static readonly validEmailPattern = "^([\\w!#$%&'*+\\/=?^`\\{\\|\\}~\\-]+(?:\\.[\\w!#$%&'*+\\/=?^`\\{\\|\\}~\\-]+)*@(?:[A-Za-z\\d](?:[A-Za-z\\d\\-]*[A-Za-z\\d])?\\.)+[A-Za-z\\d](?:[A-Za-z\\d\\-]*[A-Za-z\\d])?)$"
 	static readonly validUsernamePattern = "^(\\w(?:(?:\\w|(?:\\.(?!\\.))){0,28}(?:\\w))?)"
-	static readonly validPasswordPattern = "^[\\w~\`! @#$%^&*\\(\\)+=\\{\\}\\[\\]\\|\\;:\"<>,.\\/?\\-]+$"
+	static readonly validPasswordPattern = "^[\\w~`! @#$%^&*\\(\\)+=\\{\\}\\[\\]\\|\\;:\"<>,.\\/?\\-]+$"
 }

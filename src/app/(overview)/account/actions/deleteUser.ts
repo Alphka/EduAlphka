@@ -62,12 +62,12 @@ export default async function deleteUser(){
 					}
 				}),
 				Exam.distinct("_id", { candidates: user }).then(async examIds => {
-					const startedExamExists = (await StartedExam.distinct("exam", {
+					const startedExamExists = new Set((await StartedExam.distinct("exam", {
 						exam: { $in: examIds },
 						user: user._id
-					})).map(id => id.toString())
+					})).map(id => id.toString()))
 
-					const examsToUpdate = examIds.filter(id => !startedExamExists.includes(id.toString()))
+					const examsToUpdate = examIds.filter(id => !startedExamExists.has(id.toString()))
 
 					if(examsToUpdate.length){
 						await Exam.updateMany(

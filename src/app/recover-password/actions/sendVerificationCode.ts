@@ -39,7 +39,7 @@ export default async function sendVerificationCode(email: string){
 			expirationDate.setMinutes(expirationDate.getMinutes() + 30)
 
 			const verificationCode = new VerificationCode({
-				code: Math.floor(Math.random() * 10 ** PasswordRecoveryFormValidation.codeLength),
+				code: Math.floor(Math.random() * 10 ** PasswordRecoveryFormValidation.codeLength).toString().padStart(PasswordRecoveryFormValidation.codeLength, "0"),
 				user: user,
 				expiresAt: expirationDate
 			})

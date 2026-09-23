@@ -31,8 +31,15 @@ export type ExamQuestion = (ExamMultipleChoiceQuestion | ExamDissertativeQuestio
 
 export type MixedExamQuestion =
 	& ExamQuestionBase
-	& Omit<ExamMultipleChoiceQuestion, "type">
-	& Omit<ExamDissertativeQuestion, "type">
+	& (Omit<ExamMultipleChoiceQuestion, "type"> & {
+		type: "multiple_choice"
+		options: Types.DocumentArray<IQuestionOption>
+		correctAnswer: Types.ObjectId
+	} | Omit<ExamDissertativeQuestion, "type"> & {
+		type: "dissertative"
+		options?: never
+		correctAnswer?: never
+	})
 
 export interface IExam {
 	_id: Types.ObjectId

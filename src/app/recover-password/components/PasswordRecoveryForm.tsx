@@ -70,9 +70,10 @@ export default function PasswordRecoveryForm(){
 			{step !== "email" && (
 				<Button
 					className="self-start"
-					size="compact-sm"
-					color="white"
-					variant="transparent"
+					size="sm"
+					color="gray"
+					radius="xl"
+					variant="subtle"
 					leftSection={<MdChevronLeft size="1.25rem" />}
 					aria-label="Voltar para o formulário anterior"
 					onClick={event => {
@@ -133,14 +134,14 @@ export default function PasswordRecoveryForm(){
 					) : <>
 						<label>
 							<p className="text-md font-medium mb-xs">
-								Digite o código enviado para o seu e-mail
+								Digite o código enviado para o seu e-mail{}
 								<span className="text-error" aria-hidden> *</span>
 							</p>
 
 							<PinInput
 								gap="md"
 								size="md"
-								type={/^[0-9]*$/}
+								type={/^\d*$/}
 								inputType="number"
 								inputMode="numeric"
 								ariaLabel="Código de verificação"

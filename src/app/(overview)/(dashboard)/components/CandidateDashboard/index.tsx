@@ -8,7 +8,7 @@ export interface CandidateDashboardProps {
 }
 
 export default async function CandidateDashboard({ userId, recentExamsLimit }: CandidateDashboardProps){
-	return <>
+	return (
 		<div className="flex flex-col gap-lg">
 			<header className="flex justify-end flex-wrap-reverse gap-md">
 				<h1 className="flex-grow text-h4 font-bold">
@@ -25,5 +25,5 @@ export default async function CandidateDashboard({ userId, recentExamsLimit }: C
 				/>
 			</Suspense>
 		</div>
-	</>
+	)
 }
