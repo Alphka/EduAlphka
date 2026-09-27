@@ -46,7 +46,8 @@ const nextConfig: NextConfig = {
 		staleTimes: {
 			dynamic: 120,
 			static: 300
-		}
+		},
+		serverComponentsHmrCache: true
 	},
 	sassOptions: {
 		silenceDeprecations: ["legacy-js-api"]

@@ -2,35 +2,31 @@
 	"compilerOptions": {
 		"module": "ESNext",
 		"target": "ES2021",
-		"moduleResolution": "Bundler",
-		"strict": true,
-		"checkJs": true,
 		"allowJs": true,
-		"noImplicitAny": true,
-		"strictNullChecks": true,
-		"resolveJsonModule": true,
-		"noUnusedParameters": true,
-		"allowUnusedLabels": false,
-		"forceConsistentCasingInFileNames": true,
-		"allowSyntheticDefaultImports": true,
-		"esModuleInterop": true,
-		"isolatedModules": true,
-		"noUnusedLocals": true,
-		"skipLibCheck": false,
-		"incremental": true,
-		"sourceMap": true,
+		"checkJs": true,
+		"strict": true,
 		"jsx": "preserve",
-		"plugins": [
-			{ "name": "next" }
-		],
+		"moduleResolution": "Bundler",
+		"isolatedModules": true,
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"forceConsistentCasingInFileNames": true,
+		"allowArbitraryExtensions": true,
+		"resolveJsonModule": true,
+		"skipLibCheck": true,
+		"incremental": true,
+		"types": ["node"],
 		"lib": [
 			"DOM",
 			"DOM.Iterable",
 			"ESNext"
 		],
+		"plugins": [
+			{ "name": "next" }
+		],
 		"typeRoots": [
 			"node_modules/@types",
-			"./src/typings"
+			"src/typings"
 		],
 		"paths": {
 			"@components/*": ["./src/app/components/*"],
@@ -53,14 +49,18 @@
 		"noEmit": true
 	},
 	"include": [
-		"next-env.d.ts",
 		"**/*.ts",
 		"**/*.tsx",
-		"next.config.ts",
-		".next/types/**/*.ts"
+		"**/*.js",
+		"**/*.jsx",
+		"**/*.mjs",
+		"next-env.d.ts",
+		".next/types/**/*.ts",
+    	".next/dev/types/**/*.ts"
 	],
 	"exclude": [
-		"node_modules"
+		"node_modules",
+		".next"
 	],
 	"typeAcquisition": {
 		"enable": true
