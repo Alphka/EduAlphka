@@ -131,11 +131,11 @@ flowchart TD
 
 ### Authentication & Session Security
 - On login or registration, the server issues a 96-character hexadecimal token (`crypto.randomBytes(48)`) and persists it in a `Session` document together with the user agent and an expiration date one month out.
-- The token is set as a cookie and also accepted as a `Bearer` header; the middleware validates its shape with a strict regular expression (`^[a-fA-F0-9]{96}$`) before forwarding it to the rest of the app.
+- The token is set as a cookie and also accepted as a `Bearer` header; the middleware validates its shape with a strict regular expression requiring exactly 96 hexadecimal characters (`^[a-fA-F0-9]{96}$`) before forwarding it to the rest of the app.
 - Passwords are never stored in plain text. They are hashed with **HMAC-SHA512**, keyed by a server-only salt:
 
 $$
-\text{passwordHash} = \text{HMAC\_SHA512}(\text{password},\ \text{HASH\_SALT})
+\text{passwordHash} = \text{HMAC-SHA512}(\text{password},\ \text{salt})
 $$
 
 - Every response carries hardened headers set in the middleware and `next.config.ts`: `Referrer-Policy: origin-when-cross-origin`, `X-Frame-Options: DENY`, `X-XSS-Protection`, and `X-Content-Type-Options: nosniff`.
@@ -180,7 +180,7 @@ $$
 **Average completion time**, derived from the gap between starting and submitting an exam:
 
 $$
-\overline{t} = \operatorname{avg}\left(\text{submit.createdAt} - \text{startedExam.createdAt}\right)
+\overline{t} = \text{avg}\left(\text{submit.createdAt} - \text{startedExam.createdAt}\right)
 $$
 
 ### Invite-Based Access Control

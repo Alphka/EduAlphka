@@ -131,11 +131,11 @@ flowchart TD
 
 ### Autenticação e Segurança de Sessão
 - No login ou registro, o servidor gera um token hexadecimal de 96 caracteres (`crypto.randomBytes(48)`) e o armazena em um documento `Session`, junto com o user agent e uma data de expiração de um mês.
-- O token é definido como cookie e também aceito no cabeçalho `Bearer`; o middleware valida seu formato com uma expressão regular estrita (`^[a-fA-F0-9]{96}$`) antes de repassá-lo ao restante da aplicação.
+- O token é definido como cookie e também aceito no cabeçalho `Bearer`; o middleware valida seu formato com uma expressão regular estrita que exige exatamente 96 caracteres hexadecimais (`^[a-fA-F0-9]{96}$`) antes de repassá-lo ao restante da aplicação.
 - As senhas nunca são armazenadas em texto puro. Elas são "hasheadas" com **HMAC-SHA512**, usando um salt mantido apenas no servidor:
 
 $$
-\text{passwordHash} = \text{HMAC\_SHA512}(\text{password},\ \text{HASH\_SALT})
+\text{passwordHash} = \text{HMAC-SHA512}(\text{password},\ \text{salt})
 $$
 
 - Toda resposta carrega cabeçalhos de segurança definidos no middleware e no `next.config.ts`: `Referrer-Policy: origin-when-cross-origin`, `X-Frame-Options: DENY`, `X-XSS-Protection` e `X-Content-Type-Options: nosniff`.
@@ -180,7 +180,7 @@ $$
 **Tempo médio de conclusão**, calculado a partir da diferença entre o início e o envio do teste:
 
 $$
-\overline{t} = \operatorname{média}\left(\text{submit.createdAt} - \text{startedExam.createdAt}\right)
+\overline{t} = \text{média}\left(\text{submit.createdAt} - \text{startedExam.createdAt}\right)
 $$
 
 ### Controle de Acesso por Convite
