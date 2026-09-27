@@ -1,5 +1,9 @@
 {
 	"reject": [
+		"@mantine/charts",
+		"@mantine/core",
+		"@mantine/dates",
+		"@mantine/hooks",
 		"postcss-load-config",
 		"react-toastify",
 		"tailwind-merge",

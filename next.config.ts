@@ -4,7 +4,6 @@ import routes from "@app/routes"
 const nextConfig: NextConfig = {
 	productionBrowserSourceMaps: true,
 	reactStrictMode: false,
-	poweredByHeader: false,
 	logging: {
 		fetches: {
 			fullUrl: true,
@@ -39,7 +38,9 @@ const nextConfig: NextConfig = {
 	},
 	experimental: {
 		optimizePackageImports: [
+			"@mantine/charts",
 			"@mantine/core",
+			"@mantine/dates",
 			"@mantine/hooks"
 		],
 		staleTimes: {
