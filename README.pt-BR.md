@@ -370,7 +370,7 @@ diagram/                    # Diagramas conceitual, entidade-relacionamento e de
 ## Como Executar o Projeto
 
 ### Pré-requisitos
-- **Node.js** `^18.18 || ^19.8 || ^20.3 || >=21`
+- **Node.js** `>=20.19`
 - **[pnpm](https://pnpm.io/)** ou `npm`
 - Uma instância do **MongoDB**: um cluster [Atlas](https://www.mongodb.com/atlas) ou um servidor local (`>= 6.0`)
 - Uma **conta do Gmail com uma Senha de App**, usada para enviar e-mails de recuperação de senha

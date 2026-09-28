@@ -370,7 +370,7 @@ diagram/                    # Conceptual, entity-relationship, and class diagram
 ## Getting Started
 
 ### Prerequisites
-- **Node.js** `^18.18 || ^19.8 || ^20.3 || >=21`
+- **Node.js** `>=20.19`
 - **[pnpm](https://pnpm.io/)** or `npm`
 - A **MongoDB** instance: an [Atlas](https://www.mongodb.com/atlas) cluster or a local server (`>= 6.0`)
 - A **Gmail account with an App Password**, used to send password-recovery e-mails
